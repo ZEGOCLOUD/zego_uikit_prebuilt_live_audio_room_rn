@@ -1,0 +1,167 @@
+import React from 'react';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableWithoutFeedback,
+} from 'react-native';
+import ZegoUIKit, { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
+import { ZegoLiveAudioRoomRole } from './index';
+
+export default function ZegoSeatingArea(props) {
+  const {
+    // rowConfigs,
+    rowSpacing,
+    foregroundBuilder,
+    // seatIndex,
+    roomProperties,
+    onSeatItemClick,
+    backgroundColor,
+    backgroundImage,
+    seatingAreaData,
+  } = props;
+  const flexStyle = [
+    'space-around',
+    'flex-start',
+    'flex-end',
+    'center',
+    'space-between',
+    'space-evenly',
+  ];
+  const memberList = ZegoUIKit.getAllUsers();
+  // console.log('===memberList', memberList, seatIndex, roomProperties);
+
+  const updateLayout = () => {
+    // layoutavailableSeatList.forEach((seatInfo) => {
+    //   console.log('===update', roomProperties.contains(seatInfo.userID));
+    //   if (!roomProperties.contains(seatInfo.userID)) {
+    //     setLayoutSeatToEmptySeatView(seatInfo.index);
+    //   }
+    // });
+    // // 对比一下 roomProperties 中哪些坐席目前是空的，是则创建AudioVideoView
+    // roomProperties.forEach(({ key, value }) => {
+    //   var index = key.toNumber();
+    //   if (!layoutavailableSeatList.contains(index)) {
+    //     setLayoutSeatToAudioVideoView(value, index);
+    //   }
+    // });
+  };
+
+  const onPress = (index) => {
+    onSeatItemClick(index);
+  };
+  const renderItem = (row, foregroundBuilder) => {
+    const rowArr = [];
+    row.forEach((value) => {
+      rowArr.push(value);
+    });
+    console.log('===rowarr', rowArr);
+    return rowArr.map((item, index) => (
+      <TouchableWithoutFeedback
+        key={index}
+        style={styles.touch}
+        onPress={() => {
+          onPress(item.seatIndex);
+        }}
+      >
+        <View
+          style={[
+            styles.item,
+            {
+              marginHorizontal:
+                item.alignment === 'center' ||
+                item.alignment === 'start' ||
+                item.alignment === 'end'
+                  ? item.seatSpacing
+                  : 0,
+            },
+          ]}
+        >
+          <View
+            style={[styles.defaultSeat, { backgroundColor: backgroundColor }]}
+          >
+            {item.userID ? (
+              <ZegoAudioVideoView
+                userID={item.userID}
+                foregroundBuilder={
+                  foregroundBuilder
+                    ? foregroundBuilder
+                    : ({ userInfo }) => <View />
+                }
+                useVideoViewAspectFill={true}
+                showSoundWave={true}
+                audioViewBackgroudColor={backgroundColor}
+                avatarSize={{ width: 54, height: 54 }}
+              />
+            ) : (
+              <Image
+                style={styles.icon}
+                source={require('./resources/seating-area-default-icon.png')}
+              ></Image>
+            )}
+            {item.role ? null : (
+              <Image
+                style={styles.hostIcon}
+                source={require('./resources/host-icon.png')}
+              />
+            )}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    ));
+  };
+
+  return (
+    <View style={styles.container}>
+      {seatingAreaData.map((row, index) => (
+        <View
+          key={index}
+          style={[
+            styles.row,
+            {
+              marginVertical: rowSpacing ? rowSpacing : 0,
+              justifyContent: flexStyle[row.alignment],
+            },
+          ]}
+        >
+          {renderItem(row.seatList, foregroundBuilder)}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  row: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
+  },
+  item: {
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // marginVertical: 18,
+    // marginHorizontal: 16,
+    width: 84,
+    height: 84,
+  },
+  defaultSeat: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 84,
+    height: 84,
+  },
+  icon: {
+    width: 54,
+    height: 54,
+  },
+  hostIcon: {
+    position: 'absolute',
+    bottom: 15,
+    width: 47,
+    height: 12,
+  },
+});
