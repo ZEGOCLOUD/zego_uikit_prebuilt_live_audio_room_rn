@@ -4,7 +4,7 @@ import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   SPEAKER_DEFAULT_CONFIG,
   ZegoLiveAudioRoomLayoutAlignment,
-} from '@zegocloud/zego-uikit-prebuilt-live-audio-room';
+} from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
 export default function HostPage(props) {
   const {route} = props;
   const {params} = route;

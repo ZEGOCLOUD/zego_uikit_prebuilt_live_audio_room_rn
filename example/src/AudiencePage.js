@@ -4,7 +4,7 @@ import {StyleSheet, View, Image, Text} from 'react-native';
 import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   AUDIENCE_DEFAULT_CONFIG,
-} from '@zegocloud/zego-uikit-prebuilt-live-audio-room';
+} from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
 import ZegoUIKitSignalingPlugin from './plugin/index';
 
 export default function AudiencePage(props) {
