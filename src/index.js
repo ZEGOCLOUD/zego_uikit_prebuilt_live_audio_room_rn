@@ -120,7 +120,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
 
   const [isInit, setIsInit] = useState(false);
   const [seatingAreaData, setSeatingAreaData] = useState([]); // 坐席区渲染数组
-  // const [hostID, setHostID] = useState('');
+  const [hostID, setHostID] = useState('');
   const memberList = ZegoUIKit.getAllUsers(); // 判断host（还未做）
 
   const callbackID =
