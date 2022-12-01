@@ -1,38 +1,54 @@
 const path = require('path');
 const escape = require('escape-string-regexp');
-const { getDefaultConfig } = require('@expo/metro-config');
 const exclusionList = require('metro-config/src/defaults/exclusionList');
-const pak = require('../package.json');
+const uikitPak = require('../../../package.json');
+const prebuiltPak = require('../package.json');
 
-const root = path.resolve(__dirname, '..');
+const prebuiltRoot = path.resolve(__dirname, '..');
+const uikitRoot = path.resolve(__dirname, '../../..');
 
-const modules = Object.keys({
-  ...pak.peerDependencies,
+const uikitModules = Object.keys({
+  ...uikitPak.peerDependencies,
 });
 
-const defaultConfig = getDefaultConfig(__dirname);
+const prebuiltModules = Object.keys({
+  ...prebuiltPak.peerDependencies,
+});
 
 module.exports = {
-  ...defaultConfig,
-
   projectRoot: __dirname,
-  watchFolders: [root],
+  watchFolders: [prebuiltRoot, uikitRoot],
 
   // We need to make sure that only one version is loaded for peerDependencies
   // So we block them at the root, and alias them to the versions in example's node_modules
   resolver: {
-    ...defaultConfig.resolver,
+    blacklistRE: exclusionList([
+      ...uikitModules.map(
+        m =>
+          new RegExp(
+            `^${escape(path.join(uikitRoot, 'node_modules', m))}\\/.*$`,
+          ),
+      ),
+      ...prebuiltModules.map(
+        m =>
+          new RegExp(
+            `^${escape(path.join(prebuiltRoot, 'node_modules', m))}\\/.*$`,
+          ),
+      ),
+    ]),
 
-    blacklistRE: exclusionList(
-      modules.map(
-        (m) =>
-          new RegExp(`^${escape(path.join(root, 'node_modules', m))}\\/.*$`)
-      )
-    ),
-
-    extraNodeModules: modules.reduce((acc, name) => {
+    extraNodeModules: uikitModules.reduce((acc, name) => {
       acc[name] = path.join(__dirname, 'node_modules', name);
       return acc;
     }, {}),
+  },
+
+  transformer: {
+    getTransformOptions: async () => ({
+      transform: {
+        experimentalImportSupport: false,
+        inlineRequires: true,
+      },
+    }),
   },
 };
