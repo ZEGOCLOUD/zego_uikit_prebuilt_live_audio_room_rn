@@ -397,9 +397,9 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       }
       rowObj.seatList = rowSeatObj;
       arr.push(rowObj);
-      setSeatingAreaData(arr);
-      console.log('===arr', arr, seatingAreaData);
     });
+    setSeatingAreaData(arr);
+    console.log('===arr', arr, seatingAreaData);
   };
   // replace BottomMenuBarButtons
   const replaceBottomMenuBarButtons = (buttons) => {
@@ -483,9 +483,14 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               false
             );
             ZegoUIKit.getSignalingPlugin().updateRoomProperty(index, userID);
-            ZegoUIKit.getSignalingPlugin().deleteRoomProperties([
-              oldIndex.toString(),
-            ]);
+            ZegoUIKit.getSignalingPlugin()
+              .deleteRoomProperties([oldIndex.toString()])
+              .then((data) => {
+                console.log('===delete room properties success', data);
+              })
+              .catch((err) => {
+                console.log('===delete room properties err', err);
+              });
             ZegoUIKit.getSignalingPlugin()
               .endRoomPropertiesBatchOperation()
               .then((data) => {
