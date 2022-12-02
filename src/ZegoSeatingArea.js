@@ -5,19 +5,14 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
 } from 'react-native';
-import ZegoUIKit, { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
-import { ZegoLiveAudioRoomRole } from './index';
+import { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
 
 export default function ZegoSeatingArea(props) {
   const {
-    // rowConfigs,
     rowSpacing,
     foregroundBuilder,
-    // seatIndex,
-    roomProperties,
     onSeatItemClick,
     backgroundColor,
-    backgroundImage,
     seatingAreaData,
   } = props;
   const flexStyle = [
@@ -28,24 +23,6 @@ export default function ZegoSeatingArea(props) {
     'space-between',
     'space-evenly',
   ];
-  const memberList = ZegoUIKit.getAllUsers();
-  // console.log('===memberList', memberList, seatIndex, roomProperties);
-
-  const updateLayout = () => {
-    // layoutavailableSeatList.forEach((seatInfo) => {
-    //   console.log('===update', roomProperties.contains(seatInfo.userID));
-    //   if (!roomProperties.contains(seatInfo.userID)) {
-    //     setLayoutSeatToEmptySeatView(seatInfo.index);
-    //   }
-    // });
-    // // 对比一下 roomProperties 中哪些坐席目前是空的，是则创建AudioVideoView
-    // roomProperties.forEach(({ key, value }) => {
-    //   var index = key.toNumber();
-    //   if (!layoutavailableSeatList.contains(index)) {
-    //     setLayoutSeatToAudioVideoView(value, index);
-    //   }
-    // });
-  };
 
   const onPress = (index) => {
     onSeatItemClick(index);
@@ -55,7 +32,6 @@ export default function ZegoSeatingArea(props) {
     row.forEach((value) => {
       rowArr.push(value);
     });
-    console.log('===rowarr', rowArr);
     return rowArr.map((item, index) => (
       <TouchableWithoutFeedback
         key={index}
@@ -141,10 +117,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   item: {
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    // marginVertical: 18,
-    // marginHorizontal: 16,
     width: 84,
     height: 84,
   },
