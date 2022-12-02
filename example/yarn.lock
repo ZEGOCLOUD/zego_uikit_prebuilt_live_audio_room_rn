@@ -7068,7 +7068,7 @@ yargs@^15.1.0, yargs@^15.3.1, yargs@^15.4.1:
 
 zego-express-engine-reactnative@^3.0.3:
   version "3.0.3"
-  resolved "https://registry.npmmirror.com/zego-express-engine-reactnative/-/zego-express-engine-reactnative-3.0.3.tgz#b47356c995c359053ed67c3b0e78ebd2017d977d"
+  resolved "https://registry.yarnpkg.com/zego-express-engine-reactnative/-/zego-express-engine-reactnative-3.0.3.tgz#b47356c995c359053ed67c3b0e78ebd2017d977d"
   integrity sha512-f0b34kqFox9xaLQ1u0GMgKBQqseICRhFuQoW16jkHMMJ65CtfelYbI9NoEdy0JFcsyLoI2PkzHoJqfnS2P/E4g==
 
 zego-zim-react-native@^2.4.0:

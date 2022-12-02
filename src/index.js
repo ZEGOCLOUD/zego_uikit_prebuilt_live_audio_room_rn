@@ -587,10 +587,11 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           backgroundColor={backgroundColor}
           backgroundImage={backgroundImage}
           seatingAreaData={seatingAreaData}
-        ></ZegoSeatingArea>
+        />
       </View>
       {isCallMemberListVisable ? (
         <ZegoLiveAudioRoomMemberList
+          seatingAreaData={seatingAreaData}
           showMicrophoneState={showMicrophoneState}
           itemBuilder={itemBuilder}
           onCloseCallMemberList={onCloseCallMemberList}

@@ -1,19 +1,74 @@
 import React from 'react';
 import ZegoUIKit, { ZegoMemberList } from '@zegocloud/zego-uikit-rn';
 import { StyleSheet, View, Text } from 'react-native';
+import { ZegoLiveAudioRoomRole } from './define';
 
 export default function ZegoLiveAudioRoomMemberList(props) {
-  const { showMicrophoneState, itemBuilder, onCloseCallMemberList } = props;
+  const {
+    showMicrophoneState,
+    itemBuilder,
+    onCloseCallMemberList,
+    seatingAreaData,
+  } = props;
   const memberList = ZegoUIKit.getAllUsers();
   console.log('===ZegoLiveAudioRoomMemberList memberList', memberList);
+
+  const sortUserList = (userList) => {
+    // Sort by seatingAreaData
+    // [{ "seatList": Map { 0 => { "seatIndex": 0, "role": 2, "userID": "xxxx" } } }]
+    // you are host: you(host) -> other host -> speaker -> audience
+    // yor are not host: host -> you -> speaker -> audience
+
+    const localUserID = ZegoUIKit.getLocalUserInfo().userID;
+    // Find out the role of everyone
+    const hostArr = [],
+      speakerArr = [],
+      audienceArr = [];
+    seatingAreaData.forEach((element) => {
+      Array.from(element.seatList.values()).forEach((item) => {
+        if (item.userID) {
+          if (item.role === ZegoLiveAudioRoomRole.host) {
+            if (item.userID === localUserID) {
+              hostArr.unshift(item.userID);
+            } else {
+              hostArr.push(item.userID);
+            }
+          } else if (item.role === ZegoLiveAudioRoomRole.speaker) {
+            if (item.userID === localUserID) {
+              speakerArr.unshift(item.userID);
+            } else {
+              speakerArr.push(item.userID);
+            }
+          } else {
+            if (item.userID === localUserID) {
+              audienceArr.unshift(item.userID);
+            } else {
+              audienceArr.push(item.userID);
+            }
+          }
+        }
+      });
+    });
+    const allArr = hostArr.concat(speakerArr, audienceArr);
+    const newUserList = [];
+    allArr.forEach((userID) => {
+      const index = userList.findIndex((user) => user.userID === userID);
+      if (index !== -1) {
+        newUserList.push(userList[index]);
+      }
+    });
+    return newUserList;
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.topLine}></View>
+      <View style={styles.topLine} />
       <View style={styles.header}>
         <Text style={styles.title}>Attendance · {memberList.length}</Text>
       </View>
       <View style={styles.memberListContainer}>
         <ZegoMemberList
+          sortUserList={sortUserList}
           showMicrophoneState={showMicrophoneState}
           itemBuilder={itemBuilder}
         />
