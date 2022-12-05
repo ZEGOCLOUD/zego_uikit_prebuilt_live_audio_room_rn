@@ -12,6 +12,7 @@ export default function HostPage(props) {
   let rowConfigs = [];
   let rowSpacing = 0;
   let seatIndex = -1;
+  let backgroundColor = 'transparent';
   switch (layoutType) {
     case 0:
       rowConfigs = [
@@ -101,17 +102,29 @@ export default function HostPage(props) {
       seatIndex = 4;
       break;
   }
-  const foregroundBuilder = () => {
+  const foregroundBuilder = ({userInfo}) => {
     return (
       <View style={styles.builder}>
         <View style={styles.avatarBox}>
           <Image style={styles.avatar} />
-          <Image
-            style={styles.icon}
-            source={require('./resources/owner-icon.png')}
-          />
+          {userInfo.inRoomAttributes?.role ? (
+            <Image
+              style={styles.hostIcon}
+              source={require('./resources/host-icon.png')}
+            />
+          ) : null}
         </View>
         <Text style={styles.name}>{userName}</Text>
+      </View>
+    );
+  };
+  const background = () => {
+    return (
+      <View style={styles.backgroundView}>
+        <View style={styles.titleBar}>
+          <Text style={styles.title}>A Live Audio Room</Text>
+          <Text style={styles.id}>ID:{roomID}</Text>
+        </View>
       </View>
     );
   };
@@ -130,7 +143,11 @@ export default function HostPage(props) {
             rowSpacing,
           },
           seatIndex,
-          foregroundBuilder,
+          seatConfig: {
+            backgroundColor,
+            foregroundBuilder,
+          },
+          background,
           onLeaveConfirmation: () => {
             props.navigation.navigate('HomePage');
           },
@@ -146,33 +163,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 0,
-  },
-  avView: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    zIndex: 1,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    backgroundColor: 'red',
-  },
-  ctrlBar: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    marginBottom: 50,
-    width: '100%',
-    height: 50,
-    zIndex: 2,
-  },
-  ctrlBtn: {
-    flex: 1,
-    width: 48,
-    height: 48,
-    marginLeft: 37 / 2,
-    position: 'absolute',
   },
   builder: {
     flex: 1,
@@ -201,5 +191,33 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: 47,
     height: 12,
+  },
+  hostIcon: {
+    position: 'absolute',
+    bottom: 0,
+    width: 47,
+    height: 12,
+    zIndex: 2,
+  },
+  backgroundView: {
+    zIndex: -1,
+    width: '100%',
+    height: '100%',
+  },
+  titleBar: {
+    width: '100%',
+    height: 54,
+    position: 'absolute',
+    top: 55,
+    paddingLeft: 18,
+  },
+  title: {
+    fontSize: 16,
+    lineHeight: 33,
+    color: '#1B1B1B',
+  },
+  id: {
+    fontSize: 10,
+    color: '#606060',
   },
 });

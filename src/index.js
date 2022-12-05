@@ -8,6 +8,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import Delegate from 'react-delegate-component';
 import ZegoUIKit, {
   ZegoLeaveButton,
   ZegoInRoomMessageInput,
@@ -105,6 +106,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     layoutConfig = {},
     lockSeatIndexesForHost = [0],
     seatConfig = {},
+    background,
     // extends
     memberListConfig = {},
   } = config;
@@ -156,7 +158,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   const [isInit, setIsInit] = useState(false);
   const [seatingAreaData, setSeatingAreaData] = useState([]); // 坐席区渲染数组
 
-  // const [hostID, setHostID] = useState('');
   const memberList = ZegoUIKit.getAllUsers(); // 判断host（还未做）
 
   const callbackID =
@@ -234,7 +235,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             );
             ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins)
               .then(() => {
-                // setIsInit(true);
+                setIsInit(true);
                 console.log('===init success');
                 pluginJoinRoom(roomID);
               })
@@ -362,6 +363,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   };
   const updateLayout = () => {
     // const roomProperties = ZegoUIKit.getSignalingPlugin().queryRoomProperties();
+    console.log('==getUser', ZegoUIKit.getUser(userID));
     ZegoUIKit.getSignalingPlugin()
       .queryRoomProperties()
       .then((data) => {
@@ -601,13 +603,19 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   function onCloseCallMemberList() {
     setIsCallMemberListVisable(false);
   }
-
+  function MaskViewDefault(props) {
+    const { userInfo } = props;
+    const { userName = '' } = userInfo;
+    return (
+      <View style={styles.defaultMaskContainer}>
+        <View style={styles.defaultMaskNameLabelContainer}>
+          <Text style={styles.defaultMaskNameLabel}>{userName}</Text>
+        </View>
+      </View>
+    );
+  }
   return (
     <View style={styles.container} onTouchStart={onFullPageTouch}>
-      <View style={styles.titleBar}>
-        <Text style={styles.title}>A Live Audio Room</Text>
-        <Text style={styles.id}>ID:{roomID}</Text>
-      </View>
       <View style={styles.leaveButton}>
         <ZegoLeaveButton
           onLeaveConfirmation={showDefaultLeaveDialog}
@@ -618,33 +626,38 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         />
       </View>
       <View style={styles.seatingArea}>
-        <ZegoSeatingArea
-          role={role}
-          userID={userID}
-          rowSpacing={rowSpacing}
-          foregroundBuilder={foregroundBuilder}
-          seatIndex={role !== ZegoLiveAudioRoomRole.audience ? seatIndex : -1}
-          onSeatItemClick={onSeatItemClick}
-          backgroundColor={backgroundColor}
-          backgroundImage={backgroundImage}
-          seatingAreaData={seatingAreaData}
-        />
+        {isInit ? (
+          <ZegoSeatingArea
+            role={role}
+            userID={userID}
+            rowSpacing={rowSpacing}
+            foregroundBuilder={foregroundBuilder}
+            seatIndex={role !== ZegoLiveAudioRoomRole.audience ? seatIndex : -1}
+            onSeatItemClick={onSeatItemClick}
+            backgroundColor={backgroundColor}
+            backgroundImage={backgroundImage}
+            seatingAreaData={seatingAreaData}
+          />
+        ) : null}
       </View>
       {isCallMemberListVisable ? (
+        // <View >
         <ZegoLiveAudioRoomMemberList
+          style={styles.memberListBox}
           seatingAreaData={seatingAreaData}
           showMicrophoneState={showMicrophoneState}
           itemBuilder={itemBuilder}
           onCloseCallMemberList={onCloseCallMemberList}
         />
       ) : (
+        // </View>
         <View />
       )}
       <View style={styles.messageListView}>
         <ZegoInRoomMessageView style={styles.fillParent} />
       </View>
       <KeyboardAvoidingView
-        style={[styles.fillParent, { zIndex: 9 }]}
+        style={[styles.fillParent, { zIndex: 0 }]}
         behavior={'padding'}
       >
         {Platform.OS != 'ios' && keyboardHeight > 0 ? null : (
@@ -686,11 +699,25 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           </View>
         ) : null}
       </KeyboardAvoidingView>
+      <Delegate
+        style={styles.mask}
+        to={background}
+        default={MaskViewDefault}
+        props={{ userID }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  mask: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    zIndex: 2,
+    backgroundColor: 'red',
+  },
   container: {
     flex: 1,
     position: 'absolute',
@@ -705,22 +732,7 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
-  titleBar: {
-    width: '100%',
-    height: 54,
-    position: 'absolute',
-    top: 55,
-    paddingLeft: 18,
-  },
-  title: {
-    fontSize: 16,
-    lineHeight: 33,
-    color: '#1B1B1B',
-  },
-  id: {
-    fontSize: 10,
-    color: '#606060',
-  },
+
   leaveButton: {
     position: 'absolute',
     top: 65,
@@ -765,6 +777,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 125,
     width: '100%',
-    zIndex: 11,
+    zIndex: 3,
+  },
+  memberListBox: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    zIndex: 12,
   },
 });

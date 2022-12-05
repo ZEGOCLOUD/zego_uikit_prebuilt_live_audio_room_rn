@@ -76,12 +76,6 @@ export default function ZegoSeatingArea(props) {
                 source={require('./resources/seating-area-default-icon.png')}
               ></Image>
             )}
-            {item.role ? null : (
-              <Image
-                style={styles.hostIcon}
-                source={require('./resources/host-icon.png')}
-              />
-            )}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -130,11 +124,5 @@ const styles = StyleSheet.create({
   icon: {
     width: 54,
     height: 54,
-  },
-  hostIcon: {
-    position: 'absolute',
-    bottom: 15,
-    width: 47,
-    height: 12,
   },
 });

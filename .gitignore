@@ -67,3 +67,4 @@ android/keystores/debug.keystore
 lib/
 
 example/src/KeyCenter.js
+example/yarn.lock
