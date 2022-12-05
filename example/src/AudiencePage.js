@@ -4,13 +4,108 @@ import {StyleSheet, View, Image, Text} from 'react-native';
 import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   AUDIENCE_DEFAULT_CONFIG,
+  ZegoLiveAudioRoomLayoutAlignment,
 } from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
 import ZegoUIKitSignalingPlugin from './plugin/index';
 
 export default function AudiencePage(props) {
   const {route} = props;
   const {params} = route;
-  const {userID, userName, roomID} = params;
+  const {userID, userName, roomID, layoutType} = params;
+  let rowConfigs = [];
+  let rowSpacing = 0;
+  let seatIndex = -1;
+  let backgroundColor = 'transparent';
+  switch (layoutType) {
+    case 0:
+      rowConfigs = [
+        {
+          count: 4,
+          seatSpacing: 16,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
+        },
+        {
+          count: 4,
+          seatSpacing: 16,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
+        },
+      ];
+      seatIndex = 0;
+      break;
+    case 1:
+      rowConfigs = [
+        {
+          count: 4,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
+        },
+        {
+          count: 4,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
+        },
+        {
+          count: 4,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
+        },
+        {
+          count: 4,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
+        },
+      ];
+      rowSpacing = 5;
+      seatIndex = 0;
+      break;
+    case 2:
+      rowConfigs = [
+        {
+          count: 1,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.center,
+        },
+        {
+          count: 3,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
+        },
+        {
+          count: 3,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
+        },
+        {
+          count: 2,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceEvenly,
+        },
+      ];
+      rowSpacing = 0;
+      seatIndex = 0;
+      backgroundColor = '#ccc';
+      break;
+    case 3:
+      rowConfigs = [
+        {
+          count: 3,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
+        },
+        {
+          count: 3,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
+        },
+        {
+          count: 3,
+          seatSpacing: 0,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
+        },
+      ];
+      seatIndex = 4;
+      break;
+  }
   const foregroundBuilder = ({userInfo}) => {
     return (
       <View style={styles.builder}>
@@ -31,8 +126,13 @@ export default function AudiencePage(props) {
         roomID={roomID}
         config={{
           ...AUDIENCE_DEFAULT_CONFIG,
+          layoutConfig: {
+            rowConfigs,
+            rowSpacing,
+          },
           seatConfig: {
             foregroundBuilder,
+            backgroundColor,
           },
           onLeaveConfirmation: () => {
             props.navigation.navigate('HomePage');
