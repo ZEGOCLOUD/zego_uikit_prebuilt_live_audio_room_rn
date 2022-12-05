@@ -51,12 +51,14 @@ export default function ZegoLiveAudioRoomMemberList(props) {
     });
     const allArr = hostArr.concat(speakerArr, audienceArr);
     const newUserList = [];
+    console.warn('========allArr==========', allArr);
     allArr.forEach((userID) => {
       const index = userList.findIndex((user) => user.userID === userID);
       if (index !== -1) {
         newUserList.push(userList[index]);
       }
     });
+    console.warn('========newUserList==========', newUserList);
     return newUserList;
   };
 
