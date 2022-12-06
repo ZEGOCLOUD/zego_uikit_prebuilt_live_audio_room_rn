@@ -177,25 +177,25 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       let grantedAudio = PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
       );
-      let grantedCamera = PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.CAMERA
-      );
+      // let grantedCamera = PermissionsAndroid.check(
+      //   PermissionsAndroid.PERMISSIONS.CAMERA
+      // );
       const ungrantedPermissions = [];
       try {
         const isAudioGranted = await grantedAudio;
-        const isVideoGranted = await grantedCamera;
+        // const isVideoGranted = await grantedCamera;
         if (!isAudioGranted) {
           ungrantedPermissions.push(
             PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
           );
         }
-        if (!isVideoGranted) {
-          ungrantedPermissions.push(PermissionsAndroid.PERMISSIONS.CAMERA);
-        }
+        // if (!isVideoGranted) {
+        //   ungrantedPermissions.push(PermissionsAndroid.PERMISSIONS.CAMERA);
+        // }
       } catch (error) {
         ungrantedPermissions.push(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-          PermissionsAndroid.PERMISSIONS.CAMERA
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
+          // PermissionsAndroid.PERMISSIONS.CAMERA
         );
       }
       // If not, request it
@@ -204,6 +204,21 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           console.warn('requestMultiple', data);
           if (callback) {
             callback();
+          }
+          if (data && data['android.permission.RECORD_AUDIO'] === 'denied') {
+            console.log('===拒绝了麦克风权限');
+            showDialog(translationText.microphonePermissionSettingDialogInfo)
+              .then(() => {
+                console.log('===dialog ok');
+                PermissionsAndroid.requestMultiple(ungrantedPermissions).then(
+                  (data) => {
+                    console.log('requestMultiple', data);
+                  }
+                );
+              })
+              .catch(() => {
+                console.log('===dialog cancel');
+              });
           }
         }
       );
