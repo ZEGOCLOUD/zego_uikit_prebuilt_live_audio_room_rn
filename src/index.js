@@ -162,6 +162,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   const [seatingAreaData, setSeatingAreaData] = useState([]); // 坐席区渲染数组
   const [modalVisible, setModalVisible] = useState(false);
   const [clickSeatIndex, setClickSeatIndex] = useState(-1);
+  const [modalText, setModalText] = useState('');
   const callbackID =
     'ZegoUIKitPrebuiltLiveAudioRoom' +
     String(Math.floor(Math.random() * 10000));
@@ -417,35 +418,33 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   };
 
   const onSeatItemClick = (index) => {
-    console.log('===onSeatItemClick', role, index);
+    console.log('===onSeatItemClick', role, index, seatIndex);
+    setClickSeatIndex(index);
     ZegoUIKit.getSignalingPlugin()
       .queryRoomProperties()
       .then(async (data) => {
         if (!data.code) {
           const roomProperties = data._roomAttributes;
+          console.log('===clickSeatObj', roomProperties);
           if (role == ZegoLiveAudioRoomRole.host) {
             // 遍历房间属性的key，先检查麦位是否被占了（是否有房间属性的key与index相同）
             // host 踢 speaker 下麦
             if (roomProperties[index] && roomProperties[index] !== userID) {
-              const dialogInfo =
-                translationText.removeSpeakerFromSeatDialogInfo;
-              if (dialogInfo.message.indexOf('%0') > -1) {
-                dialogInfo.message = dialogInfo.message.replace(
+              let text = translationText.removeSpeakerMenuDialogButton;
+              if (text.indexOf('%0') > -1) {
+                text = text.replace(
                   '%0',
-                  roomProperties[index]
+                  ZegoUIKit.getUser(roomProperties[index]).userName
                 );
               }
-              showDialog(dialogInfo)
-                .then(() => {
-                  console.log('===dialog ok', roomProperties);
-                  leaveSeat(index);
-                })
-                .catch(() => {
-                  console.log('===dialog cancel');
-                });
+              setModalVisible(true);
+              setModalText(text);
             }
           } else {
             // speaker
+            if (index === seatIndex) {
+              return false;
+            }
             // 检查一下席位是否被占据
             let seated = false;
             for (let key in roomProperties) {
@@ -457,21 +456,13 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               console.log('Seat has been taken', index);
               if (roomProperties[index] == userID) {
                 // 自己占据，下麦
-                console.log('===role', config.role);
-                showDialog(translationText.leaveSeatDialogInfo)
-                  .then(() => {
-                    console.log('===dialog ok', roomProperties);
-                    leaveSeat(index);
-                  })
-                  .catch(() => {
-                    console.log('===dialog cancel');
-                  });
+                setModalVisible(true);
+                setModalText(translationText.leaveSeatMenuDialogButton);
               }
             } else {
               // 检查自己是否已有麦位
               const oldIndex = await getSeatIndexByUserID(userID);
               if (oldIndex && oldIndex !== -1) {
-                setClickSeatIndex(index);
                 // 切换麦位
                 ZegoUIKit.getSignalingPlugin().beginRoomPropertiesBatchOperation(
                   true,
@@ -505,9 +496,9 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                   });
               } else {
                 // 上麦
-                setClickSeatIndex(index);
                 console.log('===上麦', clickSeatIndex, index);
                 setModalVisible(true);
+                setModalText(translationText.takeSeatMenuDialogButton);
               }
             }
           }
@@ -515,8 +506,33 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       });
   };
 
-  const takeSeat = () => {
+  const onModalPress = () => {
     setModalVisible(false);
+    if (modalText.indexOf('Take the seat') > -1) {
+      takeSeat();
+    } else if (modalText.indexOf('Remove') > -1) {
+      const dialogInfo = translationText.removeSpeakerFromSeatDialogInfo;
+      if (dialogInfo.message.indexOf('%0') > -1) {
+        dialogInfo.message = dialogInfo.message.replace(
+          '%0',
+          modalText.split(' ')[1]
+        );
+      }
+      showDialog(dialogInfo)
+        .then(() => {
+          leaveSeat(clickSeatIndex);
+        })
+        .catch(() => {});
+    } else if (modalText.indexOf('Leave') > -1) {
+      showDialog(translationText.leaveSeatDialogInfo)
+        .then(() => {
+          leaveSeat(clickSeatIndex);
+        })
+        .catch(() => {});
+    }
+  };
+
+  const takeSeat = () => {
     ZegoUIKit.getSignalingPlugin()
       .updateRoomProperty(clickSeatIndex, userID, true, false, false)
       .then((data) => {
@@ -572,10 +588,10 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         resolve();
       } else {
         const {
-          title = 'Leave the live streaming',
-          message = 'Are you sure to leave the live streaming?',
+          title = 'Leave the room',
+          message = 'Are you sure to leave the room?',
           cancelButtonName = 'Cancel',
-          confirmButtonName = 'Confirm',
+          confirmButtonName = 'OK',
         } = confirmDialogInfo;
         Alert.alert(title, message, [
           {
@@ -709,6 +725,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           </View>
         ) : null}
       </KeyboardAvoidingView>
+      {/* 菜单 */}
       <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <TouchableWithoutFeedback
           onPress={() => {
@@ -718,10 +735,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           <View style={styles.modalMask}></View>
         </TouchableWithoutFeedback>
         <View style={styles.modalView}>
-          <TouchableOpacity onPress={takeSeat}>
-            <Text style={styles.modalText}>
-              {translationText.takeSeatMenuDialogButton}
-            </Text>
+          <TouchableOpacity onPress={onModalPress}>
+            <Text style={styles.modalText}>{modalText}</Text>
           </TouchableOpacity>
         </View>
       </Modal>

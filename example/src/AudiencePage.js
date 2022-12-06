@@ -152,6 +152,7 @@ export default function AudiencePage(props) {
             rowConfigs,
             rowSpacing,
           },
+          seatIndex,
           seatConfig: {
             foregroundBuilder,
             backgroundColor,
