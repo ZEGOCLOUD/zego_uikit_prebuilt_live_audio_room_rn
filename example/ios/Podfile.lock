@@ -366,6 +366,8 @@ PODS:
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
+  - zego-uikit-rn (1.4.0):
+    - React-Core
   - ZegoExpressEngine (3.0.3):
     - ZegoExpressEngine/Video (= 3.0.3)
   - ZegoExpressEngine/Video (3.0.3)
@@ -431,6 +433,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
+  - "zego-uikit-rn (from `../node_modules/@zegocloud/zego-uikit-rn`)"
 
 SPEC REPOS:
   trunk:
@@ -523,6 +526,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
+  zego-uikit-rn:
+    :path: "../node_modules/@zegocloud/zego-uikit-rn"
 
 SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
@@ -575,6 +580,7 @@ SPEC CHECKSUMS:
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: c4d61225a466f250c35c1ee78d2d0b3d41fe661c
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
+  zego-uikit-rn: 7801da8f307996e48b629a73b5cb1c2bfc37865e
   ZegoExpressEngine: 69a011ea12cbe6e7006cab05058ab1489d176d68
   ZIM: dacf435d3a486bb5ef132b6c8848ad3aced4874e
 

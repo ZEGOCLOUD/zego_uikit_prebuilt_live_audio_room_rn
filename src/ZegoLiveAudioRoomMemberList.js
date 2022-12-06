@@ -19,6 +19,7 @@ export default function ZegoLiveAudioRoomMemberList(props) {
     // you are host: you(host) -> other host -> speaker -> audience
     // yor are not host: host -> you -> speaker -> audience
 
+    console.warn('========sortUserList==========', userList);
     const localUserID = ZegoUIKit.getLocalUserInfo().userID;
     // Find out the role of everyone
     const hostArr = [],
@@ -26,6 +27,7 @@ export default function ZegoLiveAudioRoomMemberList(props) {
       audienceArr = [];
     seatingAreaData.forEach((element) => {
       Array.from(element.seatList.values()).forEach((item) => {
+        console.warn('========sortUserList==========', item);
         if (item.userID) {
           if (item.role === ZegoLiveAudioRoomRole.host) {
             if (item.userID === localUserID) {
@@ -51,12 +53,14 @@ export default function ZegoLiveAudioRoomMemberList(props) {
     });
     const allArr = hostArr.concat(speakerArr, audienceArr);
     const newUserList = [];
+    console.warn('========allArr==========', allArr);
     allArr.forEach((userID) => {
       const index = userList.findIndex((user) => user.userID === userID);
       if (index !== -1) {
         newUserList.push(userList[index]);
       }
     });
+    console.warn('========newUserList==========', newUserList);
     return newUserList;
   };
 
