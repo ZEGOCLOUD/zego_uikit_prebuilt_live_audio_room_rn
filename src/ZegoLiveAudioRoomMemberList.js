@@ -22,6 +22,7 @@ export default function ZegoLiveAudioRoomMemberList(props) {
     console.warn('========sortUserList==========', userList);
     const localUserID = ZegoUIKit.getLocalUserInfo().userID;
     // Find out the role of everyone
+    const userIDRoleMap = new Map();
     const hostArr = [],
       speakerArr = [],
       audienceArr = [];
@@ -29,39 +30,42 @@ export default function ZegoLiveAudioRoomMemberList(props) {
       Array.from(element.seatList.values()).forEach((item) => {
         console.warn('========sortUserList==========', item);
         if (item.userID) {
-          if (item.role === ZegoLiveAudioRoomRole.host) {
-            if (item.userID === localUserID) {
-              hostArr.unshift(item.userID);
-            } else {
-              hostArr.push(item.userID);
-            }
-          } else if (item.role === ZegoLiveAudioRoomRole.speaker) {
-            if (item.userID === localUserID) {
-              speakerArr.unshift(item.userID);
-            } else {
-              speakerArr.push(item.userID);
-            }
-          } else {
-            if (item.userID === localUserID) {
-              audienceArr.unshift(item.userID);
-            } else {
-              audienceArr.push(item.userID);
-            }
-          }
+          userIDRoleMap.set(
+            item.userID,
+            item.role || ZegoLiveAudioRoomRole.audience.toString()
+          );
         }
       });
     });
-    const allArr = hostArr.concat(speakerArr, audienceArr);
-    const newUserList = [];
-    console.warn('========allArr==========', allArr);
-    allArr.forEach((userID) => {
-      const index = userList.findIndex((user) => user.userID === userID);
-      if (index !== -1) {
-        newUserList.push(userList[index]);
+    userList.forEach((item) => {
+      if (
+        userIDRoleMap.get(item.userID) === ZegoLiveAudioRoomRole.host.toString()
+      ) {
+        if (item.userID === localUserID) {
+          hostArr.unshift(item);
+        } else {
+          hostArr.push(item);
+        }
+      } else if (
+        userIDRoleMap.get(item.userID) ===
+        ZegoLiveAudioRoomRole.speaker.toString()
+      ) {
+        if (item.userID === localUserID) {
+          speakerArr.unshift(item);
+        } else {
+          speakerArr.push(item);
+        }
+      } else {
+        if (item.userID === localUserID) {
+          audienceArr.unshift(item);
+        } else {
+          audienceArr.push(item);
+        }
       }
     });
-    console.warn('========newUserList==========', newUserList);
-    return newUserList;
+    const allArr = hostArr.concat(speakerArr, audienceArr);
+    console.warn('========sortUserList==========', allArr);
+    return allArr;
   };
 
   return (
