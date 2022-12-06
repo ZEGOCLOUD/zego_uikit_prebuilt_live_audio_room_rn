@@ -7,6 +7,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Modal,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import Delegate from 'react-delegate-component';
 import ZegoUIKit, {
@@ -157,9 +160,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
 
   const [isInit, setIsInit] = useState(false);
   const [seatingAreaData, setSeatingAreaData] = useState([]); // 坐席区渲染数组
-
-  const memberList = ZegoUIKit.getAllUsers(); // 判断host（还未做）
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [clickSeatIndex, setClickSeatIndex] = useState(-1);
   const callbackID =
     'ZegoUIKitPrebuiltLiveAudioRoom' +
     String(Math.floor(Math.random() * 10000));
@@ -362,7 +364,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       });
   };
   const updateLayout = () => {
-    // const roomProperties = ZegoUIKit.getSignalingPlugin().queryRoomProperties();
     console.log('==getUser', ZegoUIKit.getUser(userID));
     ZegoUIKit.getSignalingPlugin()
       .queryRoomProperties()
@@ -394,7 +395,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             }
             rowObj.seatList = rowSeatObj;
             arr.push(rowObj);
-            console.log('===row', rowObj);
           });
           setSeatingAreaData(arr);
         }
@@ -413,7 +413,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             // host 踢 speaker 下麦
             if (roomProperties[index] && roomProperties[index] !== userID) {
               const dialogInfo =
-                ZegoTranslationText.removeSpeakerFromSeatDialogInfo;
+                translationText.removeSpeakerFromSeatDialogInfo;
               if (dialogInfo.message.indexOf('%0') > -1) {
                 dialogInfo.message = dialogInfo.message.replace(
                   '%0',
@@ -443,7 +443,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               if (roomProperties[index] == userID) {
                 // 自己占据，下麦
                 console.log('===role', config.role);
-                showDialog(ZegoTranslationText.leaveSeatDialogInfo)
+                showDialog(translationText.leaveSeatDialogInfo)
                   .then(() => {
                     console.log('===dialog ok', roomProperties);
                     leaveSeat(index);
@@ -455,8 +455,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             } else {
               // 检查自己是否已有麦位
               const oldIndex = await getSeatIndexByUserID(userID);
-              console.log('===oldindex', oldIndex);
               if (oldIndex && oldIndex !== -1) {
+                setClickSeatIndex(index);
                 // 切换麦位
                 ZegoUIKit.getSignalingPlugin().beginRoomPropertiesBatchOperation(
                   true,
@@ -490,21 +490,9 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                   });
               } else {
                 // 上麦
-                console.log('===上麦');
-                ZegoUIKit.getSignalingPlugin()
-                  .updateRoomProperty(index, userID, true, false, false)
-                  .then((data) => {
-                    if (!data.code) {
-                      config.role = ZegoLiveAudioRoomRole.speaker;
-                      replaceBottomMenuBarButtons(speakerButtons);
-                      replaceBottomMenuBarExtendButtons(speakerExtendButtons);
-                      // 打开麦克风
-                      ZegoUIKit.turnMicrophoneOn('', true);
-                    }
-                  })
-                  .catch((err) => {
-                    console.log('===update err', err);
-                  });
+                setClickSeatIndex(index);
+                console.log('===上麦', clickSeatIndex, index);
+                setModalVisible(true);
               }
             }
           }
@@ -512,6 +500,23 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       });
   };
 
+  const takeSeat = () => {
+    setModalVisible(false);
+    ZegoUIKit.getSignalingPlugin()
+      .updateRoomProperty(clickSeatIndex, userID, true, false, false)
+      .then((data) => {
+        if (!data.code) {
+          config.role = ZegoLiveAudioRoomRole.speaker;
+          replaceBottomMenuBarButtons(speakerButtons);
+          replaceBottomMenuBarExtendButtons(speakerExtendButtons);
+          // 打开麦克风
+          ZegoUIKit.turnMicrophoneOn('', true);
+        }
+      })
+      .catch((err) => {
+        console.log('===update err', err);
+      });
+  };
   const leaveSeat = (index) => {
     ZegoUIKit.getSignalingPlugin()
       .deleteRoomProperties([index.toString()], true)
@@ -603,17 +608,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   function onCloseCallMemberList() {
     setIsCallMemberListVisable(false);
   }
-  function MaskViewDefault(props) {
-    const { userInfo } = props;
-    const { userName = '' } = userInfo;
-    return (
-      <View style={styles.defaultMaskContainer}>
-        <View style={styles.defaultMaskNameLabelContainer}>
-          <Text style={styles.defaultMaskNameLabel}>{userName}</Text>
-        </View>
-      </View>
-    );
-  }
+
   return (
     <View style={styles.container} onTouchStart={onFullPageTouch}>
       <View style={styles.leaveButton}>
@@ -699,12 +694,23 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           </View>
         ) : null}
       </KeyboardAvoidingView>
-      <Delegate
-        style={styles.mask}
-        to={background}
-        default={MaskViewDefault}
-        props={{ userID }}
-      />
+      <Modal animationType="fade" transparent={true} visible={modalVisible}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <View style={styles.modalMask}></View>
+        </TouchableWithoutFeedback>
+        <View style={styles.modalView}>
+          <TouchableOpacity onPress={takeSeat}>
+            <Text style={styles.modalText}>
+              {translationText.takeSeatMenuDialogButton}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+      <Delegate style={styles.mask} to={background} props={{ userID }} />
     </View>
   );
 }
@@ -784,5 +790,32 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     zIndex: 12,
+  },
+
+  modalMask: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  modalView: {
+    position: 'absolute',
+    left: '50%',
+    right: '50%',
+    bottom: 30,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    width: 315,
+    height: 49,
+    marginLeft: -157.5,
+    marginRight: -157.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalText: {
+    width: 315,
+    lineHeight: 49,
+    textAlign: 'center',
   },
 });

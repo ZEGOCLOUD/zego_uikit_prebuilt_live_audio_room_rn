@@ -115,6 +115,12 @@ export default function HostPage(props) {
               source={require('./resources/host-icon.png')}
             />
           ) : null}
+          {!userInfo.isMicDeviceOn ? (
+            <Image
+              style={styles.mic}
+              source={require('./resources/close-mic.png')}
+            />
+          ) : null}
         </View>
         <Text style={styles.name}>{userInfo.userName}</Text>
       </View>
@@ -182,19 +188,26 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 54,
   },
+  mic: {
+    position: 'absolute',
+    width: 54,
+    height: 54,
+    zIndex: 2,
+  },
   name: {
     position: 'absolute',
     bottom: 0,
     lineHeight: 14,
     fontSize: 10,
     color: '#000',
+    zIndex: 3,
   },
   hostIcon: {
     position: 'absolute',
     bottom: 0,
     width: 47,
     height: 12,
-    zIndex: 2,
+    zIndex: 3,
   },
   backgroundView: {
     zIndex: -1,
