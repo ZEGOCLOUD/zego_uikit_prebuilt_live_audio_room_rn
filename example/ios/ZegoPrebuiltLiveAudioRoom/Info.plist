@@ -35,8 +35,8 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>We need camera.</string>
+	<!-- <key>NSCameraUsageDescription</key>
+	<string>We need camera.</string> -->
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
