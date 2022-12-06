@@ -4,12 +4,7 @@ import { StyleSheet, View, Text } from 'react-native';
 import { ZegoLiveAudioRoomRole } from './define';
 
 export default function ZegoLiveAudioRoomMemberList(props) {
-  const {
-    showMicrophoneState,
-    itemBuilder,
-    onCloseCallMemberList,
-    seatingAreaData,
-  } = props;
+  const { showMicrophoneState, onCloseCallMemberList, seatingAreaData } = props;
   const memberList = ZegoUIKit.getAllUsers();
   console.log('===ZegoLiveAudioRoomMemberList memberList', memberList);
 
@@ -28,15 +23,16 @@ export default function ZegoLiveAudioRoomMemberList(props) {
       audienceArr = [];
     seatingAreaData.forEach((element) => {
       Array.from(element.seatList.values()).forEach((item) => {
-        console.warn('========sortUserList==========', item);
+        console.log('========sortUserList==========', item);
         if (item.userID) {
           userIDRoleMap.set(
             item.userID,
-            item.role || ZegoLiveAudioRoomRole.audience.toString()
+            item.role.toString() || ZegoLiveAudioRoomRole.audience.toString()
           );
         }
       });
     });
+
     userList.forEach((item) => {
       if (
         userIDRoleMap.get(item.userID) === ZegoLiveAudioRoomRole.host.toString()
@@ -64,8 +60,66 @@ export default function ZegoLiveAudioRoomMemberList(props) {
       }
     });
     const allArr = hostArr.concat(speakerArr, audienceArr);
-    console.warn('========sortUserList==========', allArr);
     return allArr;
+  };
+
+  const roleDescription = (item) => {
+    console.warn('===============roleDescription==============', item);
+    const localUserID = ZegoUIKit.getLocalUserInfo().userID;
+    const showMe = item.userID == localUserID ? 'You' : '';
+    let roleName = '';
+    seatingAreaData.forEach((element) => {
+      Array.from(element.seatList.values()).forEach((seatItem) => {
+        if (seatItem.userID === item.userID) {
+          const roleValue = seatItem.role.toString();
+          if (roleValue) {
+            roleName =
+              roleValue === ZegoLiveAudioRoomRole.host.toString()
+                ? 'Host'
+                : roleValue === ZegoLiveAudioRoomRole.speaker.toString()
+                ? 'Speaker'
+                : '';
+          }
+        }
+      });
+    });
+    if (!showMe && !roleName) {
+      return '';
+    } else {
+      return `(${showMe + (showMe && roleName ? ',' : '') + roleName})`;
+    }
+  };
+
+  const getShotName = (name) => {
+    if (!name) {
+      return '';
+    }
+    const nl = name.split(' ');
+    var shotName = '';
+    nl.forEach((part) => {
+      if (part !== '') {
+        shotName += part.substring(0, 1);
+      }
+    });
+    return shotName;
+  };
+
+  const itemBuilder = ({ userInfo }) => {
+    return (
+      <View style={styles.item}>
+        <View style={styles.itemLeft}>
+          <View style={styles.avatar}>
+            <Text style={styles.nameLabel}>
+              {getShotName(userInfo.userName)}
+            </Text>
+          </View>
+          <Text style={styles.name}>
+            {userInfo.userName + roleDescription(userInfo)}
+          </Text>
+        </View>
+        <View style={styles.itemRight}></View>
+      </View>
+    );
   };
 
   return (
@@ -135,5 +189,43 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 12,
     paddingBottom: 14,
+  },
+
+  item: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingLeft: 18,
+    paddingRight: 17,
+    height: 62,
+  },
+  itemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 36,
+    height: 36,
+    backgroundColor: '#DBDDE3',
+    borderRadius: 1000,
+    marginRight: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nameLabel: {
+    flex: 1,
+    textAlign: 'center',
+    color: '#222222',
+    fontSize: 16,
+  },
+  name: {
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  itemRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

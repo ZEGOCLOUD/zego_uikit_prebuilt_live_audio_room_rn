@@ -110,8 +110,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     lockSeatIndexesForHost = [0],
     seatConfig = {},
     background,
-    // extends
-    memberListConfig = {},
   } = config;
   const {
     showInRoomMessageButton = true,
@@ -148,7 +146,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
 
   let hostID = '';
 
-  const { showMicrophoneState = true, itemBuilder } = memberListConfig;
   const keyboardHeight = useKeyboard();
   const [textInputVisable, setTextInputVisable] = useState(false);
   const [textInput, setTextInput] = useState('');
@@ -671,8 +668,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         <ZegoLiveAudioRoomMemberList
           style={styles.memberListBox}
           seatingAreaData={seatingAreaData}
-          showMicrophoneState={showMicrophoneState}
-          itemBuilder={itemBuilder}
+          showMicrophoneState={true}
           onCloseCallMemberList={onCloseCallMemberList}
         />
       ) : (

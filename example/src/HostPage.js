@@ -136,6 +136,7 @@ export default function HostPage(props) {
       </View>
     );
   };
+
   return (
     <View style={styles.container}>
       <ZegoUIKitPrebuiltLiveAudioRoom
