@@ -12,7 +12,7 @@ export default function HostPage(props) {
   const {userID, userName, roomID, layoutType} = params;
   let rowConfigs = [];
   let rowSpacing = 0;
-  let seatIndex = -1;
+  let takeSeatIndexWhenJoining = -1;
   let backgroundColor = 'transparent';
   switch (layoutType) {
     case 0:
@@ -28,7 +28,7 @@ export default function HostPage(props) {
           alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
         },
       ];
-      seatIndex = 0;
+      takeSeatIndexWhenJoining = 0;
       break;
     case 1:
       rowConfigs = [
@@ -54,7 +54,7 @@ export default function HostPage(props) {
         },
       ];
       rowSpacing = 5;
-      seatIndex = 0;
+      takeSeatIndexWhenJoining = 0;
       break;
     case 2:
       rowConfigs = [
@@ -80,7 +80,7 @@ export default function HostPage(props) {
         },
       ];
       rowSpacing = 0;
-      seatIndex = 0;
+      takeSeatIndexWhenJoining = 0;
       backgroundColor = '#ccc';
       break;
     case 3:
@@ -101,7 +101,7 @@ export default function HostPage(props) {
           alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
         },
       ];
-      seatIndex = 4;
+      takeSeatIndexWhenJoining = 4;
       break;
   }
   const foregroundBuilder = ({userInfo}) => {
@@ -151,7 +151,7 @@ export default function HostPage(props) {
             rowConfigs,
             rowSpacing,
           },
-          seatIndex,
+          takeSeatIndexWhenJoining,
           seatConfig: {
             backgroundColor,
             foregroundBuilder,

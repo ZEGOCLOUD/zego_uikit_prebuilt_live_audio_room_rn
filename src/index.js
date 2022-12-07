@@ -19,20 +19,28 @@ import ZegoUIKit, {
 } from '@zegocloud/zego-uikit-rn';
 import ZegoBottomBar from './ZegoBottomBar';
 import { useKeyboard } from './utils/keyboard';
-import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
 import ZegoSeatingArea from './ZegoSeatingArea';
 import ZegoLiveAudioRoomMemberList from './ZegoLiveAudioRoomMemberList';
 import ZegoPrebuiltPlugins from './utils/plugins';
-
-const ZegoLiveAudioRoomRole = {
-  host: 0,
-  speaker: 1,
-  audience: 2,
-};
+import {
+  ZegoLiveAudioRoomRole,
+  ZegoLiveAudioRoomLayoutAlignment,
+  ZegoLiveAudioRoomLayoutRowConfig,
+  ZegoBottomMenuBarConfig,
+  // ZegoDialogInfo,
+  ZegoTranslationText,
+} from './define';
 
 const HOST_DEFAULT_CONFIG = {
   role: ZegoLiveAudioRoomRole.host,
+  takeSeatIndexWhenJoining: 0,
   turnOnMicrophoneWhenJoining: true,
+  confirmDialogInfo: {
+    title: 'Stop the live',
+    message: 'Are you sure to stop the live?',
+    cancelButtonName: 'Cancel',
+    confirmButtonName: 'Stop it',
+  },
 };
 const SPEAKER_DEFAULT_CONFIG = {
   role: ZegoLiveAudioRoomRole.speaker,
@@ -40,54 +48,8 @@ const SPEAKER_DEFAULT_CONFIG = {
 };
 const AUDIENCE_DEFAULT_CONFIG = {
   role: ZegoLiveAudioRoomRole.audience,
-  turnOnMicrophoneWhenJoining: false,
 };
-const ZegoLiveAudioRoomLayoutAlignment = {
-  spaceAround: 0,
-  start: 1,
-  end: 2,
-  center: 3,
-  spaceBetween: 4,
-  spaceEvenly: 5,
-};
-const ZegoLiveAudioRoomLayoutRowConfig = {
-  count: 4,
-  seatSpacing: 16,
-  alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
-};
-const ZegoDialogInfo = {
-  title: '',
-  message: '',
-  cancelButtonName: '',
-  confirmButtonName: '',
-};
-const ZegoTranslationText = {
-  prebuiltTitle: 'Live Audio Room',
-  removeSpeakerMenuDialogButton: 'Remove %0 from seat',
-  takeSeatMenuDialogButton: 'Take the seat',
-  leaveSeatMenuDialogButton: 'Leave the seat',
-  cancelMenuDialogButton: 'Cancel',
-  memberListTitle: 'Attendance',
-  removeSpeakerFailedToast: 'Failed to remove %0 from seat', // 红色
-  microphonePermissionSettingDialogInfo: {
-    title: 'Can not use Microphone!',
-    message: 'Please enable microphone access in the system settings!',
-    cancelButtonName: 'Cancel',
-    confirmButtonName: 'Settings',
-  },
-  leaveSeatDialogInfo: {
-    title: 'Leave the seat',
-    message: 'Are you sure to leave the seat?',
-    cancelButtonName: 'Cancel',
-    confirmButtonName: 'OK',
-  },
-  removeSpeakerFromSeatDialogInfo: {
-    title: 'Remove from seat',
-    message: 'Are you sure to remove %0 from seat?',
-    cancelButtonName: 'Cancel',
-    confirmButtonName: 'OK',
-  },
-};
+
 export {
   ZegoLiveAudioRoomRole,
   HOST_DEFAULT_CONFIG,
@@ -99,10 +61,10 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   const { appID, appSign, userID, userName, roomID, config, plugins } = props;
   const {
     role = ZegoLiveAudioRoomRole.audience,
-    seatIndex = -1,
+    takeSeatIndexWhenJoining = -1,
     turnOnMicrophoneWhenJoining = false,
     useSpeakerWhenJoining = true,
-    bottomMenuBarConfig = {},
+    bottomMenuBarConfig = ZegoBottomMenuBarConfig,
     confirmDialogInfo = {},
     onLeaveConfirmation,
     translationText = ZegoTranslationText,
@@ -112,24 +74,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     background,
   } = config;
   const {
-    showInRoomMessageButton = true,
-    hostButtons = [
-      ZegoMenuBarButtonName.toggleMicrophoneButton,
-      ZegoMenuBarButtonName.showMemberListButton,
-    ],
-    speakerButtons = [
-      ZegoMenuBarButtonName.toggleMicrophoneButton,
-      ZegoMenuBarButtonName.showMemberListButton,
-    ],
-    audienceButtons = [ZegoMenuBarButtonName.showMemberListButton],
-    hostExtendButtons = [],
-    speakerExtendButtons = [],
-    audienceExtendButtons = [],
-    maxCount = 5,
-  } = bottomMenuBarConfig;
-  // const { title, message, cancelButtonName, confirmButtonName } =
-  //   confirmDialogInfo;
-  const {
     rowConfigs = [
       ZegoLiveAudioRoomLayoutRowConfig,
       ZegoLiveAudioRoomLayoutRowConfig,
@@ -138,7 +82,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   } = layoutConfig;
 
   const {
-    // showSoundWavesInAudioMode = true,
+    showSoundWavesInAudioMode = true,
     foregroundBuilder,
     backgroundColor = 'transparent',
     backgroundImage,
@@ -234,7 +178,20 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   }, []);
 
   useEffect(() => {
-    console.log('===useeffect');
+    if (
+      (role == ZegoLiveAudioRoomRole.host ||
+        role == ZegoLiveAudioRoomRole.speaker) &&
+      takeSeatIndexWhenJoining < 0
+    ) {
+      config.role = ZegoLiveAudioRoomRole.audience;
+      config.takeSeatIndexWhenJoining = -1;
+    } else if (
+      role == ZegoLiveAudioRoomRole.speaker &&
+      lockSeatIndexesForHost.some((item) => item === takeSeatIndexWhenJoining)
+    ) {
+      config.role = ZegoLiveAudioRoomRole.audience;
+      config.takeSeatIndexWhenJoining = -1;
+    }
     ZegoUIKit.init(appID, appSign, { userID: userID, userName: userName })
       .then(() => {
         ZegoUIKit.turnCameraOn('', false);
@@ -306,17 +263,23 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               if (oldValue == userID && !newValue) {
                 console.log('===被踢下麦');
                 config.role = ZegoLiveAudioRoomRole.audience;
-                replaceBottomMenuBarButtons(audienceButtons);
-                replaceBottomMenuBarExtendButtons(audienceExtendButtons);
+                replaceBottomMenuBarButtons(
+                  bottomMenuBarConfig.audienceButtons
+                );
+                replaceBottomMenuBarExtendButtons(
+                  bottomMenuBarConfig.audienceExtendButtons
+                );
                 ZegoUIKit.turnMicrophoneOn('', false);
               }
               updateLayout();
             }
           );
-          replaceBottomMenuBarButtons(audienceButtons);
-          replaceBottomMenuBarExtendButtons(audienceExtendButtons);
+          replaceBottomMenuBarButtons(bottomMenuBarConfig.audienceButtons);
+          replaceBottomMenuBarExtendButtons(
+            bottomMenuBarConfig.audienceExtendButtons
+          );
           // 设置当前房间的hostID
-          if (config.role === ZegoLiveAudioRoomRole.host) {
+          if (role === ZegoLiveAudioRoomRole.host) {
             hostID = userID;
           } else {
             ZegoUIKit.getSignalingPlugin()
@@ -332,42 +295,60 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                 }
               });
           }
-          if (config.role == ZegoLiveAudioRoomRole.host) {
+          if (role == ZegoLiveAudioRoomRole.host) {
             console.log('===is host', role, config.role);
             // 如果是host，先强制抢占指定的麦位
             ZegoUIKit.getSignalingPlugin()
-              .updateRoomProperty(config.seatIndex, userID, true, true, true)
+              .updateRoomProperty(
+                config.takeSeatIndexWhenJoining,
+                userID,
+                true,
+                true,
+                true
+              )
               .then((data) => {
                 // 如果麦位设置成功了，则设置成员的房间属性，标记为host
                 console.log('===updateRoomProperty', data);
                 if (!data.code) {
                   ZegoUIKit.getSignalingPlugin()
-                    .setUsersInRoomAttributes('role', config.role.toString(), [
-                      userID,
-                    ])
+                    .setUsersInRoomAttributes('role', role.toString(), [userID])
                     .then((data) => {
                       console.log('===setUsersInRoomAttributes', data);
                       if (!data.code) {
                         // 设置成员房间属性成功
-                        replaceBottomMenuBarButtons(hostButtons);
-                        replaceBottomMenuBarExtendButtons(hostExtendButtons);
+                        replaceBottomMenuBarButtons(
+                          bottomMenuBarConfig.hostButtons
+                        );
+                        replaceBottomMenuBarExtendButtons(
+                          bottomMenuBarConfig.hostExtendButtons
+                        );
                       } else {
                         // 设置成员房间属性失败，回滚为观众身份
-                        leaveSeat(config.seatIndex);
+                        leaveSeat(takeSeatIndexWhenJoining);
                         config.role = ZegoLiveAudioRoomRole.audience;
                       }
                     });
                 }
               });
-          } else if (config.role == ZegoLiveAudioRoomRole.speaker) {
+          } else if (role == ZegoLiveAudioRoomRole.speaker) {
             // 如果是speaker，则尝试抢麦
             ZegoUIKit.getSignalingPlugin()
-              .updateRoomProperty(config.seatIndex, userID, true, false, false)
+              .updateRoomProperty(
+                takeSeatIndexWhenJoining,
+                userID,
+                true,
+                false,
+                false
+              )
               .then((data) => {
                 // 如果抢麦位不成功，那么把该成员的角色打回观众
                 if (!data.code) {
-                  replaceBottomMenuBarButtons(speakerButtons);
-                  replaceBottomMenuBarExtendButtons(speakerExtendButtons);
+                  replaceBottomMenuBarButtons(
+                    bottomMenuBarConfig.speakerButtons
+                  );
+                  replaceBottomMenuBarExtendButtons(
+                    bottomMenuBarConfig.speakerExtendButtons
+                  );
                 } else {
                   config.role = ZegoLiveAudioRoomRole.audience;
                 }
@@ -415,7 +396,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   };
 
   const onSeatItemClick = (index) => {
-    console.log('===onSeatItemClick', role, index, seatIndex);
+    console.log('===onSeatItemClick', role, index);
     setClickSeatIndex(index);
     ZegoUIKit.getSignalingPlugin()
       .queryRoomProperties()
@@ -439,7 +420,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             }
           } else {
             // speaker
-            if (index === seatIndex) {
+            if (index === takeSeatIndexWhenJoining) {
               return false;
             }
             // 检查一下席位是否被占据
@@ -535,8 +516,10 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       .then((data) => {
         if (!data.code) {
           config.role = ZegoLiveAudioRoomRole.speaker;
-          replaceBottomMenuBarButtons(speakerButtons);
-          replaceBottomMenuBarExtendButtons(speakerExtendButtons);
+          replaceBottomMenuBarButtons(bottomMenuBarConfig.speakerButtons);
+          replaceBottomMenuBarExtendButtons(
+            bottomMenuBarConfig.speakerExtendButtons
+          );
           // 打开麦克风
           ZegoUIKit.turnMicrophoneOn('', true);
         }
@@ -552,8 +535,10 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         console.log('===deleteRoomProperties', data);
         if (!data.code) {
           config.role = ZegoLiveAudioRoomRole.audience;
-          replaceBottomMenuBarButtons(audienceButtons);
-          replaceBottomMenuBarExtendButtons(audienceExtendButtons);
+          replaceBottomMenuBarButtons(bottomMenuBarConfig.audienceButtons);
+          replaceBottomMenuBarExtendButtons(
+            bottomMenuBarConfig.audienceExtendButtons
+          );
           ZegoUIKit.turnMicrophoneOn('', false);
         }
       })
@@ -581,6 +566,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
 
   const showDefaultLeaveDialog = () => {
     return new Promise((resolve, reject) => {
+      console.log('===confirmDialogInfo', confirmDialogInfo);
       if (!confirmDialogInfo) {
         resolve();
       } else {
@@ -655,11 +641,16 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             userID={userID}
             rowSpacing={rowSpacing}
             foregroundBuilder={foregroundBuilder}
-            seatIndex={role !== ZegoLiveAudioRoomRole.audience ? seatIndex : -1}
+            seatIndex={
+              role !== ZegoLiveAudioRoomRole.audience
+                ? takeSeatIndexWhenJoining
+                : -1
+            }
             onSeatItemClick={onSeatItemClick}
             backgroundColor={backgroundColor}
             backgroundImage={backgroundImage}
             seatingAreaData={seatingAreaData}
+            showSoundWavesInAudioMode={showSoundWavesInAudioMode}
           />
         ) : null}
       </View>
@@ -684,12 +675,14 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       >
         {Platform.OS != 'ios' && keyboardHeight > 0 ? null : (
           <ZegoBottomBar
-            menuBarButtonsMaxCount={maxCount}
+            menuBarButtonsMaxCount={bottomMenuBarConfig.maxCount}
             menuBarButtons={menuBarButtons}
             menuBarExtendedButtons={menuBarExtendedButtons}
             turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
             useSpeakerWhenJoining={useSpeakerWhenJoining}
-            showInRoomMessageButton={showInRoomMessageButton}
+            showInRoomMessageButton={
+              bottomMenuBarConfig.showInRoomMessageButton
+            }
             onMessageButtonPress={() => {
               setTextInputVisable(true);
             }}
