@@ -20,6 +20,13 @@ const ZegoLiveAudioRoomLayoutRowConfig = {
   alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
 };
 
+const ZegoLiveAudioRoomLayoutConfig = {
+  rowConfigs: [
+    ZegoLiveAudioRoomLayoutRowConfig,
+    ZegoLiveAudioRoomLayoutRowConfig,
+  ],
+  rowSpacing: 0,
+};
 const ZegoBottomMenuBarConfig = {
   showInRoomMessageButton: true,
   hostButtons: [
@@ -74,8 +81,10 @@ const ZegoTranslationText = {
 export {
   ZegoLiveAudioRoomRole,
   ZegoLiveAudioRoomLayoutAlignment,
+  ZegoLiveAudioRoomLayoutConfig,
   ZegoLiveAudioRoomLayoutRowConfig,
   ZegoBottomMenuBarConfig,
   // ZegoDialogInfo,
   ZegoTranslationText,
+  ZegoMenuBarButtonName,
 };

@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { ZegoToggleMicrophoneButton } from '@zegocloud/zego-uikit-rn';
+import {
+  ZegoToggleMicrophoneButton,
+  ZegoSwitchAudioOutputButton,
+  ZegoLeaveButton,
+} from '@zegocloud/zego-uikit-rn';
 
 import ZegoMoreButton from './ZegoMoreButton';
 import ZegoMessageButton from './ZegoMessageButton';
@@ -17,6 +21,9 @@ export default function ZegoBottomBar(props) {
     onMessageButtonPress,
     showInRoomMessageButton = false,
     onOpenCallMemberList,
+    useSpeakerWhenJoining,
+    onLeaveLiveStreamingConfirming,
+    onLeaveLiveStreaming,
   } = props;
   const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -39,6 +46,26 @@ export default function ZegoBottomBar(props) {
           <ZegoMemberButton
             key={buttonIndex}
             onPressed={onOpenCallMemberList}
+            width={buttonSize}
+            height={buttonSize}
+          />
+        );
+      case ZegoMenuBarButtonName.switchAudioOutputButton:
+        return (
+          <ZegoSwitchAudioOutputButton
+            key={buttonIndex}
+            useSpeaker={useSpeakerWhenJoining}
+            width={buttonSize}
+            height={buttonSize}
+          />
+        );
+      case ZegoMenuBarButtonName.leaveButton:
+        return (
+          <ZegoLeaveButton
+            key={buttonIndex}
+            onLeaveConfirmation={onLeaveLiveStreamingConfirming}
+            onPressed={onLeaveLiveStreaming}
+            iconLeave={require('./resources/white_bottom_button_close.png')}
             width={buttonSize}
             height={buttonSize}
           />

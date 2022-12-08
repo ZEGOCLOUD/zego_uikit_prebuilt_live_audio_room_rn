@@ -29,6 +29,7 @@ import {
   ZegoBottomMenuBarConfig,
   // ZegoDialogInfo,
   ZegoTranslationText,
+  ZegoMenuBarButtonName,
 } from './define';
 
 const HOST_DEFAULT_CONFIG = {
@@ -52,6 +53,7 @@ export {
   HOST_DEFAULT_CONFIG,
   AUDIENCE_DEFAULT_CONFIG,
   ZegoLiveAudioRoomLayoutAlignment,
+  ZegoMenuBarButtonName,
 };
 export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   const { appID, appSign, userID, userName, roomID, config, plugins } = props;
@@ -64,18 +66,11 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     confirmDialogInfo = {},
     onLeaveConfirmation,
     translationText = ZegoTranslationText,
-    layoutConfig = {},
+    layoutConfig = ZegoLiveAudioRoomLayoutConfig,
     hostSeatIndexes = [0],
     seatConfig = {},
     background,
   } = config;
-  const {
-    rowConfigs = [
-      ZegoLiveAudioRoomLayoutRowConfig,
-      ZegoLiveAudioRoomLayoutRowConfig,
-    ],
-    rowSpacing = 0,
-  } = layoutConfig;
 
   const {
     showSoundWavesInAudioMode = true,
@@ -362,7 +357,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           const roomProperties = data._roomAttributes;
           const arr = [];
           let num = 0;
-          rowConfigs.forEach((row, index) => {
+          layoutConfig.rowConfigs.forEach((row, index) => {
             const rowObj = { alignment: row.alignment };
             const rowSeatObj = new Map();
             for (let i = 0; i < row.count; i++) {
@@ -635,7 +630,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           <ZegoSeatingArea
             role={role}
             userID={userID}
-            rowSpacing={rowSpacing}
+            rowSpacing={layoutConfig.rowSpacing}
             foregroundBuilder={foregroundBuilder}
             seatIndex={
               role !== ZegoLiveAudioRoomRole.audience
