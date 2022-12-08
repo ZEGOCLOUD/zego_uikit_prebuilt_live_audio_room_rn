@@ -65,7 +65,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     onLeaveConfirmation,
     translationText = ZegoTranslationText,
     layoutConfig = {},
-    lockSeatIndexesForHost = [0],
+    hostSeatIndexes = [0],
     seatConfig = {},
     background,
   } = config;
@@ -183,7 +183,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       config.takeSeatIndexWhenJoining = -1;
     } else if (
       role == ZegoLiveAudioRoomRole.speaker &&
-      lockSeatIndexesForHost.some((item) => item === takeSeatIndexWhenJoining)
+      hostSeatIndexes.some((item) => item === takeSeatIndexWhenJoining)
     ) {
       config.role = ZegoLiveAudioRoomRole.audience;
       config.takeSeatIndexWhenJoining = -1;
@@ -198,7 +198,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             console.log(
               '===prebuilt uikit join room success',
               data,
-              lockSeatIndexesForHost,
+              hostSeatIndexes,
               roomID
             );
             ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins)
