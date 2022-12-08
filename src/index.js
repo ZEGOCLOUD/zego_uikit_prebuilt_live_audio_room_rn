@@ -42,10 +42,7 @@ const HOST_DEFAULT_CONFIG = {
     confirmButtonName: 'Stop it',
   },
 };
-const SPEAKER_DEFAULT_CONFIG = {
-  role: ZegoLiveAudioRoomRole.speaker,
-  turnOnMicrophoneWhenJoining: true,
-};
+
 const AUDIENCE_DEFAULT_CONFIG = {
   role: ZegoLiveAudioRoomRole.audience,
 };
@@ -53,7 +50,6 @@ const AUDIENCE_DEFAULT_CONFIG = {
 export {
   ZegoLiveAudioRoomRole,
   HOST_DEFAULT_CONFIG,
-  SPEAKER_DEFAULT_CONFIG,
   AUDIENCE_DEFAULT_CONFIG,
   ZegoLiveAudioRoomLayoutAlignment,
 };
