@@ -5,7 +5,6 @@ import ZegoUIKitPrebuiltLiveAudioRoom, {
   HOST_DEFAULT_CONFIG,
   ZegoLiveAudioRoomLayoutAlignment,
 } from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
-import ZegoUIKitSignalingPlugin from './plugin/index';
 export default function HostPage(props) {
   const {route} = props;
   const {params} = route;
@@ -161,7 +160,6 @@ export default function HostPage(props) {
             props.navigation.navigate('HomePage');
           },
         }}
-        plugins={[ZegoUIKitSignalingPlugin]}
       />
     </View>
   );

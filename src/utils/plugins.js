@@ -3,6 +3,7 @@ import ZegoUIKit, {
   ZegoInvitationConnectionState,
 } from '@zegocloud/zego-uikit-rn';
 import { zloginfo } from './logger';
+import ZegoUIKitSignalingPlugin from '../../example/src/plugin';
 
 const _appInfo = {};
 const _localUser = {};
@@ -23,9 +24,10 @@ const _install = (plugins) => {
 };
 
 const ZegoPrebuiltPlugins = {
-  init: (appID, appSign, userID, userName, plugins) => {
+  init: (appID, appSign, userID, userName, plugins = []) => {
     const callbackID =
       'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
+    plugins.push(ZegoUIKitSignalingPlugin);
     _install(plugins);
     ZegoUIKit.getSignalingPlugin().init(appID, appSign);
     ZegoUIKit.getSignalingPlugin().onConnectionStateChanged(

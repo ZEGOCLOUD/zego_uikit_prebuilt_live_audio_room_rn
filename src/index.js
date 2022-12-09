@@ -96,7 +96,7 @@ export {
   ZegoLiveAudioRoomLayoutAlignment,
 };
 export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
-  const { appID, appSign, userID, userName, roomID, config, plugins } = props;
+  const { appID, appSign, userID, userName, roomID, config } = props;
   const {
     role = ZegoLiveAudioRoomRole.audience,
     seatIndex = -1,
@@ -248,7 +248,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               lockSeatIndexesForHost,
               roomID
             );
-            ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins)
+            ZegoPrebuiltPlugins.init(appID, appSign, userID, userName)
               .then(() => {
                 setIsInit(true);
                 console.log('===init success');
@@ -268,6 +268,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       ZegoUIKit.leaveRoom();
       ZegoPrebuiltPlugins.uninit();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const pluginJoinRoom = (roomID) => {
@@ -728,7 +729,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             setModalVisible(!modalVisible);
           }}
         >
-          <View style={styles.modalMask}></View>
+          <View style={styles.modalMask} />
         </TouchableWithoutFeedback>
         <View style={styles.modalView}>
           <TouchableOpacity onPress={onModalPress}>
