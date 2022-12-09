@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, Text, Image} from 'react-native';
+import {StyleSheet, View, Text, Image, ImageBackground} from 'react-native';
 import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   HOST_DEFAULT_CONFIG,
@@ -11,8 +11,9 @@ export default function HostPage(props) {
   const {userID, userName, roomID, layoutType} = params;
   let rowConfigs = [];
   let rowSpacing = 0;
-  let seatIndex = -1;
+  let takeSeatIndexWhenJoining = -1;
   let backgroundColor = 'transparent';
+  let hostSeatIndexes = [0];
   switch (layoutType) {
     case 0:
       rowConfigs = [
@@ -27,7 +28,7 @@ export default function HostPage(props) {
           alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
         },
       ];
-      seatIndex = 0;
+      takeSeatIndexWhenJoining = 0;
       break;
     case 1:
       rowConfigs = [
@@ -53,7 +54,7 @@ export default function HostPage(props) {
         },
       ];
       rowSpacing = 5;
-      seatIndex = 0;
+      takeSeatIndexWhenJoining = 0;
       break;
     case 2:
       rowConfigs = [
@@ -79,7 +80,7 @@ export default function HostPage(props) {
         },
       ];
       rowSpacing = 0;
-      seatIndex = 0;
+      takeSeatIndexWhenJoining = 0;
       backgroundColor = '#ccc';
       break;
     case 3:
@@ -100,14 +101,14 @@ export default function HostPage(props) {
           alignment: ZegoLiveAudioRoomLayoutAlignment.spaceBetween,
         },
       ];
-      seatIndex = 4;
+      takeSeatIndexWhenJoining = 4;
+      hostSeatIndexes = [4];
       break;
   }
   const foregroundBuilder = ({userInfo}) => {
     return (
       <View style={styles.builder}>
         <View style={styles.avatarBox}>
-          <Image style={styles.avatar} />
           {userInfo.inRoomAttributes?.role ? (
             <Image
               style={styles.hostIcon}
@@ -125,13 +126,16 @@ export default function HostPage(props) {
       </View>
     );
   };
+  const image = {uri: ''};
   const background = () => {
     return (
       <View style={styles.backgroundView}>
-        <View style={styles.titleBar}>
-          <Text style={styles.title}>A Live Audio Room</Text>
-          <Text style={styles.id}>ID:{roomID}</Text>
-        </View>
+        <ImageBackground source={image} style={styles.image}>
+          <View style={styles.titleBar}>
+            <Text style={styles.title}>A Live Audio Room</Text>
+            <Text style={styles.id}>ID:{roomID}</Text>
+          </View>
+        </ImageBackground>
       </View>
     );
   };
@@ -150,7 +154,8 @@ export default function HostPage(props) {
             rowConfigs,
             rowSpacing,
           },
-          seatIndex,
+          takeSeatIndexWhenJoining,
+          hostSeatIndexes,
           seatConfig: {
             backgroundColor,
             foregroundBuilder,
@@ -182,11 +187,6 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
   },
-  avatar: {
-    width: 54,
-    height: 54,
-    borderRadius: 54,
-  },
   mic: {
     position: 'absolute',
     width: 54,
@@ -214,11 +214,11 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   titleBar: {
-    width: '100%',
-    height: 54,
     position: 'absolute',
     top: 55,
     paddingLeft: 18,
+    width: '100%',
+    height: 54,
   },
   title: {
     fontSize: 16,
@@ -228,5 +228,10 @@ const styles = StyleSheet.create({
   id: {
     fontSize: 10,
     color: '#606060',
+  },
+  image: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
   },
 });
