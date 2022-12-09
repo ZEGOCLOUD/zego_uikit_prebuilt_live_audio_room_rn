@@ -4,7 +4,12 @@ import { StyleSheet, View, Text } from 'react-native';
 import { ZegoLiveAudioRoomRole } from './define';
 
 export default function ZegoLiveAudioRoomMemberList(props) {
-  const { showMicrophoneState, onCloseCallMemberList, seatingAreaData } = props;
+  const {
+    showMicrophoneState,
+    onCloseCallMemberList,
+    seatingAreaData,
+    memberListTitle,
+  } = props;
   const memberList = ZegoUIKit.getAllUsers();
   console.log('===ZegoLiveAudioRoomMemberList memberList', memberList);
 
@@ -126,7 +131,9 @@ export default function ZegoLiveAudioRoomMemberList(props) {
     <View style={styles.container}>
       <View style={styles.topLine} />
       <View style={styles.header}>
-        <Text style={styles.title}>Attendance · {memberList.length}</Text>
+        <Text style={styles.title}>
+          {memberListTitle} · {memberList.length}
+        </Text>
       </View>
       <View style={styles.memberListContainer}>
         <ZegoMemberList

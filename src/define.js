@@ -20,29 +20,29 @@ const ZegoLiveAudioRoomLayoutRowConfig = {
   alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
 };
 
-const ZegoLiveAudioRoomLayoutConfig = {
-  rowConfigs: [
-    ZegoLiveAudioRoomLayoutRowConfig,
-    ZegoLiveAudioRoomLayoutRowConfig,
-  ],
-  rowSpacing: 0,
-};
-const ZegoBottomMenuBarConfig = {
-  showInRoomMessageButton: true,
-  hostButtons: [
-    ZegoMenuBarButtonName.toggleMicrophoneButton,
-    ZegoMenuBarButtonName.showMemberListButton,
-  ],
-  speakerButtons: [
-    ZegoMenuBarButtonName.toggleMicrophoneButton,
-    ZegoMenuBarButtonName.showMemberListButton,
-  ],
-  audienceButtons: [ZegoMenuBarButtonName.showMemberListButton],
-  hostExtendButtons: [],
-  speakerExtendButtons: [],
-  audienceExtendButtons: [],
-  maxCount: 5,
-};
+// const ZegoLiveAudioRoomLayoutConfig = {
+//   rowConfigs: [
+//     ZegoLiveAudioRoomLayoutRowConfig,
+//     ZegoLiveAudioRoomLayoutRowConfig,
+//   ],
+//   rowSpacing: 0,
+// };
+// const ZegoBottomMenuBarConfig = {
+//   showInRoomMessageButton: true,
+//   hostButtons: [
+//     ZegoMenuBarButtonName.toggleMicrophoneButton,
+//     ZegoMenuBarButtonName.showMemberListButton,
+//   ],
+//   speakerButtons: [
+//     ZegoMenuBarButtonName.toggleMicrophoneButton,
+//     ZegoMenuBarButtonName.showMemberListButton,
+//   ],
+//   audienceButtons: [ZegoMenuBarButtonName.showMemberListButton],
+//   hostExtendButtons: [],
+//   speakerExtendButtons: [],
+//   audienceExtendButtons: [],
+//   maxCount: 5,
+// };
 
 // const ZegoDialogInfo = {
 //   title: '',
@@ -51,40 +51,40 @@ const ZegoBottomMenuBarConfig = {
 //   confirmButtonName: '',
 // };
 
-const ZegoTranslationText = {
-  removeSpeakerMenuDialogButton: 'Remove %0 from seat',
-  takeSeatMenuDialogButton: 'Take the seat',
-  leaveSeatMenuDialogButton: 'Leave the seat',
-  cancelMenuDialogButton: 'Cancel',
-  memberListTitle: 'Attendance',
-  removeSpeakerFailedToast: 'Failed to remove %0 from seat', // 红色
-  microphonePermissionSettingDialogInfo: {
-    title: 'Can not use Microphone!',
-    message: 'Please enable microphone access in the system settings!',
-    cancelButtonName: 'Cancel',
-    confirmButtonName: 'Settings',
-  },
-  leaveSeatDialogInfo: {
-    title: 'Leave the seat',
-    message: 'Are you sure to leave the seat?',
-    cancelButtonName: 'Cancel',
-    confirmButtonName: 'OK',
-  },
-  removeSpeakerFromSeatDialogInfo: {
-    title: 'Remove the speaker',
-    message: 'Are you sure to remove %0 from the seat?',
-    cancelButtonName: 'Cancel',
-    confirmButtonName: 'OK',
-  },
-};
+// const ZegoTranslationText = {
+//   removeSpeakerMenuDialogButton: 'Remove %0 from seat',
+//   takeSeatMenuDialogButton: 'Take the seat',
+//   leaveSeatMenuDialogButton: 'Leave the seat',
+//   cancelMenuDialogButton: 'Cancel',
+//   memberListTitle: 'Attendance',
+//   removeSpeakerFailedToast: 'Failed to remove %0 from seat', // 红色
+//   microphonePermissionSettingDialogInfo: {
+//     title: 'Can not use Microphone!',
+//     message: 'Please enable microphone access in the system settings!',
+//     cancelButtonName: 'Cancel',
+//     confirmButtonName: 'Settings',
+//   },
+//   leaveSeatDialogInfo: {
+//     title: 'Leave the seat',
+//     message: 'Are you sure to leave the seat?',
+//     cancelButtonName: 'Cancel',
+//     confirmButtonName: 'OK',
+//   },
+//   removeSpeakerFromSeatDialogInfo: {
+//     title: 'Remove the speaker',
+//     message: 'Are you sure to remove %0 from the seat?',
+//     cancelButtonName: 'Cancel',
+//     confirmButtonName: 'OK',
+//   },
+// };
 
 export {
   ZegoLiveAudioRoomRole,
   ZegoLiveAudioRoomLayoutAlignment,
-  ZegoLiveAudioRoomLayoutConfig,
+  // ZegoLiveAudioRoomLayoutConfig,
   ZegoLiveAudioRoomLayoutRowConfig,
-  ZegoBottomMenuBarConfig,
+  // ZegoBottomMenuBarConfig,
   // ZegoDialogInfo,
-  ZegoTranslationText,
+  // ZegoTranslationText,
   ZegoMenuBarButtonName,
 };
