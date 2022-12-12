@@ -127,7 +127,7 @@ export default function AudiencePage(props) {
       </View>
     );
   };
-  const image = {uri: ''};
+  const image = {uri: 'xxx'};
   const background = () => {
     return (
       <View style={styles.backgroundView}>

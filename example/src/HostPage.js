@@ -109,7 +109,7 @@ export default function HostPage(props) {
     return (
       <View style={styles.builder}>
         <View style={styles.avatarBox}>
-          {userInfo.inRoomAttributes?.role ? (
+          {userInfo.inRoomAttributes?.role === '0' ? (
             <Image
               style={styles.hostIcon}
               source={require('./resources/host-icon.png')}
@@ -126,7 +126,7 @@ export default function HostPage(props) {
       </View>
     );
   };
-  const image = {uri: ''};
+  const image = {uri: 'xxx'};
   const background = () => {
     return (
       <View style={styles.backgroundView}>
