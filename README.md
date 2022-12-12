@@ -24,7 +24,7 @@ And it includes the business logic along with the UI, enabling you to customize 
 
   > Add or remove features accordingly
 
-To build a live audio app from scratch, you may check our [Voice Call\|\_blank](!ExpressAudioSDK-Overview/Overview).
+To build a live audio app from scratch, you may check our [Voice Call](https://doc.oa.zego.im/!ExpressAudioSDK-Overview/Overview).
 
 ## Embedded features
 
@@ -37,49 +37,17 @@ To build a live audio app from scratch, you may check our [Voice Call\|\_blank](
 - Customizable UI style
 - Real-time interactive text chat
 
-## Recommended resources
-
- <div class="md-resource-layout">
-    <div class="md-resource-layout-item">
-      <div class="item-top">
-        <div class="resource-title">I want to get started: </div>
-        <div class="resource-desc">To implement a live audio room swiftly, follow the steps:</div>
-        <a href="!LiveAudioRoomKit_QuickStart" class="md-btn-primary important"
-          target="_blank">
-          <span class="text">QUICK START</span>
-        </a>
-      </div>
-      <div class="item-bottom">
-        <p class="margin-top-20">To configure prebuilt UI for a custom experience:</p>
-        <a href="!LiveAudioRoomKit_CustomPrebuiltUI"
-          class="md-btn-primary important" target="_blank"> <span class="text">Custom Prebuilt UI</span></a>
-      </div>
-    </div>
-    <div class="md-resource-layout-item">
-      <div class="item-top">
-        <div class="resource-title">I want to get the Sample Code:</div>
-        <div class="resource-desc">Click below to get the sample code:</div>
-        <a href="https://github.com/ZEGOCLOUD/zego_uikit_prebuilt_live_audio_room_example_rn" class="md-btn-primary important"
-          target="_blank">
-          <span class="text">SAMPLE CODE</span>
-        </a>
-      </div>
-      <div class="item-bottom">
-        <p class="margin-top-20">To make a fully customized Live Audio app, you may try this SDK: </p>
-        <a href="!ExpressAudioSDK-Overview/Overview" class="md-btn-primary important" target="_blank">
-          <span class="text">Fully customized with SDKs</span>
-        </a>
-      </div>
-    </div>
-  </div>
-
 # Quick start
 
 ---
 
 ## Prerequisites
 
-@@@ZIM_BasicPrerequisites@@@
+- Go to [ZEGOCLOUD Admin Console](https://console.zegocloud.com), and do the following:
+  - Create a project, get the **AppID** and **AppSign**.
+  - Activate the **In-app Chat** service (as shown in the following figure).
+
+![ActivateZIMinConsole](https://storage.zego.im/sdk-doc/Pics/InappChat/ActivateZIMinConsole2.png)
 
 ## Integrate the SDK
 
@@ -291,13 +259,4 @@ npm run android
 
 ## Related guide
 
-[Custom prebuilt UI](!ZEGOUIKIT_Custom_prebuilt_UI)
-
-## Resources
-
-<div class="md-grid-list-box">
-  <a href="https://github.com/ZEGOCLOUD/zego_uikit_prebuilt_live_audio_room_example_rn" class="md-grid-item" target="_blank">
-    <div class="grid-title">Sample code</div>
-    <div class="grid-desc">Click here to get the complete sample code.</div>
-  </a>
-</div>
+[Custom prebuilt UI](http://docs.zegocloud.com/article/#15084)
