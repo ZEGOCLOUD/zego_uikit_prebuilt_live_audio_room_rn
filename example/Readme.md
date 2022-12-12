@@ -120,8 +120,8 @@ npm install react-delegate-component @react-navigation/native @react-navigation/
 
 ```javascript
 // App.js
-import React, { Component } from 'react';
-import { View } from 'react-native';
+import React, {Component} from 'react';
+import {View} from 'react-native';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   HOST_DEFAULT_CONFIG,
 } from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
@@ -260,12 +260,3 @@ npm run android
 ## Related guide
 
 [Custom prebuilt UI](http://docs.zegocloud.com/article/#15084)
-
-## Resources
-
-<div class="md-grid-list-box">
-  <a href="https://github.com/ZEGOCLOUD/zego_uikit_prebuilt_live_audio_room_example_rn" class="md-grid-item" target="_blank">
-    <div class="grid-title">Sample code</div>
-    <div class="grid-desc">Click here to get the complete sample code.</div>
-  </a>
-</div>
