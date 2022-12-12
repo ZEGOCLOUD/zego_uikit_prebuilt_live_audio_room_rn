@@ -56,12 +56,18 @@ export default function ZegoLiveAudioRoomMemberList(props) {
         } else {
           speakerArr.push(item);
         }
-      } else {
+      } else if (
+        userIDRoleMap.get(item.userID) ===
+        ZegoLiveAudioRoomRole.audience.toString()
+      ) {
         if (item.userID === localUserID) {
           audienceArr.unshift(item);
         } else {
           audienceArr.push(item);
         }
+      } else {
+        // localUser is audience, sort after hostArr
+        speakerArr.unshift(item);
       }
     });
     const allArr = hostArr.concat(speakerArr, audienceArr);
