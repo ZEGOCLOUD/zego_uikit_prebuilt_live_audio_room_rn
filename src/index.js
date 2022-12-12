@@ -687,15 +687,17 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           />
         ) : null}
       </View>
+
       {isCallMemberListVisable ? (
         // <View >
-        <ZegoLiveAudioRoomMemberList
-          style={styles.memberListBox}
-          seatingAreaData={seatingAreaData}
-          showMicrophoneState={true}
-          onCloseCallMemberList={onCloseCallMemberList}
-          memberListTitle={memberListTitle}
-        />
+        <View style={styles.memberListBox}>
+          <ZegoLiveAudioRoomMemberList
+            seatingAreaData={seatingAreaData}
+            showMicrophoneState={true}
+            onCloseCallMemberList={onCloseCallMemberList}
+            memberListTitle={memberListTitle}
+          />
+        </View>
       ) : (
         // </View>
         <View />
@@ -788,30 +790,30 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
-
   leaveButton: {
+    zIndex: 10,
     position: 'absolute',
     top: 65,
     right: 10,
-    zIndex: 10,
   },
   messageListView: {
+    zIndex: 12,
     position: 'absolute',
     left: 16,
     bottom: 62,
     width: 270,
     maxHeight: 200,
-    zIndex: 12,
   },
   messageInputPannel: {
+    zIndex: 11,
     position: 'absolute',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     backgroundColor: 'rgba(0, 0, 0, 0.7500)',
     width: '100%',
-    zIndex: 11,
   },
   memberButton: {
+    zIndex: 10,
     position: 'absolute',
     top: 42,
     right: 52,
@@ -822,7 +824,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 17,
-    zIndex: 10,
   },
   memberCountLabel: {
     fontSize: 14,
@@ -830,18 +831,17 @@ const styles = StyleSheet.create({
     marginLeft: 3,
   },
   seatingArea: {
+    zIndex: 3,
     position: 'absolute',
     top: 125,
     width: '100%',
-    zIndex: 3,
   },
   memberListBox: {
+    zIndex: 13,
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    zIndex: 12,
   },
-
   modalMask: {
     position: 'absolute',
     width: '100%',
