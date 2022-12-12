@@ -186,7 +186,7 @@ export default function LiveAudioRoomPage(props) {
 
 1. Open the `my_project/android/app/src/main/AndroidManifest.xml` file and add the following:
 
-<img src="/Pics/ZegoUIKit/RN/PrebuiltCall/android_config.gif" width=500/>
+<img src="https://storage.zego.im/sdk-doc/Pics/ZegoUIKit/RN/PrebuiltCall/android_config.gif" width=500/>
 
 ```xml
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -201,7 +201,7 @@ export default function LiveAudioRoomPage(props) {
 
 2. Open the `my_project/android/app/proguard-rules.pro` file and add the following:
 
-<img src="http://doc.oa.zego.im/Pics/ZegoUIKit/RN/PrebuiltCall/proguard_rules_config.jpg" width=500/>
+<img src="https://storage.zego.im/sdk-doc/Pics/ZegoUIKit/RN/PrebuiltCall/proguard_rules_config.jpg" width=500/>
 
 ```xml
 -keep class **.zego.**  { *; }
@@ -211,7 +211,7 @@ export default function LiveAudioRoomPage(props) {
 
 1. Open the `my_project/ios/my_project/Info.plist` file and add the following:
 
-<img src="/Pics/ZegoUIKit/RN/PrebuiltCall/ios_config2.gif" width=500/>
+<img src="https://storage.zego.im/sdk-doc/Pics/ZegoUIKit/RN/PrebuiltCall/ios_config2.gif" width=500/>
 
 ```xml
 <key>NSCameraUsageDescription</key>
@@ -226,8 +226,8 @@ a. Open the your_project > ios > [your_project_name].xcworkspace file.
 
 b. Select your target project, and follow the notes on the following two images to disable the Bitcode respectively.
 
-<img src="/Pics/ZegoUIKit/RN/PrebuiltCall/liveAudioRoomBitcode_1.png"/>
-<img src="/Pics/ZegoUIKit/RN/PrebuiltCall/liveAudioRoomBitcode_2.png"/>
+<img src="https://storage.zego.im/sdk-doc/Pics/ZegoUIKit/RN/PrebuiltCall/liveAudioRoomBitcode_1.png"/>
+<img src="https://storage.zego.im/sdk-doc/Pics/ZegoUIKit/RN/PrebuiltCall/liveAudioRoomBitcode_2.png"/>
 
 ## Run & Test
 
