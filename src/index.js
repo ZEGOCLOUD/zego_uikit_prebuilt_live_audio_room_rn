@@ -34,10 +34,10 @@ const HOST_DEFAULT_CONFIG = {
   takeSeatIndexWhenJoining: 0,
   turnOnMicrophoneWhenJoining: true,
   confirmDialogInfo: {
-    title: 'Stop the live',
-    message: 'Are you sure to stop the live?',
+    title: 'Leave the room',
+    message: 'Are you sure to leave the room?',
     cancelButtonName: 'Cancel',
-    confirmButtonName: 'Stop it',
+    confirmButtonName: 'OK',
   },
 };
 
@@ -600,23 +600,17 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   const showDefaultLeaveDialog = () => {
     return new Promise((resolve, reject) => {
       console.log('===confirmDialogInfo', confirmDialogInfo);
-      if (!confirmDialogInfo) {
+      if (!confirmDialogInfo.title) {
         resolve();
       } else {
-        const {
-          title = 'Leave the room',
-          message = 'Are you sure to leave the room?',
-          cancelButtonName = 'Cancel',
-          confirmButtonName = 'OK',
-        } = confirmDialogInfo;
-        Alert.alert(title, message, [
+        Alert.alert(confirmDialogInfo.title, confirmDialogInfo.message, [
           {
-            text: cancelButtonName,
+            text: confirmDialogInfo.cancelButtonName,
             onPress: () => reject(),
             style: 'cancel',
           },
           {
-            text: confirmButtonName,
+            text: confirmDialogInfo.confirmButtonName,
             onPress: () => resolve(),
           },
         ]);
