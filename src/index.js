@@ -256,6 +256,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
 
     return () => {
       ZegoUIKit.leaveRoom();
+      ZegoUIKit.onUserLeave(callbackID);
       ZegoUIKit.getSignalingPlugin().onRoomPropertiesUpdated(callbackID);
       ZegoPrebuiltPlugins.uninit();
     };
