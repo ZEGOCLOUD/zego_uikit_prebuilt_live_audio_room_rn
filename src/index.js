@@ -272,6 +272,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             callbackID,
             (key, attributes, oldAttributes, editor) => {
               // updateLayout();
+              hostID = editor;
               console.log(
                 '===onUsersInRoomAttributesUpdated',
                 userID,
@@ -292,7 +293,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                 key,
                 oldValue,
                 newValue,
-                oldValue === userID
+                oldValue === userID,
+                hostID
               );
               if (oldValue == userID && !newValue) {
                 console.log('===被踢下麦');
@@ -314,6 +316,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               .queryUsersInRoomAttributes()
               .then((data) => {
                 if (!data.code) {
+                  console.log('===queryUsersInRoomAttributes', data);
                   data.usersInRoomAttributes.forEach((v, k) => {
                     if (v.role == 0) {
                       hostID = k;
@@ -383,11 +386,12 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       .queryRoomProperties()
       .then((data) => {
         if (!data.code) {
+          console.log('===queryRoomProperties', data._roomAttributes);
           const roomProperties = data._roomAttributes;
           setRoomProperties(data._roomAttributes);
           const arr = [];
           let num = 0;
-          rowConfigs.forEach((row, index) => {
+          rowConfigs.forEach(async (row, index) => {
             const rowObj = { alignment: row.alignment };
             const rowSeatObj = new Map();
             for (let i = 0; i < row.count; i++) {
@@ -396,6 +400,19 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               const userID = roomProperties[seatIndex];
               let role = ZegoLiveAudioRoomRole.audience;
               if (userID) {
+                if (!hostID) {
+                  await ZegoUIKit.getSignalingPlugin()
+                    .queryUsersInRoomAttributes()
+                    .then((data) => {
+                      if (!data.code) {
+                        data.usersInRoomAttributes.forEach((v, k) => {
+                          if (v.role == 0) {
+                            hostID = k;
+                          }
+                        });
+                      }
+                    });
+                }
                 role =
                   userID == hostID
                     ? ZegoLiveAudioRoomRole.host
@@ -498,8 +515,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                       '===endRoomPropertiesBatchOperation data',
                       data
                     );
+                    inRoomAttributesBatching = false;
                     if (!data.code) {
-                      inRoomAttributesBatching = false;
                     } else {
                       console.log('Switch seat failed: ');
                     }
