@@ -256,6 +256,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
 
     return () => {
       ZegoUIKit.leaveRoom();
+      console.log('=======onRoomPropertiesUpdated remove=======');
+      ZegoUIKit.getSignalingPlugin().onRoomPropertiesUpdated(callbackID);
       ZegoPrebuiltPlugins.uninit();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
