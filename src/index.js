@@ -256,7 +256,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
 
     return () => {
       ZegoUIKit.leaveRoom();
-      console.log('=======onRoomPropertiesUpdated remove=======');
       ZegoUIKit.getSignalingPlugin().onRoomPropertiesUpdated(callbackID);
       ZegoPrebuiltPlugins.uninit();
     };
@@ -308,6 +307,14 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               updateLayout();
             }
           );
+          ZegoUIKit.onUserLeave(callbackID, (users) => {
+            console.log('===onUserLeave', users);
+            users.forEach((user) => {
+              if (user.userID == hostID) {
+                hostID = '';
+              }
+            });
+          });
           replaceBottomMenuBarButtons(audienceButtons);
           replaceBottomMenuBarExtendButtons(audienceExtendButtons);
           // 设置当前房间的hostID
@@ -388,7 +395,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       .queryRoomProperties()
       .then((data) => {
         if (!data.code) {
-          console.log('===queryRoomProperties', data._roomAttributes);
           const roomProperties = data._roomAttributes;
           setRoomProperties(data._roomAttributes);
           const arr = [];
@@ -402,19 +408,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               const userID = roomProperties[seatIndex];
               let role = ZegoLiveAudioRoomRole.audience;
               if (userID) {
-                if (!hostID) {
-                  await ZegoUIKit.getSignalingPlugin()
-                    .queryUsersInRoomAttributes()
-                    .then((data) => {
-                      if (!data.code) {
-                        data.usersInRoomAttributes.forEach((v, k) => {
-                          if (v.role == 0) {
-                            hostID = k;
-                          }
-                        });
-                      }
-                    });
-                }
                 role =
                   userID == hostID
                     ? ZegoLiveAudioRoomRole.host
