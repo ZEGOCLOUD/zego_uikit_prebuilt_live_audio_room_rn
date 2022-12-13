@@ -275,6 +275,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             (key, attributes, oldAttributes, editor) => {
               // updateLayout();
               hostID = editor;
+              updateLayout();
               console.log(
                 '===onUsersInRoomAttributesUpdated',
                 userID,
