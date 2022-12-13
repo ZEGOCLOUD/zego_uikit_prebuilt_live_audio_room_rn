@@ -351,6 +351,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                       console.log('===setUsersInRoomAttributes', data);
                       if (!data.code) {
                         // 设置成员房间属性成功
+                        updateLayout();
                         replaceBottomMenuBarButtons(hostButtons);
                         replaceBottomMenuBarExtendButtons(hostExtendButtons);
                       } else {
@@ -385,7 +386,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       });
   };
   const updateLayout = () => {
-    console.log('==getUser', ZegoUIKit.getUser(userID));
+    console.log('===getUser', ZegoUIKit.getUser(userID));
+    console.log('===hostid', hostID);
     ZegoUIKit.getSignalingPlugin()
       .queryRoomProperties()
       .then((data) => {
@@ -555,16 +557,19 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         console.log('===update err', err);
       });
   };
+
   const leaveSeat = (index) => {
     ZegoUIKit.getSignalingPlugin()
       .deleteRoomProperties([index.toString()], true)
       .then((data) => {
         console.log('===deleteRoomProperties', data);
         if (!data.code) {
-          config.role = ZegoLiveAudioRoomRole.audience;
-          replaceBottomMenuBarButtons(audienceButtons);
-          replaceBottomMenuBarExtendButtons(audienceExtendButtons);
-          ZegoUIKit.turnMicrophoneOn('', false);
+          if (role !== ZegoLiveAudioRoomRole.host) {
+            config.role = ZegoLiveAudioRoomRole.audience;
+            replaceBottomMenuBarButtons(audienceButtons);
+            replaceBottomMenuBarExtendButtons(audienceExtendButtons);
+            ZegoUIKit.turnMicrophoneOn('', false);
+          }
         } else {
           if (removeSpeakerFailedToast.indexOf('%0') > -1) {
             removeSpeakerFailedToast = removeSpeakerFailedToast.replace(
