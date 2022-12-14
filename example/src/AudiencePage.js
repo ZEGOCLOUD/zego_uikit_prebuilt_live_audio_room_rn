@@ -110,7 +110,7 @@ export default function AudiencePage(props) {
     return (
       <View style={styles.builder}>
         <View style={styles.avatarBox}>
-          {userInfo.inRoomAttributes?.role ? (
+          {userInfo.inRoomAttributes?.role === '0' ? (
             <Image
               style={styles.hostIcon}
               source={require('./resources/host-icon.png')}
