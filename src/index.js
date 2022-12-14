@@ -305,6 +305,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                 replaceBottomMenuBarButtons(audienceButtons);
                 replaceBottomMenuBarExtendButtons(audienceExtendButtons);
                 ZegoUIKit.turnMicrophoneOn('', false);
+                setModalVisible(false);
               }
               updateLayout();
             }

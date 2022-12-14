@@ -70,7 +70,7 @@ export default function ZegoSeatingArea(props) {
                 showSoundWave={showSoundWavesInAudioMode}
                 audioViewBackgroudColor={backgroundColor}
                 audioViewBackgroudImage={backgroundImage}
-                // avatarSize={{ width: 54, height: 54 }}
+                avatarSize={{ width: 54, height: 54 }}
                 soundWaveColor="#3655ff"
               />
             ) : (
