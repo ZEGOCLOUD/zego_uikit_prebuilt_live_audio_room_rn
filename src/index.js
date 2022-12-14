@@ -741,49 +741,56 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       <View style={styles.messageListView}>
         <ZegoInRoomMessageView style={styles.fillParent} />
       </View>
-      <KeyboardAvoidingView
-        style={[styles.fillParent, { zIndex: 0 }]}
-        behavior={'padding'}
-      >
-        {Platform.OS != 'ios' && keyboardHeight > 0 ? null : (
-          <ZegoBottomBar
-            menuBarButtonsMaxCount={maxCount}
-            menuBarButtons={menuBarButtons}
-            menuBarExtendedButtons={menuBarExtendedButtons}
-            turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
-            useSpeakerWhenJoining={useSpeakerWhenJoining}
-            showInRoomMessageButton={showInRoomMessageButton}
-            onMessageButtonPress={() => {
-              setTextInputVisable(true);
-            }}
-            onOpenCallMemberList={onOpenCallMemberList}
-          />
-        )}
-        {textInputVisable ? (
-          <View
-            style={[
-              styles.messageInputPannel,
-              {
-                bottom: Platform.OS == 'ios' ? keyboardHeight : 0,
-                height: textInputHeight,
-              },
-            ]}
+      {Platform.OS != 'ios' && keyboardHeight > 0 ? null : (
+        <ZegoBottomBar
+          menuBarButtonsMaxCount={maxCount}
+          menuBarButtons={menuBarButtons}
+          menuBarExtendedButtons={menuBarExtendedButtons}
+          turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
+          useSpeakerWhenJoining={useSpeakerWhenJoining}
+          showInRoomMessageButton={showInRoomMessageButton}
+          onMessageButtonPress={() => {
+            setTextInputVisable(true);
+          }}
+          onOpenCallMemberList={onOpenCallMemberList}
+        />
+      )}
+
+      {textInputVisable ? (
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setTextInputVisable(false);
+          }}
+        >
+          <KeyboardAvoidingView
+            style={[styles.fillParent, { zIndex: 4 }]}
+            behavior={'padding'}
           >
-            <ZegoInRoomMessageInput
-              ref={(input) => {
-                setTextInput(input);
-              }}
-              onContentSizeChange={(width, height) => {
-                setTextInputHeight(height);
-              }}
-              placeholder={'Say something...'}
-              onSumit={() => {
-                setTextInputVisable(false);
-              }}
-            />
-          </View>
-        ) : null}
-      </KeyboardAvoidingView>
+            <View
+              style={[
+                styles.messageInputPannel,
+                {
+                  bottom: Platform.OS == 'ios' ? keyboardHeight : 0,
+                  height: textInputHeight,
+                },
+              ]}
+            >
+              <ZegoInRoomMessageInput
+                ref={(input) => {
+                  setTextInput(input);
+                }}
+                onContentSizeChange={(width, height) => {
+                  setTextInputHeight(height);
+                }}
+                placeholder={'Say something...'}
+                onSumit={() => {
+                  setTextInputVisable(false);
+                }}
+              />
+            </View>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+      ) : null}
       <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <TouchableWithoutFeedback
           onPress={() => {
@@ -827,13 +834,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   leaveButton: {
-    zIndex: 10,
+    zIndex: 5,
     position: 'absolute',
     top: 65,
     right: 10,
   },
   messageListView: {
-    zIndex: 12,
+    zIndex: 3,
     position: 'absolute',
     left: 16,
     bottom: 62,
@@ -841,7 +848,6 @@ const styles = StyleSheet.create({
     maxHeight: 200,
   },
   messageInputPannel: {
-    zIndex: 11,
     position: 'absolute',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
@@ -849,7 +855,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   memberButton: {
-    zIndex: 10,
+    zIndex: 5,
     position: 'absolute',
     top: 42,
     right: 52,
@@ -873,7 +879,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   memberListBox: {
-    zIndex: 13,
+    zIndex: 5,
     position: 'absolute',
     bottom: 0,
     width: '100%',
