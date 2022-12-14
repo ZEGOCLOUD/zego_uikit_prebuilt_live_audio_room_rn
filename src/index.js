@@ -129,7 +129,9 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   } = layoutConfig;
 
   let hostID = '';
-  let inRoomAttributesBatching = false;
+  // let isRoomAttributesBatching = false;
+  const [isRoomAttributesBatching, setIsRoomAttributesBatching] =
+    useState(false);
   const [roomProperties, setRoomProperties] = useState({});
   const keyboardHeight = useKeyboard();
   const [textInputVisable, setTextInputVisable] = useState(false);
@@ -297,7 +299,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                 oldValue,
                 newValue,
                 oldValue === userID,
-                hostID
+                hostID,
+                clickSeatIndex
               );
               if (oldValue == userID && !newValue) {
                 console.log('===被踢下麦');
@@ -305,6 +308,9 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                 replaceBottomMenuBarButtons(audienceButtons);
                 replaceBottomMenuBarExtendButtons(audienceExtendButtons);
                 ZegoUIKit.turnMicrophoneOn('', false);
+                setModalVisible(false);
+              }
+              if (key === clickSeatIndex.toString()) {
                 setModalVisible(false);
               }
               updateLayout();
@@ -437,123 +443,56 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       role,
       index,
       clickSeatIndex,
-      roomProperties
+      roomProperties,
+      isRoomAttributesBatching
     );
     setClickSeatIndex(index);
-    ZegoUIKit.getSignalingPlugin()
-      .queryRoomProperties()
-      .then(async (data) => {
-        if (!data.code) {
-          const roomProperties = data._roomAttributes;
-          setRoomProperties(data._roomAttributes);
-          console.log('===clickSeatObj', roomProperties);
-          if (role == ZegoLiveAudioRoomRole.host) {
-            // 遍历房间属性的key，先检查麦位是否被占了（是否有房间属性的key与index相同）
-            // host 踢 speaker 下麦
-            if (roomProperties[index] && roomProperties[index] !== userID) {
-              let text = removeSpeakerMenuDialogButton;
-              if (text.indexOf('%0') > -1) {
-                text = text.replace(
-                  '%0',
-                  ZegoUIKit.getUser(roomProperties[index]).userName
-                );
-              }
-              setModalVisible(true);
-              setModalText(text);
-            }
-          } else {
-            // speaker
-            if (index === takeSeatIndexWhenJoining) {
-              return false;
-            }
-            // 检查一下席位是否被占据
-            let seated = false;
-            for (let key in roomProperties) {
-              if (key == index) {
-                seated = true;
-              }
-            }
-            if (seated) {
-              console.log('Seat has been taken', index);
-              if (roomProperties[index] == userID) {
-                // 自己占据，下麦
-                setModalVisible(true);
-                setModalText(leaveSeatMenuDialogButton);
-              }
-            } else {
-              // 检查自己是否已有麦位
-              const oldIndex = getSeatIndexByUserID(userID);
-              if (oldIndex && oldIndex !== -1) {
-                // 切换麦位
-                if (inRoomAttributesBatching) {
-                  return false;
-                }
-                inRoomAttributesBatching = true;
-                ZegoUIKit.getSignalingPlugin().beginRoomPropertiesBatchOperation(
-                  true,
-                  false,
-                  false
-                );
-                ZegoUIKit.getSignalingPlugin().updateRoomProperty(
-                  index,
-                  userID
-                );
-                ZegoUIKit.getSignalingPlugin()
-                  .deleteRoomProperties([oldIndex.toString()])
-                  .then((data) => {
-                    console.log('===delete room properties success', data);
-                  })
-                  .catch((err) => {
-                    console.log('===delete room properties err', err);
-                  });
-                await ZegoUIKit.getSignalingPlugin()
-                  .endRoomPropertiesBatchOperation()
-                  .then((data) => {
-                    console.log(
-                      '===endRoomPropertiesBatchOperation data',
-                      data
-                    );
-                    inRoomAttributesBatching = false;
-                    if (!data.code) {
-                    } else {
-                      console.log('Switch seat failed: ');
-                    }
-                  });
-              } else {
-                // 上麦
-                console.log('===上麦', clickSeatIndex, index);
-                setModalVisible(true);
-                setModalText(takeSeatMenuDialogButton);
-              }
-            }
-          }
+    if (role == ZegoLiveAudioRoomRole.host) {
+      // 遍历房间属性的key，先检查麦位是否被占了（是否有房间属性的key与index相同）
+      // host 踢 speaker 下麦
+      if (roomProperties[index] && roomProperties[index] !== userID) {
+        let text = removeSpeakerMenuDialogButton;
+        if (text.indexOf('%0') > -1) {
+          text = text.replace(
+            '%0',
+            ZegoUIKit.getUser(roomProperties[index]).userName
+          );
         }
-      });
-  };
-
-  const onModalPress = () => {
-    setModalVisible(false);
-    if (modalText.indexOf('Take the seat') > -1) {
-      takeSeat();
-    } else if (modalText.indexOf('Remove') > -1) {
-      const dialogInfo = removeSpeakerFromSeatDialogInfo;
-      if (dialogInfo.message.indexOf('%0') > -1) {
-        dialogInfo.message = dialogInfo.message.replace(
-          '%0',
-          modalText.split(' ')[1]
-        );
+        setModalVisible(true);
+        setModalText(text);
       }
-      showDialog(dialogInfo)
-        .then(() => {
-          leaveSeat(clickSeatIndex);
-        })
-        .catch(() => {});
-    } else if (modalText.indexOf('Leave') > -1) {
-      showDialog(leaveSeatDialogInfo)
-        .then(() => {
-          leaveSeat(clickSeatIndex);
-        })
-        .catch(() => {});
+    } else {
+      // speaker
+      if (index === takeSeatIndexWhenJoining) {
+        return false;
+      }
+      // 检查一下席位是否被占据
+      let seated = false;
+      for (let key in roomProperties) {
+        if (key == index) {
+          seated = true;
+        }
+      }
+      if (seated) {
+        console.log('Seat has been taken', index);
+        if (roomProperties[index] == userID) {
+          // 自己占据，下麦
+          setModalVisible(true);
+          setModalText(leaveSeatMenuDialogButton);
+        }
+      } else {
+        // 检查自己是否已有麦位
+        const oldIndex = getSeatIndexByUserID(userID);
+        if (oldIndex && oldIndex !== -1) {
+          // 切换麦位
+          switchToSeat(index, oldIndex);
+        } else {
+          // 上麦
+          console.log('===上麦', clickSeatIndex, index);
+          setModalVisible(true);
+          setModalText(takeSeatMenuDialogButton);
+        }
+      }
     }
   };
 
@@ -574,7 +513,19 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       });
   };
 
-  const leaveSeat = (index) => {
+  const leaveSeat = (index, removeUserID) => {
+    console.log('===leave seat', roomProperties[index], userID);
+    if (removeUserID) {
+      // 主持人踢人
+      if (roomProperties[index] !== removeUserID) {
+        return false;
+      }
+    } else {
+      // speaker 自己下麦
+      if (roomProperties[index] !== userID) {
+        return false;
+      }
+    }
     ZegoUIKit.getSignalingPlugin()
       .deleteRoomProperties([index.toString()], true)
       .then((data) => {
@@ -600,9 +551,73 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         console.log('==err', err);
       });
   };
+
+  const switchToSeat = async (index, oldIndex) => {
+    if (isRoomAttributesBatching) {
+      return false;
+    }
+    // isRoomAttributesBatching = true;
+    setIsRoomAttributesBatching(true);
+    ZegoUIKit.getSignalingPlugin().beginRoomPropertiesBatchOperation(
+      true,
+      false,
+      false
+    );
+    ZegoUIKit.getSignalingPlugin().updateRoomProperty(index, userID);
+    ZegoUIKit.getSignalingPlugin()
+      .deleteRoomProperties([oldIndex.toString()])
+      .then((data) => {
+        console.log('===delete room properties success', data);
+      })
+      .catch((err) => {
+        console.log('===delete room properties err', err);
+      });
+    await ZegoUIKit.getSignalingPlugin()
+      .endRoomPropertiesBatchOperation()
+      .then((data) => {
+        console.log('===endRoomPropertiesBatchOperation data', data);
+        // isRoomAttributesBatching = false;
+        setIsRoomAttributesBatching(false);
+        if (data.code) {
+          console.log('Switch seat failed: ');
+        }
+      });
+  };
+
+  const onModalPress = () => {
+    setModalVisible(false);
+    if (modalText.indexOf('Take the seat') > -1) {
+      takeSeat();
+    } else if (modalText.indexOf('Remove') > -1) {
+      const dialogInfo = removeSpeakerFromSeatDialogInfo;
+      if (dialogInfo.message.indexOf('%0') > -1) {
+        dialogInfo.message = dialogInfo.message.replace(
+          '%0',
+          modalText.split(' ')[1]
+        );
+      }
+      showDialog(dialogInfo)
+        .then(() => {
+          leaveSeat(clickSeatIndex, modalText.split(' ')[1]);
+        })
+        .catch(() => {});
+    } else if (modalText.indexOf('Leave') > -1) {
+      showDialog(leaveSeatDialogInfo)
+        .then(() => {
+          leaveSeat(clickSeatIndex);
+        })
+        .catch(() => {});
+    }
+  };
+
   const getSeatIndexByUserID = (userID) => {
     let index = -1;
-    console.log('===getSeatIndexByUserID', roomProperties, seatingAreaData);
+    console.log(
+      '===getSeatIndexByUserID',
+      userID,
+      roomProperties,
+      seatingAreaData
+    );
     for (let key in roomProperties) {
       if (roomProperties[key] == userID) {
         index = key;
