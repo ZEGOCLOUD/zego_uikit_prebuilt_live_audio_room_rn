@@ -157,10 +157,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     'ZegoUIKitPrebuiltLiveAudioRoom' +
     String(Math.floor(Math.random() * 10000));
 
-  const onFullPageTouch = () => {
-    setIsCallMemberListVisable(false);
-  };
-
   const grantPermissions = async (callback) => {
     // Android: Dynamically obtaining device permissions
     if (Platform.OS == 'android') {
@@ -168,9 +164,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       let grantedAudio = PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
       );
-      // let grantedCamera = PermissionsAndroid.check(
-      //   PermissionsAndroid.PERMISSIONS.CAMERA
-      // );
       const ungrantedPermissions = [];
       try {
         const isAudioGranted = await grantedAudio;
@@ -180,14 +173,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
           );
         }
-        // if (!isVideoGranted) {
-        //   ungrantedPermissions.push(PermissionsAndroid.PERMISSIONS.CAMERA);
-        // }
       } catch (error) {
-        ungrantedPermissions.push(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
-          // PermissionsAndroid.PERMISSIONS.CAMERA
-        );
+        ungrantedPermissions.push(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
       }
       // If not, request it
       return PermissionsAndroid.requestMultiple(ungrantedPermissions).then(
@@ -408,6 +395,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         }
       });
   };
+
   const updateLayout = () => {
     ZegoUIKit.getSignalingPlugin()
       .queryRoomProperties()
@@ -701,7 +689,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   }
 
   return (
-    <View style={styles.container} onTouchStart={onFullPageTouch}>
+    <View style={styles.container}>
       <View style={styles.leaveButton}>
         <ZegoLeaveButton
           onLeaveConfirmation={showDefaultLeaveDialog}
@@ -733,17 +721,24 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       </View>
 
       {isCallMemberListVisable ? (
-        // <View >
-        <View style={styles.memberListBox}>
-          <ZegoLiveAudioRoomMemberList
-            seatingAreaData={seatingAreaData}
-            showMicrophoneState={true}
-            onCloseCallMemberList={onCloseCallMemberList}
-            memberListTitle={memberListTitle}
-          />
+        <View style={styles.memberListContainer}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setIsCallMemberListVisable(false);
+            }}
+          >
+            <View style={styles.memberListBoxMask}></View>
+          </TouchableWithoutFeedback>
+          <View style={styles.memberListBox}>
+            <ZegoLiveAudioRoomMemberList
+              seatingAreaData={seatingAreaData}
+              showMicrophoneState={true}
+              onCloseCallMemberList={onCloseCallMemberList}
+              memberListTitle={memberListTitle}
+            />
+          </View>
         </View>
       ) : (
-        // </View>
         <View />
       )}
       <View style={styles.messageListView}>
@@ -902,6 +897,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 125,
     width: '100%',
+  },
+  memberListContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  memberListBoxMask: {
+    zIndex: 4,
+    width: '100%',
+    height: '100%',
   },
   memberListBox: {
     zIndex: 5,
