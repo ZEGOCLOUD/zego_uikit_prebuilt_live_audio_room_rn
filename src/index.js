@@ -6,7 +6,6 @@ import {
   Text,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   Modal,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -21,6 +20,7 @@ import ZegoBottomBar from './ZegoBottomBar';
 import { useKeyboard } from './utils/keyboard';
 import ZegoSeatingArea from './ZegoSeatingArea';
 import ZegoLiveAudioRoomMemberList from './ZegoLiveAudioRoomMemberList';
+import ZegoDialogModal from './ZegoDialogModal';
 import ZegoPrebuiltPlugins from './utils/plugins';
 import {
   ZegoLiveAudioRoomRole,
@@ -147,6 +147,12 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [clickSeatIndex, setClickSeatIndex] = useState(-1);
   const [modalText, setModalText] = useState('');
+
+  // dialog
+  const [dialogInfo, setDialogInfo] = useState({});
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [onDialogConfirmPress, setOnDialogConfirmPress] = useState(() => {});
+  let [onDialogCancelPress, setOnDialogCancelPress] = useState('');
   const callbackID =
     'ZegoUIKitPrebuiltLiveAudioRoom' +
     String(Math.floor(Math.random() * 10000));
@@ -192,18 +198,19 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           }
           if (data && data['android.permission.RECORD_AUDIO'] === 'denied') {
             console.log('===拒绝了麦克风权限');
-            showDialog(microphonePermissionSettingDialogInfo)
-              .then(() => {
-                console.log('===dialog ok');
-                PermissionsAndroid.requestMultiple(ungrantedPermissions).then(
-                  (data) => {
-                    console.log('requestMultiple', data);
-                  }
-                );
-              })
-              .catch(() => {
-                console.log('===dialog cancel');
-              });
+            const confirm = () => {
+              console.log('===dialog ok');
+              PermissionsAndroid.requestMultiple(ungrantedPermissions).then(
+                (data) => {
+                  console.log('requestMultiple', data);
+                }
+              );
+              setDialogVisible(false);
+            };
+            const cancel = () => {
+              setDialogVisible(false);
+            };
+            showDialog(microphonePermissionSettingDialogInfo, confirm, cancel);
           }
         }
       );
@@ -298,9 +305,9 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                 key,
                 oldValue,
                 newValue,
-                oldValue === userID,
                 hostID,
-                clickSeatIndex
+                clickSeatIndex,
+                modalText
               );
               if (oldValue == userID && !newValue) {
                 console.log('===被踢下麦');
@@ -309,9 +316,11 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                 replaceBottomMenuBarExtendButtons(audienceExtendButtons);
                 ZegoUIKit.turnMicrophoneOn('', false);
                 setModalVisible(false);
+                setDialogVisible(false);
               }
-              if (key === clickSeatIndex.toString()) {
+              if (oldValue === modalText.split(' ')[1]) {
                 setModalVisible(false);
+                setDialogVisible(false);
               }
               updateLayout();
             }
@@ -438,6 +447,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   };
 
   const onSeatItemClick = (index) => {
+    setClickSeatIndex(index);
     console.log(
       '===onSeatItemClick',
       role,
@@ -446,7 +456,6 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       roomProperties,
       isRoomAttributesBatching
     );
-    setClickSeatIndex(index);
     if (role == ZegoLiveAudioRoomRole.host) {
       // 遍历房间属性的key，先检查麦位是否被占了（是否有房间属性的key与index相同）
       // host 踢 speaker 下麦
@@ -601,17 +610,23 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           modalText.split(' ')[1]
         );
       }
-      showDialog(dialogInfo)
-        .then(() => {
-          leaveSeat(clickSeatIndex, modalText.split(' ')[1]);
-        })
-        .catch(() => {});
+      const confirm = () => {
+        leaveSeat(clickSeatIndex, modalText.split(' ')[1]);
+        setDialogVisible(false);
+      };
+      const cancel = () => {
+        setDialogVisible(false);
+      };
+      showDialog(dialogInfo, confirm, cancel);
     } else if (modalText.indexOf('Leave') > -1) {
-      showDialog(leaveSeatDialogInfo)
-        .then(() => {
-          leaveSeat(clickSeatIndex);
-        })
-        .catch(() => {});
+      const confirm = () => {
+        leaveSeat(clickSeatIndex);
+        setDialogVisible(false);
+      };
+      const cancel = () => {
+        setDialogVisible(false);
+      };
+      showDialog(leaveSeatDialogInfo, confirm, cancel);
     }
   };
 
@@ -650,35 +665,23 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       if (!confirmDialogInfo.title) {
         resolve();
       } else {
-        Alert.alert(confirmDialogInfo.title, confirmDialogInfo.message, [
-          {
-            text: confirmDialogInfo.cancelButtonName,
-            onPress: () => reject(),
-            style: 'cancel',
-          },
-          {
-            text: confirmDialogInfo.confirmButtonName,
-            onPress: () => resolve(),
-          },
-        ]);
+        const confirm = () => {
+          resolve();
+        };
+        const cancel = () => {
+          // reject();
+          setDialogVisible(false);
+        };
+        showDialog(confirmDialogInfo, confirm, cancel);
       }
     });
   };
 
-  const showDialog = (dialogInfo) => {
-    return new Promise((resolve, reject) => {
-      Alert.alert(dialogInfo.title, dialogInfo.message, [
-        {
-          text: dialogInfo.cancelButtonName,
-          onPress: () => reject(),
-          style: 'cancel',
-        },
-        {
-          text: dialogInfo.confirmButtonName,
-          onPress: () => resolve(),
-        },
-      ]);
-    });
+  const showDialog = (dialogInfo, confirm, cancel) => {
+    setDialogInfo(dialogInfo);
+    setDialogVisible(true);
+    setOnDialogConfirmPress(() => confirm);
+    setOnDialogCancelPress(() => cancel);
   };
 
   // replace BottomMenuBarButtons
@@ -796,6 +799,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
       ) : null}
+
       <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <TouchableWithoutFeedback
           onPress={() => {
@@ -810,6 +814,13 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           </TouchableOpacity>
         </View>
       </Modal>
+
+      <ZegoDialogModal
+        dialogInfo={dialogInfo}
+        dialogVisible={dialogVisible}
+        onDialogConfirmPress={onDialogConfirmPress}
+        onDialogCancelPress={onDialogCancelPress}
+      ></ZegoDialogModal>
       <Delegate style={styles.mask} to={background} props={{ userID }} />
     </View>
   );
