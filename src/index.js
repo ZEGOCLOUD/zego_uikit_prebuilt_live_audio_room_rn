@@ -804,18 +804,23 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           <View style={styles.modalMask}></View>
         </TouchableWithoutFeedback>
         <View style={styles.modalView}>
-          <View style={styles.buttonBox}>
-            <TouchableOpacity onPress={onModalPress}>
-              <Text style={styles.btnText}>{modalText}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}
+          <TouchableOpacity onPress={onModalPress}>
+            <Text style={styles.btnText}>{modalText}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <Text
+              style={[
+                styles.btnText,
+                { borderTopWidth: 1, borderTopColor: '#ccc' },
+              ]}
             >
-              <Text style={styles.btnText}>{cancelMenuDialogButton}</Text>
-            </TouchableOpacity>
-          </View>
+              {cancelMenuDialogButton}
+            </Text>
+          </TouchableOpacity>
         </View>
       </Modal>
 
@@ -923,21 +928,15 @@ const styles = StyleSheet.create({
   },
   modalView: {
     position: 'absolute',
-    left: '50%',
-    right: '50%',
-    bottom: 30,
-    marginLeft: -157.5,
-    marginRight: -157.5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: 'white',
+    borderTopRightRadius: 12,
+    borderTopLeftRadius: 15,
   },
   btnText: {
-    marginTop: 10,
-    width: 310,
     height: 50,
-    lineHeight: 49,
-    backgroundColor: 'white',
-    borderRadius: 12,
+    lineHeight: 50,
     textAlign: 'center',
   },
 });
