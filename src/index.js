@@ -581,6 +581,11 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         if (data.code) {
           console.log('Switch seat failed: ');
         }
+      })
+      .catch((err) => {
+        console.log('===end room properties err', err);
+        // isRoomAttributesBatching = false;
+        setIsRoomAttributesBatching(false);
       });
   };
 
