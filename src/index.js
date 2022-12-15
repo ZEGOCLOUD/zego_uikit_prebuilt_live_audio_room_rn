@@ -405,7 +405,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           setRoomProperties(data._roomAttributes);
           const arr = [];
           let num = 0;
-          rowConfigs.forEach(async (row, index) => {
+          rowConfigs.forEach(async (row) => {
             const rowObj = { alignment: row.alignment };
             const rowSeatObj = new Map();
             for (let i = 0; i < row.count; i++) {
@@ -904,12 +904,12 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   memberListContainer: {
+    zIndex: 4,
     position: 'absolute',
     width: '100%',
     height: '100%',
   },
   memberListBoxMask: {
-    zIndex: 4,
     width: '100%',
     height: '100%',
   },
