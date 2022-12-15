@@ -305,7 +305,10 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
                 setModalVisible(false);
                 setDialogVisible(false);
               }
-              if (oldValue === modalText.split(' ')[1]) {
+              if (
+                modalText.split(' ')[1] &&
+                oldValue === modalText.split(' ')[1]
+              ) {
                 setModalVisible(false);
                 setDialogVisible(false);
               }
