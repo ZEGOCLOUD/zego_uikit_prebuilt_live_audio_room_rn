@@ -806,12 +806,21 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             setModalVisible(!modalVisible);
           }}
         >
-          <View style={styles.modalMask} />
+          <View style={styles.modalMask}></View>
         </TouchableWithoutFeedback>
         <View style={styles.modalView}>
-          <TouchableOpacity onPress={onModalPress}>
-            <Text style={styles.modalText}>{modalText}</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonBox}>
+            <TouchableOpacity onPress={onModalPress}>
+              <Text style={styles.btnText}>{modalText}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <Text style={styles.btnText}>{cancelMenuDialogButton}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
 
@@ -912,18 +921,18 @@ const styles = StyleSheet.create({
     left: '50%',
     right: '50%',
     bottom: 30,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    width: 315,
-    height: 49,
     marginLeft: -157.5,
     marginRight: -157.5,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalText: {
-    width: 315,
+  btnText: {
+    marginTop: 10,
+    width: 310,
+    height: 50,
     lineHeight: 49,
+    backgroundColor: 'white',
+    borderRadius: 12,
     textAlign: 'center',
   },
 });
