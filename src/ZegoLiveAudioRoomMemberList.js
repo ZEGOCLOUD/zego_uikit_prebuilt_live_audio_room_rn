@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     backgroundColor: 'rgba(17, 16, 20, 0.9)',
     width: '100%',
-    height: 520,
+    height: 350,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
