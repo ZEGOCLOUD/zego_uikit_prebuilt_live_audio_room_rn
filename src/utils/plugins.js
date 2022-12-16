@@ -3,7 +3,7 @@ import ZegoUIKit, {
   ZegoInvitationConnectionState,
 } from '@zegocloud/zego-uikit-rn';
 import { zloginfo } from './logger';
-import ZegoUIKitSignalingPlugin from '@zegocloud/zego-uikit-signaling-plugin-rn';
+import ZegoUIKitSignalingPlugin from '../../example/src/plugin';
 
 const _appInfo = {};
 const _localUser = {};
