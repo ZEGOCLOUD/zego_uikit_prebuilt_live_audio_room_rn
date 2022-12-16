@@ -16,11 +16,6 @@ export default function ZegoDialogModal(props) {
   } = props;
   return (
     <Modal animationType="fade" transparent={true} visible={dialogVisible}>
-      {/* <TouchableWithoutFeedback
-          onPress={() => {
-            setModalVisible(!modalVisible);
-          }}
-        > */}
       <View style={styles.modalMask}>
         <View style={styles.modalView}>
           <View style={styles.messageBox}>
@@ -35,14 +30,16 @@ export default function ZegoDialogModal(props) {
                 }
               }}
             >
-              <Text
-                style={[
-                  styles.buttonText,
-                  { borderRightColor: '#d3d7d4', borderRightWidth: 1 },
-                ]}
-              >
-                {dialogInfo.cancelButtonName}
-              </Text>
+              <View>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { borderRightColor: '#d3d7d4', borderRightWidth: 1 },
+                  ]}
+                >
+                  {dialogInfo.cancelButtonName}
+                </Text>
+              </View>
             </TouchableWithoutFeedback>
             <TouchableWithoutFeedback
               onPress={() => {
@@ -51,14 +48,15 @@ export default function ZegoDialogModal(props) {
                 }
               }}
             >
-              <Text style={styles.buttonText}>
-                {dialogInfo.confirmButtonName}
-              </Text>
+              <View>
+                <Text style={styles.buttonText}>
+                  {dialogInfo.confirmButtonName}
+                </Text>
+              </View>
             </TouchableWithoutFeedback>
           </View>
         </View>
       </View>
-      {/* </TouchableWithoutFeedback> */}
     </Modal>
   );
 }

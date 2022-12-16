@@ -168,6 +168,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     String(Math.floor(Math.random() * 10000));
 
   const grantPermissions = async (callback) => {
+    console.log('===grantPermissions');
     // Android: Dynamically obtaining device permissions
     if (Platform.OS == 'android') {
       // Check if permission granted
@@ -177,7 +178,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       const ungrantedPermissions = [];
       try {
         const isAudioGranted = await grantedAudio;
-        // const isVideoGranted = await grantedCamera;
+        console.log('===isAudioGranted', isAudioGranted);
         if (!isAudioGranted) {
           ungrantedPermissions.push(
             PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
@@ -193,24 +194,28 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           if (callback) {
             callback();
           }
-          if (data && data['android.permission.RECORD_AUDIO'] === 'denied') {
-            console.log('===拒绝了麦克风权限');
-            const confirm = () => {
-              console.log('===dialog ok');
-              // NativeModules.OpenSettings.openNetworkSettings((data) => {
-              //   console.log('call back data', data);
-              // });
-              PermissionsAndroid.requestMultiple(ungrantedPermissions).then(
-                (data) => {
-                  console.log('requestMultiple', data);
-                }
+          if (data) {
+            if (
+              data['android.permission.RECORD_AUDIO'] === 'denied' ||
+              data['android.permission.RECORD_AUDIO'] === 'never_ask_again'
+            ) {
+              console.log('===拒绝了麦克风权限');
+              const confirm = () => {
+                console.log('===dialog ok');
+                NativeModules.OpenSettings.openNetworkSettings((data) => {
+                  console.log('call back data', data);
+                });
+                setDialogVisible(false);
+              };
+              const cancel = () => {
+                setDialogVisible(false);
+              };
+              showDialog(
+                microphonePermissionSettingDialogInfo,
+                confirm,
+                cancel
               );
-              setDialogVisible(false);
-            };
-            const cancel = () => {
-              setDialogVisible(false);
-            };
-            showDialog(microphonePermissionSettingDialogInfo, confirm, cancel);
+            }
           }
         }
       );
@@ -236,27 +241,16 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     }
     ZegoUIKit.init(appID, appSign, { userID: userID, userName: userName })
       .then(() => {
+        console.log('===zego uikit init success1');
         ZegoUIKit.turnCameraOn('', false);
         ZegoUIKit.turnMicrophoneOn('', turnOnMicrophoneWhenJoining);
         ZegoUIKit.setAudioOutputToSpeaker(useSpeakerWhenJoining);
-        grantPermissions(() => {
-          ZegoUIKit.joinRoom(roomID).then((data) => {
-            console.log(
-              '===prebuilt uikit join room success',
-              data,
-              hostSeatIndexes,
-              roomID
-            );
-            ZegoPrebuiltPlugins.init(appID, appSign, userID, userName)
-              .then(() => {
-                setIsInit(true);
-                console.log('===init success');
-                pluginJoinRoom(roomID);
-              })
-              .catch((err) => {
-                console.log('===init err', err);
-              });
-          });
+        ZegoUIKit.joinRoom(roomID).then(() => {
+          console.log('===prebuilt uikit join room success');
+          if (role !== ZegoLiveAudioRoomRole.audience) {
+            grantPermissions();
+          }
+          pluginInit();
         });
       })
       .catch((err) => {
@@ -271,10 +265,18 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     };
   }, []);
 
-  const pluginJoinRoom = (roomID) => {
-    setTimeout(() => {
-      console.log('===clickSeatIndex', clickSeatIndex);
-    }, 10000);
+  const pluginInit = () => {
+    return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName)
+      .then(() => {
+        setIsInit(true);
+        console.log('===init success');
+        pluginJoinRoom();
+      })
+      .catch((err) => {
+        console.log('===init err', err);
+      });
+  };
+  const pluginJoinRoom = () => {
     console.log('===plugin join room');
     return ZegoUIKit.getSignalingPlugin()
       .joinRoom(roomID)
@@ -418,7 +420,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   };
 
   const onSeatItemClick = (index) => {
-    setClickSeatIndex(index);
+    setClickSeatIndex((index) => index);
     // clickSeatIndex = index;
     console.log(
       '===onSeatItemClick',
@@ -479,6 +481,9 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   };
 
   const takeSeat = (index, isDeleteAfterOwnerLeft, isForce, isUpdateOwner) => {
+    if (role === ZegoLiveAudioRoomRole.audience) {
+      grantPermissions();
+    }
     ZegoUIKit.getSignalingPlugin()
       .updateRoomProperty(
         index,
