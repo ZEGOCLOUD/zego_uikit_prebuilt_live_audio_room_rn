@@ -75,8 +75,6 @@ PODS:
   - glog (0.3.5)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
-  - Permission-Camera (3.6.1):
-    - RNPermissions
   - Permission-Microphone (3.6.1):
     - RNPermissions
   - RCT-Folly (2021.06.28.00-v2):
@@ -407,7 +405,6 @@ DEPENDENCIES:
   - FlipperKit/SKIOSNetworkPlugin (= 0.125.0)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - OpenSSL-Universal (= 1.1.1100)
-  - Permission-Camera (from `../node_modules/react-native-permissions/ios/Camera`)
   - Permission-Microphone (from `../node_modules/react-native-permissions/ios/Microphone`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
@@ -475,8 +472,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/React/FBReactNativeSpec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
-  Permission-Camera:
-    :path: "../node_modules/react-native-permissions/ios/Camera"
   Permission-Microphone:
     :path: "../node_modules/react-native-permissions/ios/Microphone"
   RCT-Folly:
@@ -563,7 +558,6 @@ SPEC CHECKSUMS:
   glog: 476ee3e89abb49e07f822b48323c51c57124b572
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
-  Permission-Camera: bf6791b17c7f614b6826019fcfdcc286d3a107f6
   Permission-Microphone: 48212dd4d28025d9930d583e3c7a56da7268665c
   RCT-Folly: 4d8508a426467c48885f1151029bc15fa5d7b3b8
   RCTRequired: 0f06b6068f530932d10e1a01a5352fad4eaacb74
@@ -602,6 +596,6 @@ SPEC CHECKSUMS:
   ZegoExpressEngine: 69a011ea12cbe6e7006cab05058ab1489d176d68
   ZIM: dacf435d3a486bb5ef132b6c8848ad3aced4874e
 
-PODFILE CHECKSUM: 58c4899fe3cbd56b0584853805087695039a2d0d
+PODFILE CHECKSUM: 7f8f52c8fcf4fe84b2ecf75496e3bce01a8e0e31
 
 COCOAPODS: 1.11.3
