@@ -877,6 +877,9 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         onDialogConfirmPress={onDialogConfirmPress}
         onDialogCancelPress={onDialogCancelPress}
       />
+      {toastVisible ? (
+        <ZegoToast toast={toastText} toastVisible={toastVisible}></ZegoToast>
+      ) : null}
       <Delegate style={styles.mask} to={background} props={{ userID }} />
     </View>
   );
