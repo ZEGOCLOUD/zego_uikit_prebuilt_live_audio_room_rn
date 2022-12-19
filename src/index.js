@@ -205,9 +205,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               data['android.permission.RECORD_AUDIO'] === 'never_ask_again'
             ) {
               const confirm = () => {
-                NativeModules.OpenSettings.openNetworkSettings((data) => {
-                  console.log('call back data', data);
-                });
+                Linking.openSettings();
                 setDialogVisible(false);
               };
               const cancel = () => {
