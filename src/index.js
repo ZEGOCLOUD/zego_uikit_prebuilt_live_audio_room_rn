@@ -223,11 +223,23 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         }
       );
     } else {
-      grantIOSPermissions(callback);
+      grantIOSPermissions();
     }
   };
 
-  const grantIOSPermissions = async (callback) => {
+  const grantIOSPermissions = async () => {
+    const confirmHandle = () => {
+      const confirm = () => {
+        console.log('******Open ios settings******');
+        Linking.openSettings();
+        setDialogVisible(false);
+      };
+      const cancel = () => {
+        console.log('******Cancel open ios settings******');
+        setDialogVisible(false);
+      };
+      showDialog(microphonePermissionSettingDialogInfo, confirm, cancel);
+    };
     console.log('******Check ios permission start******');
     try {
       const checkResult = await check(PERMISSIONS.IOS.MICROPHONE);
@@ -245,18 +257,11 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         console.log('******Request ios permission start******');
         const requestResult = await request(PERMISSIONS.IOS.MICROPHONE);
         console.log('******Request ios permission end******', requestResult);
-        callback && callback();
+        if (requestResult === RESULTS.BLOCKED) {
+          confirmHandle();
+        }
       } else if (checkResult === RESULTS.BLOCKED) {
-        const confirm = () => {
-          console.log('******Open ios settings******');
-          Linking.openSettings();
-          setDialogVisible(false);
-        };
-        const cancel = () => {
-          console.log('******Cancel open ios settings******');
-          setDialogVisible(false);
-        };
-        showDialog(microphonePermissionSettingDialogInfo, confirm, cancel);
+        confirmHandle();
       }
     } catch (error) {
       console.error('******Check ios permission error******', error);
