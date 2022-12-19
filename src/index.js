@@ -30,6 +30,7 @@ import {
   ZegoLiveAudioRoomLayoutRowConfig,
   ZegoMenuBarButtonName,
 } from './define';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const HOST_DEFAULT_CONFIG = {
   role: ZegoLiveAudioRoomRole.host,
@@ -220,7 +221,34 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         }
       );
     } else if (callback) {
-      callback();
+      grantIOSPermissions(callback);
+    }
+  };
+
+  const grantIOSPermissions = async (callback) => {
+    console.log('******Check ios permission start******');
+    try {
+      const checkResult = await check(PERMISSIONS.IOS.MICROPHONE);
+      // RESULTS.UNAVAILABLE  This feature is not available (on this device / in this context)
+      // RESULTS.DENIED The permission has not been requested / is denied but requestable
+      // RESULTS.GRANTED  The permission is granted
+      // RESULTS.LIMITED  The permission is granted but with limitations
+      // RESULTS.BLOCKED  The permission is denied and not requestable anymore
+      if (checkResult === RESULTS.UNAVAILABLE) {
+        console.error(
+          '******This feature is not available (on this device / in this context)******'
+        );
+      } else if (checkResult !== RESULTS.GRANTED) {
+        const requestResult = await request(PERMISSIONS.IOS.MICROPHONE);
+        callback && callback();
+        if (requestResult === RESULTS.DENIED) {
+          console.log(
+            '******The permission has not been requested / is denied but requestable******'
+          );
+        }
+      }
+    } catch (error) {
+      console.error('******Check ios permission error******', error);
     }
   };
 
@@ -733,7 +761,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
               setIsCallMemberListVisable(false);
             }}
           >
-            <View style={styles.memberListBoxMask}></View>
+            <View style={styles.memberListBoxMask} />
           </TouchableWithoutFeedback>
           <View style={styles.memberListBox}>
             <ZegoLiveAudioRoomMemberList
@@ -807,7 +835,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             setModalVisible(!modalVisible);
           }}
         >
-          <View style={styles.modalMask}></View>
+          <View style={styles.modalMask} />
         </TouchableWithoutFeedback>
         <View style={styles.modalView}>
           <TouchableOpacity onPress={onModalPress}>
@@ -835,10 +863,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         dialogVisible={dialogVisible}
         onDialogConfirmPress={onDialogConfirmPress}
         onDialogCancelPress={onDialogCancelPress}
-      ></ZegoDialogModal>
-      {toastVisible ? (
-        <ZegoToast toast={toastText} toastVisible={toastVisible}></ZegoToast>
-      ) : null}
+      />
       <Delegate style={styles.mask} to={background} props={{ userID }} />
     </View>
   );
