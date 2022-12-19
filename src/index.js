@@ -226,11 +226,12 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   };
 
   useEffect(() => {
-    console.log('===123', changedSeatItem, clickSeatItem);
-    if (changedSeatItem.index === clickSeatItem.index) {
-      if (changedSeatItem.userID !== clickSeatItem.userID) {
-        setModalVisible(false);
-        setDialogVisible(false);
+    if (modalText.indexOf('Leave') > -1 || modalText.indexOf('Remove') > -1) {
+      if (changedSeatItem.index === clickSeatItem.index) {
+        if (changedSeatItem.userID !== clickSeatItem.userID) {
+          setModalVisible(false);
+          setDialogVisible(false);
+        }
       }
     }
   }, [changedSeatItem]);
@@ -563,7 +564,18 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         }
       })
       .catch((err) => {
-        console.log('==err', err);
+        console.log('==deleteRoomProperties err', err);
+        if (removeSpeakerFailedToast.indexOf('%0') > -1) {
+          removeSpeakerFailedToast = removeSpeakerFailedToast.replace(
+            '%0',
+            modalText.split(' ')[1]
+          );
+        }
+        setToastVisible(true);
+        setToastText(removeSpeakerFailedToast);
+        setTimeout(() => {
+          setToastVisible(false);
+        }, 3000);
       });
   };
 
