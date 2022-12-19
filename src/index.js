@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   NativeModules,
+  Linking,
 } from 'react-native';
 import Delegate from 'react-delegate-component';
 import ZegoUIKit, {
@@ -220,7 +221,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           }
         }
       );
-    } else if (callback) {
+    } else {
       grantIOSPermissions(callback);
     }
   };
@@ -229,6 +230,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     console.log('******Check ios permission start******');
     try {
       const checkResult = await check(PERMISSIONS.IOS.MICROPHONE);
+      console.log('******Check ios permission end******', checkResult);
       // RESULTS.UNAVAILABLE  This feature is not available (on this device / in this context)
       // RESULTS.DENIED The permission has not been requested / is denied but requestable
       // RESULTS.GRANTED  The permission is granted
@@ -238,14 +240,22 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         console.error(
           '******This feature is not available (on this device / in this context)******'
         );
-      } else if (checkResult !== RESULTS.GRANTED) {
+      } else if (checkResult === RESULTS.DENIED) {
+        console.log('******Request ios permission start******');
         const requestResult = await request(PERMISSIONS.IOS.MICROPHONE);
+        console.log('******Request ios permission end******', requestResult);
         callback && callback();
-        if (requestResult === RESULTS.DENIED) {
-          console.log(
-            '******The permission has not been requested / is denied but requestable******'
-          );
-        }
+      } else if (checkResult === RESULTS.BLOCKED) {
+        const confirm = () => {
+          console.log('******Open ios settings******');
+          Linking.openSettings();
+          setDialogVisible(false);
+        };
+        const cancel = () => {
+          console.log('******Cancel open ios settings******');
+          setDialogVisible(false);
+        };
+        showDialog(microphonePermissionSettingDialogInfo, confirm, cancel);
       }
     } catch (error) {
       console.error('******Check ios permission error******', error);
