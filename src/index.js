@@ -31,7 +31,7 @@ import {
   ZegoLiveAudioRoomLayoutRowConfig,
   ZegoMenuBarButtonName,
 } from './define';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+// import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const HOST_DEFAULT_CONFIG = {
   role: ZegoLiveAudioRoomRole.host,
@@ -221,50 +221,50 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         }
       );
     } else {
-      grantIOSPermissions();
+      // grantIOSPermissions();
     }
   };
 
-  const grantIOSPermissions = async () => {
-    const confirmHandle = () => {
-      const confirm = () => {
-        console.log('******Open ios settings******');
-        Linking.openSettings();
-        setDialogVisible(false);
-      };
-      const cancel = () => {
-        console.log('******Cancel open ios settings******');
-        setDialogVisible(false);
-      };
-      showDialog(microphonePermissionSettingDialogInfo, confirm, cancel);
-    };
-    console.log('******Check ios permission start******');
-    try {
-      const checkResult = await check(PERMISSIONS.IOS.MICROPHONE);
-      console.log('******Check ios permission end******', checkResult);
-      // RESULTS.UNAVAILABLE  This feature is not available (on this device / in this context)
-      // RESULTS.DENIED The permission has not been requested / is denied but requestable
-      // RESULTS.GRANTED  The permission is granted
-      // RESULTS.LIMITED  The permission is granted but with limitations
-      // RESULTS.BLOCKED  The permission is denied and not requestable anymore
-      if (checkResult === RESULTS.UNAVAILABLE) {
-        console.error(
-          '******This feature is not available (on this device / in this context)******'
-        );
-      } else if (checkResult === RESULTS.DENIED) {
-        console.log('******Request ios permission start******');
-        const requestResult = await request(PERMISSIONS.IOS.MICROPHONE);
-        console.log('******Request ios permission end******', requestResult);
-        if (requestResult === RESULTS.BLOCKED) {
-          confirmHandle();
-        }
-      } else if (checkResult === RESULTS.BLOCKED) {
-        confirmHandle();
-      }
-    } catch (error) {
-      console.error('******Check ios permission error******', error);
-    }
-  };
+  // const grantIOSPermissions = async () => {
+  //   const confirmHandle = () => {
+  //     const confirm = () => {
+  //       console.log('******Open ios settings******');
+  //       Linking.openSettings();
+  //       setDialogVisible(false);
+  //     };
+  //     const cancel = () => {
+  //       console.log('******Cancel open ios settings******');
+  //       setDialogVisible(false);
+  //     };
+  //     showDialog(microphonePermissionSettingDialogInfo, confirm, cancel);
+  //   };
+  //   console.log('******Check ios permission start******');
+  //   try {
+  //     const checkResult = await check(PERMISSIONS.IOS.MICROPHONE);
+  //     console.log('******Check ios permission end******', checkResult);
+  //     // RESULTS.UNAVAILABLE  This feature is not available (on this device / in this context)
+  //     // RESULTS.DENIED The permission has not been requested / is denied but requestable
+  //     // RESULTS.GRANTED  The permission is granted
+  //     // RESULTS.LIMITED  The permission is granted but with limitations
+  //     // RESULTS.BLOCKED  The permission is denied and not requestable anymore
+  //     if (checkResult === RESULTS.UNAVAILABLE) {
+  //       console.error(
+  //         '******This feature is not available (on this device / in this context)******'
+  //       );
+  //     } else if (checkResult === RESULTS.DENIED) {
+  //       console.log('******Request ios permission start******');
+  //       const requestResult = await request(PERMISSIONS.IOS.MICROPHONE);
+  //       console.log('******Request ios permission end******', requestResult);
+  //       if (requestResult === RESULTS.BLOCKED) {
+  //         confirmHandle();
+  //       }
+  //     } else if (checkResult === RESULTS.BLOCKED) {
+  //       confirmHandle();
+  //     }
+  //   } catch (error) {
+  //     console.error('******Check ios permission error******', error);
+  //   }
+  // };
 
   useEffect(() => {
     if (modalText.indexOf('Leave') > -1 || modalText.indexOf('Remove') > -1) {
@@ -878,7 +878,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         onDialogCancelPress={onDialogCancelPress}
       />
       {toastVisible ? (
-        <ZegoToast toast={toastText} toastVisible={toastVisible}></ZegoToast>
+        <ZegoToast toast={toastText} toastVisible={toastVisible} />
       ) : null}
       <Delegate style={styles.mask} to={background} props={{ userID }} />
     </View>

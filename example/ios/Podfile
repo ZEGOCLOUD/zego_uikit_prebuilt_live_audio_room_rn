@@ -6,9 +6,9 @@ install! 'cocoapods', :deterministic_uuids => false
 
 target 'ZegoPrebuiltLiveAudioRoom' do
 
-  permissions_path = '../node_modules/react-native-permissions/ios'
+  # permissions_path = '../node_modules/react-native-permissions/ios'
 
-  pod 'Permission-Microphone', :path => "#{permissions_path}/Microphone"
+  # pod 'Permission-Microphone', :path => "#{permissions_path}/Microphone"
 
   config = use_native_modules!
 
