@@ -20,9 +20,9 @@ export default class ZegoPluginRoomPropertiesService {
     value,
     isDeleteAfterOwnerLeft,
     isForce = false,
-    isUpdateOwner = false
+    isUpdateOwner = false,
   ) {
-    const attributes = { [key]: value };
+    const attributes = {[key]: value};
     const config = {
       isForce,
       isDeleteAfterOwnerLeft,
@@ -30,7 +30,7 @@ export default class ZegoPluginRoomPropertiesService {
     };
     return ZegoPluginRoomPropertiesCore.getInstance().updateRoomProperty(
       attributes,
-      config
+      config,
     );
   }
   deleteRoomProperties(keys = [], isForce) {
@@ -39,13 +39,13 @@ export default class ZegoPluginRoomPropertiesService {
     };
     return ZegoPluginRoomPropertiesCore.getInstance().deleteRoomProperties(
       keys,
-      config
+      config,
     );
   }
   beginRoomPropertiesBatchOperation(
     isDeleteAfterOwnerLeft = false,
     isForce = false,
-    isUpdateOwner = false
+    isUpdateOwner = false,
   ) {
     const config = {
       isDeleteAfterOwnerLeft,
@@ -53,7 +53,7 @@ export default class ZegoPluginRoomPropertiesService {
       isUpdateOwner,
     };
     return ZegoPluginRoomPropertiesCore.getInstance().beginRoomPropertiesBatchOperation(
-      config
+      config,
     );
   }
   endRoomPropertiesBatchOperation() {
@@ -62,10 +62,10 @@ export default class ZegoPluginRoomPropertiesService {
   queryRoomProperties() {
     return ZegoPluginRoomPropertiesCore.getInstance().queryRoomProperties();
   }
-  onRoomPropertiesUpdated(callbackID, callback) {
-    ZegoPluginRoomPropertiesCore.getInstance().onRoomPropertiesUpdated(
+  onRoomPropertyUpdated(callbackID, callback) {
+    ZegoPluginRoomPropertiesCore.getInstance().onRoomPropertyUpdated(
       callbackID,
-      callback
+      callback,
     );
   }
 }
