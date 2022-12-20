@@ -313,7 +313,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     return () => {
       ZegoUIKit.leaveRoom();
       ZegoUIKit.onUserLeave(callbackID);
-      ZegoUIKit.getSignalingPlugin().onRoomPropertiesUpdated(callbackID);
+      ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(callbackID);
       ZegoPrebuiltPlugins.uninit();
     };
   }, []);
@@ -387,11 +387,11 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
         );
       }
     );
-    ZegoUIKit.getSignalingPlugin().onRoomPropertiesUpdated(
+    ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(
       callbackID,
       (key, oldValue, newValue) => {
         console.log(
-          '===onRoomPropertiesUpdated',
+          '===onRoomPropertyUpdated',
           userID,
           key,
           oldValue,
