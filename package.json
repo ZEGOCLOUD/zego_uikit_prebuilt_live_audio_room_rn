@@ -152,5 +152,7 @@
       ]
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@zegocloud/zego-uikit-signaling-plugin-rn": "^1.0.4"
+  }
 }
