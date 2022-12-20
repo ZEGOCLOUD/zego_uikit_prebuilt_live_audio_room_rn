@@ -153,6 +153,7 @@
     ]
   },
   "dependencies": {
-    "@zegocloud/zego-uikit-signaling-plugin-rn": "^1.0.4"
+    "@zegocloud/zego-uikit-signaling-plugin-rn": "^1.0.4",
+    "zego-zim-react-native": "2.4.0"
   }
 }
