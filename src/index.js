@@ -199,25 +199,25 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
           if (callback) {
             callback();
           }
-          if (data) {
-            if (
-              data['android.permission.RECORD_AUDIO'] === 'denied' ||
-              data['android.permission.RECORD_AUDIO'] === 'never_ask_again'
-            ) {
-              const confirm = () => {
-                Linking.openSettings();
-                setDialogVisible(false);
-              };
-              const cancel = () => {
-                setDialogVisible(false);
-              };
-              showDialog(
-                microphonePermissionSettingDialogInfo,
-                confirm,
-                cancel
-              );
-            }
-          }
+          // if (data) {
+          //   if (
+          //     data['android.permission.RECORD_AUDIO'] === 'denied' ||
+          //     data['android.permission.RECORD_AUDIO'] === 'never_ask_again'
+          //   ) {
+          //     const confirm = () => {
+          //       Linking.openSettings();
+          //       setDialogVisible(false);
+          //     };
+          //     const cancel = () => {
+          //       setDialogVisible(false);
+          //     };
+          //     showDialog(
+          //       microphonePermissionSettingDialogInfo,
+          //       confirm,
+          //       cancel
+          //     );
+          //   }
+          // }
         }
       );
     } else {
