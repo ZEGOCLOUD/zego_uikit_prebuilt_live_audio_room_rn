@@ -7,12 +7,6 @@ import {
 } from 'react-native';
 import { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
 
-const ZegoLiveAudioRoomLayoutAlignment = {
-  center: 0,
-  start: 1,
-  end: 2,
-};
-
 export default function ZegoSeatingArea(props) {
   const {
     rowSpacing,
@@ -77,7 +71,7 @@ export default function ZegoSeatingArea(props) {
                 audioViewBackgroudColor={backgroundColor}
                 audioViewBackgroudImage={backgroundImage}
                 avatarSize={{ width: 54, height: 54 }}
-                avatarAlignment={ZegoLiveAudioRoomLayoutAlignment.center}
+                avatarAlignment={0}
                 soundWaveColor="#3655ff"
               />
             ) : (
