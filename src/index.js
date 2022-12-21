@@ -91,7 +91,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
   } = bottomMenuBarConfig;
 
   const {
-    showSoundWavesInAudioMode = true,
+    showSoundWaveInAudioMode = true,
     foregroundBuilder,
     backgroundColor = 'transparent',
     backgroundImage,
@@ -762,7 +762,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
             backgroundColor={backgroundColor}
             backgroundImage={backgroundImage}
             seatingAreaData={seatingAreaData}
-            showSoundWavesInAudioMode={showSoundWavesInAudioMode}
+            showSoundWaveInAudioMode={showSoundWaveInAudioMode}
           />
         ) : null}
       </View>

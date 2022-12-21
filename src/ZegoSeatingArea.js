@@ -15,7 +15,7 @@ export default function ZegoSeatingArea(props) {
     backgroundColor,
     backgroundImage,
     seatingAreaData,
-    showSoundWavesInAudioMode,
+    showSoundWaveInAudioMode,
   } = props;
   const flexStyle = [
     'space-around',
@@ -67,7 +67,7 @@ export default function ZegoSeatingArea(props) {
                     : ({ userInfo }) => <View />
                 }
                 useVideoViewAspectFill={true}
-                showSoundWave={showSoundWavesInAudioMode}
+                showSoundWave={showSoundWaveInAudioMode}
                 audioViewBackgroudColor={backgroundColor}
                 audioViewBackgroudImage={backgroundImage}
                 avatarSize={{ width: 54, height: 54 }}
