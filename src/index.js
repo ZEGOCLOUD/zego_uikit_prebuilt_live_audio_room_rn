@@ -17,6 +17,7 @@ import ZegoUIKit, {
   ZegoLeaveButton,
   ZegoInRoomMessageInput,
   ZegoInRoomMessageView,
+  ZegoAudioVideoResourceMode,
 } from '@zegocloud/zego-uikit-rn';
 import ZegoBottomBar from './ZegoBottomBar';
 import { useKeyboard } from './utils/keyboard';
@@ -298,6 +299,7 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     ZegoUIKit.init(appID, appSign, { userID: userID, userName: userName })
       .then(() => {
         console.log('===zego uikit init success');
+        ZegoUIKit.setAudioVideoResourceMode(ZegoAudioVideoResourceMode.RTCOnly);
         ZegoUIKit.turnCameraOn('', false);
         ZegoUIKit.turnMicrophoneOn('', turnOnMicrophoneWhenJoining);
         ZegoUIKit.setAudioOutputToSpeaker(useSpeakerWhenJoining);
