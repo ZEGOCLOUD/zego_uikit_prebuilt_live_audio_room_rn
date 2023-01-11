@@ -63,7 +63,7 @@ export default function ZegoSeatingArea(props) {
                 userID={item.userID}
                 foregroundBuilder={
                   foregroundBuilder
-                    ? foregroundBuilder
+                    ? ({ userInfo }) => foregroundBuilder({ userInfo, seatIndex: item.seatIndex })
                     : ({ userInfo }) => <View />
                 }
                 useVideoViewAspectFill={true}

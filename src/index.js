@@ -71,6 +71,9 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
     hostSeatIndexes = [0],
     seatConfig = {},
     background,
+    avatar = '',
+    userInRoomAttributes = { },
+    onUserCountOrPropertyChanged,
   } = config;
 
   const {
@@ -309,8 +312,12 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       .catch((err) => {
         console.log('===err', err);
       });
-
+    ZegoUIKit.onUserCountOrPropertyChanged(callbackID, (userList) => {
+      console.log('########### Custom onUserCountOrPropertyChanged', userID, userList);
+      typeof onUserCountOrPropertyChanged === 'function' && onUserCountOrPropertyChanged(userList);
+    });
     return () => {
+      ZegoUIKit.onUserCountOrPropertyChanged(callbackID);
       ZegoUIKit.leaveRoom();
       ZegoUIKit.onUserLeave(callbackID);
       ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(callbackID);
@@ -330,6 +337,16 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       });
   };
 
+  // Set the avatar url and user-defined additional properties
+  const setUserCustomRoomAttributes = () => {
+    console.log('###########setUserCustomRoomAttributes', userID, avatar, userInRoomAttributes);
+    ZegoUIKit.getSignalingPlugin().setUsersInRoomAttributes('avatar', avatar, [userID]);
+    Object.keys(userInRoomAttributes).forEach((key) => {
+    console.log('###########setUserCustomRoomAttributes', userID, key, userInRoomAttributes[key]);
+      ZegoUIKit.getSignalingPlugin().setUsersInRoomAttributes(key, userInRoomAttributes[key], [userID]);
+    });
+  }
+
   const pluginJoinRoom = () => {
     console.log('===plugin join room');
     return ZegoUIKit.getSignalingPlugin()
@@ -337,6 +354,8 @@ export default function ZegoUIKitPrebuiltLiveAudioRoom(props) {
       .then((data) => {
         if (!data.code) {
           console.log('===plugin join room success', role);
+          // Set the avatar url and user-defined additional properties
+          setUserCustomRoomAttributes();
           registerUIKitListener();
           replaceBottomMenuBarButtons(audienceButtons);
           replaceBottomMenuBarExtendButtons(audienceExtendButtons);
