@@ -288,9 +288,9 @@ PODS:
     - RCTTypeSafety
     - React-Core
     - ReactCommon/turbomodule/core
-  - react-native-zego-express-engine (3.0.3):
+  - react-native-zego-express-engine (3.2.0):
     - React
-    - ZegoExpressEngine (= 3.0.3)
+    - ZegoExpressEngine (= 3.2.0)
   - react-native-zego-zim (2.4.0):
     - React
     - ZIM (= 2.4.0)
@@ -366,11 +366,11 @@ PODS:
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
-  - zego-uikit-rn (1.4.3):
+  - zego-uikit-rn (1.11.1):
     - React-Core
-  - ZegoExpressEngine (3.0.3):
-    - ZegoExpressEngine/Video (= 3.0.3)
-  - ZegoExpressEngine/Video (3.0.3)
+  - ZegoExpressEngine (3.2.0):
+    - ZegoExpressEngine/Video (= 3.2.0)
+  - ZegoExpressEngine/Video (3.2.0)
   - ZIM (2.4.0)
 
 DEPENDENCIES:
@@ -562,7 +562,7 @@ SPEC CHECKSUMS:
   React-jsinspector: eb202e43b3879aba9a14f3f65788aec85d4e1ea9
   React-logger: 98f663b292a60967ebbc6d803ae96c1381183b6d
   react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
-  react-native-zego-express-engine: dd599187e73afb9ce1832308a61548bfb9a9c688
+  react-native-zego-express-engine: 47e48e9e647bc973827a04f0c09723a9f3421feb
   react-native-zego-zim: 2128a03e1a1f2d2c9cea1e737db52d8ada6f4b8a
   React-perflogger: 0458a87ea9a7342079e7a31b0d32b3734fb8415f
   React-RCTActionSheet: 22538001ea2926dea001111dd2846c13a0730bc9
@@ -580,8 +580,8 @@ SPEC CHECKSUMS:
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: c4d61225a466f250c35c1ee78d2d0b3d41fe661c
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
-  zego-uikit-rn: 50474c3c2c765ab50e802a5b838ece501ffb87ac
-  ZegoExpressEngine: 69a011ea12cbe6e7006cab05058ab1489d176d68
+  zego-uikit-rn: 6b8441b6a9154fa624d7dff2a58ccb1d18983ab3
+  ZegoExpressEngine: 7ddbd7134c03c45bfdcddb61f4d76a1486518425
   ZIM: dacf435d3a486bb5ef132b6c8848ad3aced4874e
 
 PODFILE CHECKSUM: b306e5d8bc0ab9ea1bb029b1263925382c7f83bd
