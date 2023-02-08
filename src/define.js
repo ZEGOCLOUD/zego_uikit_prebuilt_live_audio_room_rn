@@ -56,7 +56,7 @@ const ZegoLiveAudioRoomLayoutRowConfig = {
 //   takeSeatMenuDialogButton: 'Take the seat',
 //   leaveSeatMenuDialogButton: 'Leave the seat',
 //   cancelMenuDialogButton: 'Cancel',
-//   memberListTitle: 'Attendance',
+//   memberListTitle: 'Audience',
 //   removeSpeakerFailedToast: 'Failed to remove %0 from seat', // 红色
 //   microphonePermissionSettingDialogInfo: {
 //     title: 'Can not use Microphone!',
