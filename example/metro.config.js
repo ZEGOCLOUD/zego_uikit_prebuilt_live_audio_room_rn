@@ -38,7 +38,7 @@ module.exports = {
       ),
     ]),
 
-    extraNodeModules: uikitModules.reduce((acc, name) => {
+    extraNodeModules: [...uikitModules, ...prebuiltModules].reduce((acc, name) => {
       acc[name] = path.join(__dirname, 'node_modules', name);
       return acc;
     }, {}),

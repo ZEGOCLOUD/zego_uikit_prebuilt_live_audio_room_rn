@@ -78,8 +78,7 @@
     "react": "*",
     "react-native": "*",
     "@zegocloud/zego-uikit-rn": ">=1.12.0",
-    "@zegocloud/zego-uikit-signaling-plugin-rn": ">=1.2.0",
-    "zego-zim-react-native": ">=2.5.0"
+    "@zegocloud/zego-uikit-signaling-plugin-rn": ">=1.2.6"
   },
   "jest": {
     "preset": "react-native",
@@ -153,9 +152,5 @@
         }
       ]
     ]
-  },
-  "dependencies": {
-    "@zegocloud/zego-uikit-signaling-plugin-rn": ">=1.2.0",
-    "zego-zim-react-native": ">=2.5.0"
   }
 }
