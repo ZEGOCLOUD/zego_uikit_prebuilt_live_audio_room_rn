@@ -1526,10 +1526,10 @@
   version "0.0.0"
   uid ""
 
-"@zegocloud/zego-uikit-signaling-plugin-rn@1.2.6":
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/@zegocloud/zego-uikit-signaling-plugin-rn/-/zego-uikit-signaling-plugin-rn-1.2.6.tgz#294f208dc15c524c636611ce61358ee4fc751227"
-  integrity sha512-44OIHKzb6rbw/9YsWfH5PoQOS/LsyCKKraqm0c1GmIH+lh2aqjXZAjzGfQOwe5yV9dpp3jw8FDN5wWy0bGtz5Q==
+"@zegocloud/zego-uikit-signaling-plugin-rn@1.2.7":
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@zegocloud/zego-uikit-signaling-plugin-rn/-/zego-uikit-signaling-plugin-rn-1.2.7.tgz#f6667f2f79eda02f2c2362d2a2c286325db157a9"
+  integrity sha512-aqaWMK8tAg6V4vT9CSGEhwseRHuvonFJZv2W68YwrC6lpu86jDaWpFyd/FNcQTjrlcIWQ1cjWrGhMIuUgNVtIw==
 
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.6"

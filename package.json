@@ -78,7 +78,7 @@
     "react": "*",
     "react-native": "*",
     "@zegocloud/zego-uikit-rn": ">=1.12.0",
-    "@zegocloud/zego-uikit-signaling-plugin-rn": ">=1.2.6"
+    "@zegocloud/zego-uikit-signaling-plugin-rn": ">=1.2.7"
   },
   "jest": {
     "preset": "react-native",
