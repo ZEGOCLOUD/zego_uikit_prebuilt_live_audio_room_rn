@@ -19,19 +19,19 @@ import ZegoUIKit, {
   ZegoInRoomMessageView,
   ZegoAudioVideoResourceMode,
 } from '@zegocloud/zego-uikit-rn';
-import ZegoBottomBar from './ZegoBottomBar';
+import ZegoBottomBar from './components/ZegoBottomBar';
 import { useKeyboard } from './utils/keyboard';
-import ZegoSeatingArea from './ZegoSeatingArea';
-import ZegoLiveAudioRoomMemberList from './ZegoLiveAudioRoomMemberList';
-import ZegoDialogModal from './ZegoDialogModal';
-import ZegoToast from './ZegoToast';
-import ZegoPrebuiltPlugins from './utils/plugins';
+import ZegoSeatingArea from './components/ZegoSeatingArea';
+import ZegoLiveAudioRoomMemberList from './components/ZegoLiveAudioRoomMemberList';
+import ZegoDialogModal from './components/ZegoDialogModal';
+import ZegoToast from './components/ZegoToast';
+import ZegoPrebuiltPlugins from './services/plugins';
 import {
   ZegoLiveAudioRoomRole,
   ZegoLiveAudioRoomLayoutAlignment,
   ZegoLiveAudioRoomLayoutRowConfig,
   ZegoMenuBarButtonName,
-} from './define';
+} from './services/define';
 // import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const HOST_DEFAULT_CONFIG = {

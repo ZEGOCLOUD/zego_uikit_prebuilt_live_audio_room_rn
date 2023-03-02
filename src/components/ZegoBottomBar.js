@@ -6,10 +6,10 @@ import {
   ZegoLeaveButton,
 } from '@zegocloud/zego-uikit-rn';
 
-import ZegoMoreButton from './ZegoMoreButton';
-import ZegoMessageButton from './ZegoMessageButton';
-import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
-import ZegoMemberButton from './ZegoMemberButton';
+import ZegoMoreButton from '../components/ZegoMoreButton';
+import ZegoMessageButton from '../components/ZegoMessageButton';
+import ZegoMenuBarButtonName from '../components/ZegoMenuBarButtonName';
+import ZegoMemberButton from '../components/ZegoMemberButton';
 
 export default function ZegoBottomBar(props) {
   const {
@@ -37,8 +37,8 @@ export default function ZegoBottomBar(props) {
             isOn={turnOnMicrophoneWhenJoining}
             width={buttonSize}
             height={buttonSize}
-            iconMicOn={require('./resources/bottom_button_mic_on.png')}
-            iconMicOff={require('./resources/bottom_button_mic_off.png')}
+            iconMicOn={require('../resources/bottom_button_mic_on.png')}
+            iconMicOff={require('../resources/bottom_button_mic_off.png')}
           />
         );
       case ZegoMenuBarButtonName.showMemberListButton:
@@ -65,7 +65,7 @@ export default function ZegoBottomBar(props) {
             key={buttonIndex}
             onLeaveConfirmation={onLeaveLiveStreamingConfirming}
             onPressed={onLeaveLiveStreaming}
-            iconLeave={require('./resources/white_bottom_button_close.png')}
+            iconLeave={require('../resources/white_bottom_button_close.png')}
             width={buttonSize}
             height={buttonSize}
           />

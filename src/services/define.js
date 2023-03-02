@@ -1,4 +1,4 @@
-import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
+import ZegoMenuBarButtonName from '../components/ZegoMenuBarButtonName';
 const ZegoLiveAudioRoomRole = {
   host: 0,
   speaker: 1,

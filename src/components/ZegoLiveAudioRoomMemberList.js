@@ -1,7 +1,7 @@
 import React from 'react';
 import ZegoUIKit, { ZegoMemberList } from '@zegocloud/zego-uikit-rn';
 import { StyleSheet, View, Text } from 'react-native';
-import { ZegoLiveAudioRoomRole } from './define';
+import { ZegoLiveAudioRoomRole } from '../services/define';
 
 export default function ZegoLiveAudioRoomMemberList(props) {
   const {

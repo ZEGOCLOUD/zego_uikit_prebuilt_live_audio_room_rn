@@ -77,7 +77,7 @@ export default function ZegoSeatingArea(props) {
             ) : (
               <Image
                 style={styles.icon}
-                source={require('./resources/seating-area-default-icon.png')}
+                source={require('../resources/seating-area-default-icon.png')}
               />
             )}
           </View>

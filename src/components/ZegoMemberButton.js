@@ -12,7 +12,7 @@ export default function ZegoMemberButton(props) {
       >
         <Image
           resizeMode="contain"
-          source={require('./resources/bottom_button_member.png')}
+          source={require('../resources/bottom_button_member.png')}
           style={{ width: '100%', height: '100%' }}
         />
       </TouchableOpacity>
