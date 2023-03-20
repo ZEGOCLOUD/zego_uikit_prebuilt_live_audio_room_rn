@@ -108,7 +108,7 @@ export default function AudiencePage(props) {
     default:
       rowConfigs = [
         {
-          count: 2,
+          count: 4,
           seatSpacing: 16,
           alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
         },
