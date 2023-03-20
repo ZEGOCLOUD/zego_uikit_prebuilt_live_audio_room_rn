@@ -105,6 +105,16 @@ export default function AudiencePage(props) {
       takeSeatIndexWhenJoining = 4;
       hostSeatIndexes = [4];
       break;
+    default:
+      rowConfigs = [
+        {
+          count: 2,
+          seatSpacing: 16,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
+        },
+      ];
+      takeSeatIndexWhenJoining = 0;
+      break;
   }
   const foregroundBuilder = ({userInfo, seatIndex}) => {
     return (
@@ -140,6 +150,15 @@ export default function AudiencePage(props) {
       </View>
     );
   };
+  const itemBuilder = ({ message }) => {
+    return <View style={styles.messageContainer}>
+      <Text style={styles.nameLabel}>
+        {message.sender.userName}
+        <Text style={styles.messageLabel}> {message.message}</Text>
+      </Text>
+      <View style={styles.placeholder}></View>
+    </View>
+  }
   return (
     <View style={styles.container}>
       <ZegoUIKitPrebuiltLiveAudioRoom
@@ -153,7 +172,7 @@ export default function AudiencePage(props) {
           avatar: 'https://www.zegocloud.com/_nuxt/img/discord_nav@2x.8739674.png',
           userInRoomAttributes: { test: '123' },
           onUserCountOrPropertyChanged: (userList) => {
-            console.log('AudiencePage onUserCountOrPropertyChanged', userList);
+            console.log('[Demo]AudiencePage onUserCountOrPropertyChanged', userList);
           },
           layoutConfig: {
             rowConfigs,
@@ -169,6 +188,36 @@ export default function AudiencePage(props) {
           onLeaveConfirmation: () => {
             props.navigation.navigate('HomePage');
           },
+          inRoomMessageViewConfig: {
+            itemBuilder
+          },
+          onSeatTakingRequestFailed: () => {
+            console.log('[Demo]AudiencePage onSeatTakingRequestFailed ');
+          },
+          onSeatTakingRequestRejected: () => {
+            console.log('[Demo]AudiencePage onSeatTakingRequestRejected ');
+          },
+          onHostSeatTakingInviteSent: () => {
+            console.log('[Demo]AudiencePage onHostSeatTakingInviteSent ');
+          },
+          // onMemberListMoreButtonPressed: (user) => {
+          //   console.log('[Demo]AudiencePage onMemberListMoreButtonPressed ', user);
+          // },
+          onSeatsChanged: (takenSeats, untakenSeats) => {
+            console.log('[Demo]AudiencePage onSeatsChanged ', takenSeats, untakenSeats);
+          },
+          onSeatsClosed: () => {
+            console.log('[Demo]AudiencePage onSeatsClosed ');
+          },
+          onSeatsOpened: () => {
+            console.log('[Demo]AudiencePage onSeatsOpened ');
+          },
+          onTurnOnYourMicrophoneRequest: (fromUser) => {
+            console.log('[Demo]AudiencePage onTurnOnYourMicrophoneRequest ', fromUser);
+          },
+          // onSeatClicked: (index, user) => {
+          //   console.log('[Demo]AudiencePage onSeatClicked ', index, user);
+          // },
         }}
       />
     </View>
@@ -238,5 +287,35 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
+  },
+  // message
+  messageContainer: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(1, 7, 18, 0.3000)',
+    borderRadius: 13,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 4,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingRight: 10,
+    paddingLeft: 10,
+  },
+  nameLabel: {
+    color: '#8BE7FF',
+    fontSize: 13,
+    // marginLeft: 10
+  },
+  messageLabel: {
+    color: 'white',
+    fontSize: 13,
+    marginLeft: 5,
+  },
+  placeholder: {
+    backgroundColor: 'red',
+    width: 10,
+    height: 10,
+    marginLeft: 10,
   },
 });

@@ -1,31 +1,60 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
+import { ZegoToastType } from '../services/defines'
 
 export default function ZegoToast(props) {
-  const { toast } = props;
+    const {
+        visable = false,
+        text = '',
+        type = ZegoToastType.success,
+    } = props;
+    let color = '#FFFFFF', backgroundColor = '#55BC9E';
+    switch (type) {
+        case ZegoToastType.default:
+        case ZegoToastType.info:
+            break;
+        case ZegoToastType.success:
+            break;
+        case ZegoToastType.warning:
+            backgroundColor = '#e6a23c';
+            break;
+        case ZegoToastType.error:
+            backgroundColor = '#BD5454';
+            break;
+        default:
+            break;
+    }
+
+    const getCustomTextStyle = (color) => StyleSheet.create({
+        text: {
+            color,
+        },
+    });
+    const getCustomContainerStyle = (visable, backgroundColor) => StyleSheet.create({
+        customContainer: {
+            display: visable ? 'flex' : 'none',
+            backgroundColor,
+        },
+    });
+
   return (
-    <View style={styles.toastView}>
-      <Text style={styles.text}>{toast}</Text>
+    <View style={[styles.container, getCustomContainerStyle(visable, backgroundColor).customContainer]}>
+      <Text style={[styles.text, getCustomTextStyle(color).text]}>{text}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  toastView: {
-    position: 'absolute',
-    top: 20,
-    width: '100%',
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#bc0e07',
-    borderRadius: 12,
-    height: 40,
-  },
-  text: {
-    paddingBottom: 10,
-    lineHeight: 40,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#e7e7e7',
-  },
+    container: {
+        zIndex: 12,
+        height: 70,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        top: 40,
+    },
+    text: {
+        fontSize: 14,
+    },
 });

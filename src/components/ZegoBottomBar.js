@@ -10,6 +10,8 @@ import ZegoMoreButton from '../components/ZegoMoreButton';
 import ZegoMessageButton from '../components/ZegoMessageButton';
 import ZegoMenuBarButtonName from '../components/ZegoMenuBarButtonName';
 import ZegoMemberButton from '../components/ZegoMemberButton';
+import ZegoCoHostControlButton from '../components/ZegoCoHostControlButton';
+import ZegoLockButton from '../components/ZegoLockButton';
 
 export default function ZegoBottomBar(props) {
   const {
@@ -20,10 +22,22 @@ export default function ZegoBottomBar(props) {
     onMoreButtonPress,
     onMessageButtonPress,
     showInRoomMessageButton = false,
-    onOpenCallMemberList,
+    onOpenMemberList,
     useSpeakerWhenJoining,
     onLeaveLiveStreamingConfirming,
     onLeaveLiveStreaming,
+    onSeatTakingRequestRejected,
+    onConnectStateChanged,
+    onCoHostAccepted,
+    hostID,
+    closeSeatsWhenJoin,
+    isPluginsInit,
+    isLocked,
+    requestCoHostCount,
+    memberConnectState,
+    setIsToastVisable,
+    setToastExtendedData,
+    onSeatTakingRequestFailed,
   } = props;
   const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -43,12 +57,15 @@ export default function ZegoBottomBar(props) {
         );
       case ZegoMenuBarButtonName.showMemberListButton:
         return (
-          <ZegoMemberButton
-            key={buttonIndex}
-            onPressed={onOpenCallMemberList}
-            width={buttonSize}
-            height={buttonSize}
-          />
+          <View>
+            <ZegoMemberButton
+              key={buttonIndex}
+              onPressed={onOpenMemberList}
+              width={buttonSize}
+              height={buttonSize}
+            />
+            { requestCoHostCount ? <View style={styles.memberRedDot}></View> : null }
+          </View>
         );
       case ZegoMenuBarButtonName.switchAudioOutputButton:
         return (
@@ -69,6 +86,25 @@ export default function ZegoBottomBar(props) {
             width={buttonSize}
             height={buttonSize}
           />
+        );
+      case ZegoMenuBarButtonName.applyToTakeSeatButton:
+        return (
+          isLocked ? <ZegoCoHostControlButton
+            key={buttonIndex}
+            hostID={hostID}
+            isPluginsInit={isPluginsInit}
+            memberConnectState={memberConnectState}
+            onSeatTakingRequestRejected={onSeatTakingRequestRejected}
+            onConnectStateChanged={onConnectStateChanged}
+            onCoHostAccepted={onCoHostAccepted}
+            setIsToastVisable={setIsToastVisable}
+            setToastExtendedData={setToastExtendedData}
+            onSeatTakingRequestFailed={onSeatTakingRequestFailed}
+          /> : null
+        );
+      case ZegoMenuBarButtonName.closeSeatButton:
+        return (
+          <ZegoLockButton key={buttonIndex} closeSeatsWhenJoin={closeSeatsWhenJoin} />
         );
     }
   };
@@ -220,5 +256,14 @@ const styles = StyleSheet.create({
   },
   rightBtn: {
     marginRight: 16,
+  },
+  memberRedDot: {
+    backgroundColor: '#FF0D23',
+    borderRadius: 1000,
+    width: 8,
+    height: 8,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 });
