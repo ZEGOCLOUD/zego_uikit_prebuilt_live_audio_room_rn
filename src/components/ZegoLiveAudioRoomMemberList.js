@@ -19,13 +19,13 @@ export default function ZegoLiveAudioRoomMemberList(props) {
     memberConnectStateMap,
     hostID,
     isLocked,
+    memberCount,
     onMemberListMoreButtonPressed,
     onCoHostDisagree,
     onCoHostAgree,
     setIsCoHostDialogVisable,
     setCoHostDialogExtendedData,
   } = props;
-  const memberList = ZegoUIKit.getAllUsers();
   const localUserID = ZegoUIKit.getLocalUserInfo().userID;
 
   const sortUserList = (userList) => {
@@ -49,7 +49,6 @@ export default function ZegoLiveAudioRoomMemberList(props) {
         }
       });
     });
-
     userList.forEach((item) => {
       if (
         userIDRoleMap.get(item.userID) === ZegoLiveAudioRoomRole.host.toString()
@@ -181,7 +180,7 @@ export default function ZegoLiveAudioRoomMemberList(props) {
       <View style={styles.topLine} />
       <View style={styles.header}>
         <Text style={styles.title}>
-          {ZegoInnerText.memberListTitle} · {memberList.length}
+          {ZegoInnerText.memberListTitle} · {memberCount}
         </Text>
       </View>
       <View style={styles.memberListContainer}>

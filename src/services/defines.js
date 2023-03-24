@@ -38,7 +38,6 @@ const ZegoLiveStatus = {
 const ZegoInvitationType = {
   requestCoHost: 2,
   inviteToCoHost: 3,
-  removeCoHost: 4,
 };
 const ZegoCoHostConnectState = {
   idle: 0,
@@ -68,9 +67,6 @@ const ZegoInnerText = {
   memberListAgreeButton: "Agree",
   memberListDisagreeButton: "Disagree",
   inviteToTakeSeatMenuDialogButton: "Invite %0 to take seat",
-  requestCoHostFailed: "Failed to apply for seat.",
-  inviteCoHostFailedToast: "Failed to sent the seat invitation, please try again.",
-  repeatInviteCoHostFailedToast: "You've sent the seat invitation, please wait for confirmation.",
   muteCoHostButton: 'Mute %0',
   microphonePermissionSettingDialogInfo: new ZegoDialogInfo({
     title: 'Can not use Microphone!',

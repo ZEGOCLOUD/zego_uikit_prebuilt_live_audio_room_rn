@@ -69,20 +69,19 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     // Host callback
     onSeatTakingRequested,
     onSeatTakingRequestCanceled,
-    onInviteAudienceToTakeSeatFailed,
     onSeatTakingInviteRejected,
     
     // Audience callback
-    onSeatTakingRequestFailed,
     onSeatTakingRequestRejected,
     onHostSeatTakingInviteSent,
 
     onMemberListMoreButtonPressed,
     onSeatsChanged,
-    onSeatsClosed,
+    onSeatClosed,
     onSeatsOpened,
     onTurnOnYourMicrophoneRequest,
     onSeatClicked,
+  
     inRoomMessageViewConfig = {},
   } = config;
   // When entering the room, if there is a seat conflict, change the role to the audience
@@ -176,6 +175,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   // HostID
   const [hostID, setHostID] = useState('');
 
+  const [memberCount, setMemberCount] = useState(1);
+
   // Dialog
   const [dialogInfo, setDialogInfo] = useState({});
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -219,6 +220,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   const registerPluginCallback = () => {
     if (ZegoUIKit.getPlugin(ZegoUIKitPluginType.signaling)) {
       ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
+        if (!realTimeData.current.isLocked) return;
         console.log('[Prebuilt]onInvitationReceived', JSON.stringify(realTimeData.current), requestCoHostCount, type, userID, inviter);
         if (type === ZegoInvitationType.requestCoHost && userID === realTimeData.current.hostID) {
           // The audience created a cohost request
@@ -237,6 +239,12 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           typeof onSeatTakingRequested === 'function' && onSeatTakingRequested(ZegoUIKit.getUser(inviter.id));
         } else if (type === ZegoInvitationType.inviteToCoHost) {
           // The audience is invited to connect the cohost by host
+          // Cancel request
+          ZegoUIKit.getSignalingPlugin().cancelInvitation([realTimeData.current.hostID]);
+          // Update own connection state
+          realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.idle;
+          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+
           setIsDialogVisableHandle(true);
           setDialogExtendedData({
             title: ZegoInnerText.hostInviteTakeSeatDialog.title,
@@ -256,8 +264,6 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
             onOk: () => {
               // Accept the cohost request of the host
               ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id).then(async () => {
-                // Cancel request
-                ZegoUIKit.getSignalingPlugin().cancelInvitation([realTimeData.current.hostID]);
                 setIsDialogVisableHandle(false);
                 coHostAcceptedHandle(true);
               });
@@ -265,15 +271,6 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           });
 
           typeof onHostSeatTakingInviteSent === 'function' && onHostSeatTakingInviteSent();
-        } else if (type == ZegoInvitationType.removeCoHost) {
-          // The audience was forced off the cohost by host
-          ZegoUIKit.turnMicrophoneOn('', false);
-
-          realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.idle;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
-
-          setRole(ZegoLiveAudioRoomRole.audience);
-          realTimeData.current.role = ZegoLiveAudioRoomRole.audience;
         }
       });
       ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
@@ -473,12 +470,19 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       const freeSeatIndex = getFreeSeatIndex(temp);
       if (freeSeatIndex) {
         // Take seat
-        takeSeat(freeSeatIndex, true, false, false);
-        realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.connected;
+        takeSeat(freeSeatIndex, true, false, false).then(() => {
+          realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.connected;
+          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+        }).catch(() => {
+          console.log('coHostAcceptedHandle error');
+          realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.idle;
+          console.log('coHostAcceptedHandle error', realTimeData.current.memberConnectStateMap);
+          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+        });
       } else {
         realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.idle;
+        setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
       }
-      setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
     }
   }
 
@@ -529,10 +533,21 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     ZegoUIKit.onRoomPropertyUpdated(callbackID, (key, oldvalue, newValue) => {
       console.log('###########onRoomPropertyUpdated', key, oldvalue, newValue);
       if (key === 'lockseat') {
+        // Clear all connect state
+        realTimeData.current.requestCoHostCount = 0;
+        realTimeData.current.memberConnectStateMap = {};
+        setRequestCoHostCount(0);
+        setMemberConnectStateMap({});
+        // Hidden dialog
+        setIsDialogVisableHandle(false);
+        // Reset invitation timer
+        setCoHostDialogExtendedData({ resetTimer: true });
+
         const isLocked = newValue === ZegoSeatsState.lock;
         setIsLocked(isLocked);
+        realTimeData.current.isLocked = isLocked;
         if (isLocked) {
-          typeof onSeatsClosed === 'function' && onSeatsClosed();
+          typeof onSeatClosed === 'function' && onSeatClosed();
         } else {
           const { role, hostID } = realTimeData.current;
           if (role === ZegoLiveAudioRoomRole.host) {
@@ -542,13 +557,6 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
             // Cancel request
             ZegoUIKit.getSignalingPlugin().cancelInvitation([hostID]);
           }
-          // Clear all connect state
-          realTimeData.current.requestCoHostCount = 0;
-          realTimeData.current.memberConnectStateMap = {};
-          setRequestCoHostCount(0);
-          setMemberConnectStateMap({});
-          // Hidden dialog
-          setIsDialogVisableHandle(false);
           typeof onSeatsOpened === 'function' && onSeatsOpened();
         }
       }
@@ -563,12 +571,16 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       ZegoUIKit.turnMicrophoneOn('', true);
       typeof onTurnOnYourMicrophoneRequest === 'function' && onTurnOnYourMicrophoneRequest(formUser);
     });
+    ZegoUIKit.onUserJoin(callbackID, (userList) => {
+      setMemberCount(ZegoUIKit.getAllUsers().length);
+    });
     return () => {
       ZegoUIKit.leaveRoom();
       ZegoUIKit.onUserLeave(callbackID);
       ZegoUIKit.onUserCountOrPropertyChanged(callbackID);
       ZegoUIKit.onRoomPropertyUpdated(callbackID);
       ZegoUIKit.onTurnOnYourMicrophoneRequest(callbackID);
+      ZegoUIKit.onUserJoin(callbackID);
     
       unRegisterPluginCallback();
       ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(callbackID);
@@ -611,6 +623,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           setUserCustomRoomAttributes();
           registerUIKitListener();
           if (role === ZegoLiveAudioRoomRole.host) {
+            // Active query to get other people's properties
+            ZegoUIKit.getSignalingPlugin().queryUsersInRoomAttributes();
             // hostID = userID;
             setHostID(userID);
             realTimeData.current.hostID = userID;
@@ -678,6 +692,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           // config.role = ZegoLiveAudioRoomRole.audience;
           setRole(ZegoLiveAudioRoomRole.audience);
           realTimeData.current.role = ZegoLiveAudioRoomRole.audience;
+          realTimeData.current.memberConnectStateMap[oldValue] = ZegoCoHostConnectState.idle;
+          setMemberConnectStateMap({...realTimeData.current.memberConnectStateMap});
+
           replaceBottomMenuBarButtons(audienceButtons);
           replaceBottomMenuBarExtendButtons(audienceExtendButtons);
           ZegoUIKit.turnMicrophoneOn('', false);
@@ -697,15 +714,15 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         });
       }
     );
-    ZegoUIKit.onUserLeave(callbackID, (users) => {
-      console.log('===onUserLeave', users);
-      users.forEach((user) => {
-        if (user.userID === realTimeData.current.hostID) {
-          // hostID = '';
-          setHostID('');
-          realTimeData.current.hostID = '';
-        }
-      });
+    ZegoUIKit.onUserLeave(callbackID, (userList) => {
+      console.log('===onUserLeave', userList);
+      setMemberCount(ZegoUIKit.getAllUsers().length);
+      const isHostLeft = userList.find((user) => { return user.userID === realTimeData.current.hostID; });
+      if (isHostLeft) {
+        setIsDialogVisableHandle(false);
+        setHostID('');
+        realTimeData.current.hostID = '';
+      }
     });
   };
 
@@ -818,7 +835,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     if (role === ZegoLiveAudioRoomRole.audience) {
       grantPermissions();
     }
-    ZegoUIKit.getSignalingPlugin()
+    return ZegoUIKit.getSignalingPlugin()
       .updateRoomProperty(
         index,
         userID,
@@ -860,9 +877,6 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           realTimeData.current.role = ZegoLiveAudioRoomRole.audience;
         }
       })
-      .catch((err) => {
-        console.log('===update err', err);
-      });
   };
   const leaveSeat = (index, removeUserID) => {
     console.log(
@@ -980,7 +994,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   const onModalPress = () => {
     setModalVisible(false);
     if (modalText.indexOf('Take the seat') > -1) {
-      takeSeat(clickSeatItem.index, true, false, false);
+      if (!isLocked) {
+        takeSeat(clickSeatItem.index, true, false, false);
+      }
     } else if (modalText.indexOf('Remove') > -1) {
       removeSeatByConfirmHandle();
     } else if (modalText.indexOf('Leave') > -1) {
@@ -1081,6 +1097,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         });
       });
     },
+    takeSeat: (index) => {},
     leaveSeat: () => {
       const seatIndex = getSeatIndexByUserID(userID);
       if (seatIndex !== -1) {
@@ -1126,11 +1143,13 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     closeSeats: () => {
       return ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.lock }).then(() => {
         setIsLocked(true);
+        realTimeData.current.isLocked = true;
       })
     },
     openSeats: () => {
       return ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.unlock }).then(() => {
         setIsLocked(false);
+        realTimeData.current.isLocked = false;
       })
     },
     turnMicrophoneOn: (userID, isOn) => {
@@ -1200,6 +1219,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
               memberConnectStateMap={memberConnectStateMap}
               hostID={hostID}
               isLocked={isLocked}
+              memberCount={memberCount}
               onMemberListMoreButtonPressed={onMemberListMoreButtonPressed}
               onCoHostDisagree={coHostDisagreeHandle}
               onCoHostAgree={coHostAgreeHandle}
@@ -1239,7 +1259,6 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           memberConnectState={memberConnectStateMap[userID]}
           setIsToastVisable={setIsToastVisableHandle}
           setToastExtendedData={(toastExtendedData) => setToastExtendedData(toastExtendedData)}
-          onSeatTakingRequestFailed={onSeatTakingRequestFailed}
         />
       )}
 
@@ -1293,10 +1312,15 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           </TouchableOpacity>
           {
             role === ZegoLiveAudioRoomRole.host ? <TouchableOpacity onPress={muteHandle}>
-              <Text style={styles.btnText}>
+              <Text
+                style={[
+                  styles.btnText,
+                  { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)'},
+                ]}
+              >
                 {
-                  ZegoInnerText.muteCoHostButton.includes('0%') ?
-                  ZegoInnerText.muteCoHostButton.replace('0%', clickSeatItem.userID) : 
+                  ZegoInnerText.muteCoHostButton.includes('%0') ?
+                  ZegoInnerText.muteCoHostButton.replace('%0', clickSeatItem.userID) : 
                   ZegoInnerText.muteCoHostButton
                 }
               </Text>
@@ -1310,7 +1334,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
             <Text
               style={[
                 styles.btnText,
-                { borderTopWidth: 1, borderTopColor: '#ccc' },
+                { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)'},
               ]}
             >
               {ZegoInnerText.cancelMenuDialogButton}
@@ -1332,12 +1356,10 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         invitationType={coHostDialogExtendedData.invitationType}
         onCancel={coHostDialogExtendedData.onCancel}
         onOk={coHostDialogExtendedData.onOk}
-        setIsToastVisable={setIsToastVisableHandle}
-        setToastExtendedData={(toastExtendedData) => setToastExtendedData(toastExtendedData)}
         resetTimer={coHostDialogExtendedData.resetTimer}
         isLocked={isLocked}
         memberConnectStateMap={memberConnectStateMap}
-        onInviteAudienceToTakeSeatFailed={onInviteAudienceToTakeSeatFailed}
+        seatIndex={getSeatIndexByUserID(coHostDialogExtendedData.inviteeID)}
       />
       {/* Common toast */}
       <ZegoToast
@@ -1457,7 +1479,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(17,16,20,0.9)',
     borderTopRightRadius: 12,
     borderTopLeftRadius: 15,
   },
@@ -1465,5 +1487,6 @@ const styles = StyleSheet.create({
     height: 50,
     lineHeight: 50,
     textAlign: 'center',
+    color: '#fff'
   },
 });

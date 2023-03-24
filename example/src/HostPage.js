@@ -108,7 +108,7 @@ export default function HostPage(props) {
     default:
       rowConfigs = [
         {
-          count: 4,
+          count: 2,
           seatSpacing: 16,
           alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
         },
@@ -215,8 +215,8 @@ export default function HostPage(props) {
           onSeatsChanged: (takenSeats, untakenSeats) => {
             console.log('[Demo]HostPage onSeatsChanged ', takenSeats, untakenSeats);
           },
-          onSeatsClosed: () => {
-            console.log('[Demo]HostPage onSeatsClosed ');
+          onSeatClosed: () => {
+            console.log('[Demo]HostPage onSeatClosed ');
           },
           onSeatsOpened: () => {
             console.log('[Demo]HostPage onSeatsOpened ');

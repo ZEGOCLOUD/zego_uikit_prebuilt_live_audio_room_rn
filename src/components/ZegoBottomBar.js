@@ -35,9 +35,6 @@ export default function ZegoBottomBar(props) {
     isLocked,
     requestCoHostCount,
     memberConnectState,
-    setIsToastVisable,
-    setToastExtendedData,
-    onSeatTakingRequestFailed,
   } = props;
   const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -97,9 +94,6 @@ export default function ZegoBottomBar(props) {
             onSeatTakingRequestRejected={onSeatTakingRequestRejected}
             onConnectStateChanged={onConnectStateChanged}
             onCoHostAccepted={onCoHostAccepted}
-            setIsToastVisable={setIsToastVisable}
-            setToastExtendedData={setToastExtendedData}
-            onSeatTakingRequestFailed={onSeatTakingRequestFailed}
           /> : null
         );
       case ZegoMenuBarButtonName.closeSeatButton:

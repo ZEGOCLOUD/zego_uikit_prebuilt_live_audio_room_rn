@@ -13,12 +13,12 @@ export default function ZegoLockButton(props) {
     } = props;
 
     const lockseat = ZegoUIKit.getRoomProperties().lockseat;
-    const userList =  ZegoUIKit.getAllUsers();
+    // const userList =  ZegoUIKit.getAllUsers();
     const [isLocked, setIsLocked] = useState(lockseat === ZegoSeatsState.lock);
 
     useEffect(()=> {
         console.log('ZegoLockButton', lockseat, closeSeatsWhenJoin);
-        if ((lockseat === undefined || userList.length < 2) && closeSeatsWhenJoin) {
+        if (lockseat === undefined && closeSeatsWhenJoin) {
             ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.lock }).then(() => {
                 setIsLocked(true);
             })
@@ -37,7 +37,7 @@ export default function ZegoLockButton(props) {
             onPress={pressedHandle}
         >
             <Image
-                source={isLocked ? iconUnLock : iconLock}
+                source={isLocked ? iconLock : iconUnLock}
                 style={{ width: '100%', height: '100%' }}
             />
         </TouchableOpacity>

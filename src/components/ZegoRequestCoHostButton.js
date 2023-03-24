@@ -6,9 +6,6 @@ export default function ZegoRequestCoHostButton(props) {
     const {
         hostID,
         onRequestSuccessfully,
-        setIsToastVisable,
-        setToastExtendedData,
-        onSeatTakingRequestFailed,
     } = props;
     console.log('ZegoRequestCoHostButton hostID', hostID);
 
@@ -17,9 +14,6 @@ export default function ZegoRequestCoHostButton(props) {
         console.log('ZegoRequestCoHostButton willPressedHandle hostID', hostID);
         let result = true;
         if (!hostID) {
-            setIsToastVisable(true);
-            setToastExtendedData({ type: ZegoToastType.error, text: ZegoInnerText.requestCoHostFailed });
-            typeof onSeatTakingRequestFailed === 'function' && onSeatTakingRequestFailed();
             result = false;
         }
         return result;

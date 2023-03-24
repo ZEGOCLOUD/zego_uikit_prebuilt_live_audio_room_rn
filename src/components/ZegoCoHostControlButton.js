@@ -14,9 +14,6 @@ export default function ZegoCoHostControlButton(props) {
         onSeatTakingRequestRejected,
         onConnectStateChanged,
         onCoHostAccepted,
-        setIsToastVisable,
-        setToastExtendedData,
-        onSeatTakingRequestFailed,
     } = props;
     const ZegoCoHostControlButtonType = {
         request: 0,
@@ -67,12 +64,9 @@ export default function ZegoCoHostControlButton(props) {
     return (
         <View style={styles.btnContainer}>
             {
-                memberConnectState === ZegoCoHostConnectState.idle ? <ZegoRequestCoHostButton
+                !memberConnectState ? <ZegoRequestCoHostButton
                     hostID={hostID}
                     onRequestSuccessfully={coHostControlHandle.bind(this, ZegoCoHostControlButtonType.request)}
-                    setIsToastVisable={setIsToastVisable}
-                    setToastExtendedData={setToastExtendedData}
-                    onSeatTakingRequestFailed={onSeatTakingRequestFailed}
                 /> :
                 memberConnectState === ZegoCoHostConnectState.connecting ? <ZegoCancelRequestCoHostButton
                     hostID={hostID}

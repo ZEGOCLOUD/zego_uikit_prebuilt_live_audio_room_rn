@@ -108,7 +108,7 @@ export default function AudiencePage(props) {
     default:
       rowConfigs = [
         {
-          count: 4,
+          count: 2,
           seatSpacing: 16,
           alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
         },
@@ -206,8 +206,8 @@ export default function AudiencePage(props) {
           onSeatsChanged: (takenSeats, untakenSeats) => {
             console.log('[Demo]AudiencePage onSeatsChanged ', takenSeats, untakenSeats);
           },
-          onSeatsClosed: () => {
-            console.log('[Demo]AudiencePage onSeatsClosed ');
+          onSeatClosed: () => {
+            console.log('[Demo]AudiencePage onSeatClosed ');
           },
           onSeatsOpened: () => {
             console.log('[Demo]AudiencePage onSeatsOpened ');

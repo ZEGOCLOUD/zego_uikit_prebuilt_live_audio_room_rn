@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, Fragment }from "react";
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import { StyleSheet, View, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import { ZegoSendInvitationButton } from '@zegocloud/zego-uikit-rn';
-import { ZegoInnerText, ZegoInvitationType, ZegoToastType, ZegoCoHostConnectState } from "../services/defines";
+import { ZegoInnerText, ZegoInvitationType } from "../services/defines";
 
 export default function ZegoCoHostMenuDialog(props) {
     const countdownMap = useRef();
@@ -13,12 +13,10 @@ export default function ZegoCoHostMenuDialog(props) {
         invitationType = ZegoInvitationType.inviteToCoHost,
         onCancel,
         onOk,
-        setIsToastVisable,
-        setToastExtendedData,
         resetTimer,
         isLocked,
         memberConnectStateMap,
-        onInviteAudienceToTakeSeatFailed,
+        seatIndex,
     } = props;
 
     if (visable) {
@@ -29,9 +27,12 @@ export default function ZegoCoHostMenuDialog(props) {
     }
     if (resetTimer) {
         // Reset invitation timer
-        clearInterval(countdownTimerMap.current.get(inviteeID));
-        countdownMap.current.set(inviteeID, 60);
-        countdownTimerMap.current.set(inviteeID, null);
+        const inviteeIDs = inviteeID ? [inviteeID] : Array.from(countdownTimerMap.current.keys());
+        inviteeIDs.forEach((inviteeID) => {
+            clearInterval(countdownTimerMap.current.get(inviteeID));
+            countdownMap.current.set(inviteeID, 60);
+            countdownTimerMap.current.set(inviteeID, null);
+        })
     }
 
     const getCustomContainerStyle = (visable) => StyleSheet.create({
@@ -49,10 +50,7 @@ export default function ZegoCoHostMenuDialog(props) {
             if (countdownTimerMap.current.get(inviteeID)) {
                 // The timer did not complete and the request was not allowed to occur
                 console.log('#########Timer: The timer did not complete and the request was not allowed to occur', countdownMap.current, countdownTimerMap.current);
-                setIsToastVisable(true);
-                setToastExtendedData({ type: ZegoToastType.error, text: ZegoInnerText.repeatInviteCoHostFailedToast });
                 onCancel();
-                typeof onInviteAudienceToTakeSeatFailed === 'function' && onInviteAudienceToTakeSeatFailed();
                 result = false;
             } else {
                 // Restart timer
@@ -69,15 +67,14 @@ export default function ZegoCoHostMenuDialog(props) {
                 }, 1000));
                 if (!ZegoUIKit.getUser(inviteeID)) {
                     result = false;
-                    setIsToastVisable(true);
-                    setToastExtendedData({ type: ZegoToastType.error, text: ZegoInnerText.inviteCoHostFailedToast });
                     onCancel();
-                    typeof onInviteAudienceToTakeSeatFailed === 'function' && onInviteAudienceToTakeSeatFailed();
                 }
             }
         }
         return result;
     }
+
+    // 
 
     useEffect(() => {
         // First render initializes and clears timer
@@ -100,7 +97,8 @@ export default function ZegoCoHostMenuDialog(props) {
         </TouchableWithoutFeedback>
         <View style={styles.main}>
             {
-                isLocked && !memberConnectStateMap[inviteeID] ?
+                // seatIndex = -1 : it's accepting an invitation but failing to get on the mic
+                isLocked && (!memberConnectStateMap[inviteeID] || seatIndex === -1) ?
                     <ZegoSendInvitationButton
                         backgroundColor={'transparent'}
                         width='100%'
