@@ -240,7 +240,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         } else if (type === ZegoInvitationType.inviteToCoHost) {
           // The audience is invited to connect the cohost by host
           // Cancel request
-          ZegoUIKit.getSignalingPlugin().cancelInvitation([realTimeData.current.hostID]);
+          ZegoUIKit.getSignalingPlugin().cancelInvitation([realTimeData.current.hostID]).catch(() => {});
           // Update own connection state
           realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.idle;
           setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
@@ -409,21 +409,21 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     memberConnectStateMap[changedUserID] = ZegoCoHostConnectState.idle;
 
     // Rerendering causes realTimeData.current to be empty, so a reassignment is required here
-    realTimeData.current.requestCoHostCount = requestCoHostCount - 1 || 0;
+    realTimeData.current.requestCoHostCount = requestCoHostCount ? requestCoHostCount - 1 : 0;
     realTimeData.current.memberConnectStateMap = { ...memberConnectStateMap };
 
     setMemberConnectStateMap({ ...memberConnectStateMap });
-    setRequestCoHostCount(requestCoHostCount - 1 || 0);
+    setRequestCoHostCount(requestCoHostCount ? requestCoHostCount - 1 : 0);
   }
   const coHostAgreeHandle = (changedUserID) => {
     // Just take the value in state, because there's no closure
     memberConnectStateMap[changedUserID] = ZegoCoHostConnectState.connected;
   
-    realTimeData.current.requestCoHostCount = requestCoHostCount - 1 || 0;
+    realTimeData.current.requestCoHostCount = requestCoHostCount ? requestCoHostCount - 1 : 0;
     realTimeData.current.memberConnectStateMap = { ...memberConnectStateMap };
 
     setMemberConnectStateMap({ ...memberConnectStateMap });
-    setRequestCoHostCount(requestCoHostCount - 1 || 0);
+    setRequestCoHostCount(requestCoHostCount ? requestCoHostCount - 1 : 0);
   }
   // Get free seat index 
   const getFreeSeatIndexList = (seatingAreaData) => {
@@ -506,6 +506,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       requestCoHostCount: 0,
       memberConnectStateMap: {},
       seatingAreaData: [],
+      roomProperties: {},
     };
     ZegoUIKit.init(appID, appSign, { userID: userID, userName: userName })
       .then(() => {
@@ -555,7 +556,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
             // TODO
           } else {
             // Cancel request
-            ZegoUIKit.getSignalingPlugin().cancelInvitation([hostID]);
+            ZegoUIKit.getSignalingPlugin().cancelInvitation([hostID]).catch(() => {});
           }
           typeof onSeatsOpened === 'function' && onSeatsOpened();
         }
@@ -733,6 +734,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         if (!data.code) {
           const roomProperties = data._roomAttributes;
           setRoomProperties(data._roomAttributes);
+          realTimeData.current.roomProperties = data._roomAttributes;
           const arr = [];
           let num = 0;
           rowConfigs.forEach(async (row) => {
@@ -878,22 +880,23 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         }
       })
   };
-  const leaveSeat = (index, removeUserID) => {
+  const leaveSeat = (index, removeUserID, realTimeRoomProperties) => {
+    const temp = realTimeRoomProperties || roomProperties;
     console.log(
       '===leave seat',
       index,
-      roomProperties[index],
+      temp[index],
       removeUserID,
       userID
     );
     if (removeUserID) {
       // host remove someone
-      if (roomProperties[index] !== removeUserID) {
+      if (temp[index] !== removeUserID) {
         return Promise.reject();
       }
     } else {
       // speaker leave seat
-      if (roomProperties[index] !== userID) {
+      if (temp[index] !== userID) {
         return Promise.reject();
       }
     }
@@ -1012,16 +1015,17 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     });
   }
 
-  const getSeatIndexByUserID = (userID) => {
+  const getSeatIndexByUserID = (userID, realTimeRoomProperties) => {
+    const temp = realTimeRoomProperties || roomProperties;
     let index = -1;
     console.log(
       '===getSeatIndexByUserID',
       userID,
-      roomProperties,
+      temp,
       seatingAreaData
     );
-    for (let key in roomProperties) {
-      if (roomProperties[key] == userID) {
+    for (let key in temp) {
+      if (temp[key] == userID) {
         index = key;
       }
     }
@@ -1063,11 +1067,14 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
   useImperativeHandle(ref, () => ({
     applyToTakeSeat: () => {
+      // There are closures, status values cannot be used directly
       return new Promise((resolve, reject) => {
         ZegoUIKit.getSignalingPlugin().sendInvitation(
-          [hostID],
+          [realTimeData.current.hostID],
           60,
           ZegoInvitationType.requestCoHost,
+          '',
+          {},
         ).then(({ errorInvitees }) => {
           if (!errorInvitees.length) {
             resolve();
@@ -1081,10 +1088,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       });
     },
     cancelSeatTakingRequest: () => {
+      // There are closures, status values cannot be used directly
       return new Promise((resolve, reject) => {
         ZegoUIKit.getSignalingPlugin().cancelInvitation(
-          [hostID],
-          60,
+          [realTimeData.current.hostID],
+          '',
         ).then(({ errorInvitees }) => {
           if (!errorInvitees.length) {
             resolve();
@@ -1097,11 +1105,14 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         });
       });
     },
-    takeSeat: (index) => {},
+    takeSeat: (index) => {
+      return takeSeat(index, true, false, false);
+    },
     leaveSeat: () => {
-      const seatIndex = getSeatIndexByUserID(userID);
+      // There are closures, status values cannot be used directly
+      const seatIndex = getSeatIndexByUserID(userID, realTimeData.current.roomProperties);
       if (seatIndex !== -1) {
-        return leaveSeat(seatIndex);
+        return leaveSeat(seatIndex, null, realTimeData.current.roomProperties);
       } else {
         return Promise.reject();
       }
@@ -1122,6 +1133,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           [audienceUserID],
           60,
           ZegoInvitationType.inviteToCoHost,
+          '',
+          {},
         ).then(({ errorInvitees }) => {
           if (!errorInvitees.length) {
             resolve();
@@ -1134,10 +1147,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       });
     },
     acceptHostTakeSeatInvitation: () => {
-      return ZegoUIKit.getSignalingPlugin().acceptInvitation(hostID).then(() => {
+      // There are closures, status values cannot be used directly
+      return ZegoUIKit.getSignalingPlugin().acceptInvitation(realTimeData.current.hostID).then(() => {
         // Cancel request
-        ZegoUIKit.getSignalingPlugin().cancelInvitation([hostID]);
-        coHostAcceptedHandle(false);
+        ZegoUIKit.getSignalingPlugin().cancelInvitation([realTimeData.current.hostID]).catch(() => {});
+        coHostAcceptedHandle(true);
       });
     },
     closeSeats: () => {
@@ -1156,9 +1170,10 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       return ZegoUIKit.turnMicrophoneOn(userID, isOn);
     },
     removeSpeakerFromSeat: (userID) => {
-      const seatIndex = getSeatIndexByUserID(userID);
+      // There are closures, status values cannot be used directly
+      const seatIndex = getSeatIndexByUserID(userID, realTimeData.current.roomProperties);
       if (seatIndex !== -1) {
-        return leaveSeat(seatIndex, userID);
+        return leaveSeat(seatIndex, userID, realTimeData.current.roomProperties);
       } else {
         return Promise.reject();
       }

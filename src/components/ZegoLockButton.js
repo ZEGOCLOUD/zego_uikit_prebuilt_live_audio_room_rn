@@ -13,7 +13,6 @@ export default function ZegoLockButton(props) {
     } = props;
 
     const lockseat = ZegoUIKit.getRoomProperties().lockseat;
-    // const userList =  ZegoUIKit.getAllUsers();
     const [isLocked, setIsLocked] = useState(lockseat === ZegoSeatsState.lock);
 
     useEffect(()=> {
@@ -23,6 +22,14 @@ export default function ZegoLockButton(props) {
                 setIsLocked(true);
             })
         }
+
+        const callbackID = 'ZegoLockButton' + String(Math.floor(Math.random() * 10000));
+        ZegoUIKit.onRoomPropertyUpdated(callbackID, (key, oldvalue, newValue) => {
+            if (key === 'lockseat') {
+              const isLocked = newValue === ZegoSeatsState.lock;
+              setIsLocked(isLocked);
+            }
+          });
     }, []);
 
     const pressedHandle = () => {

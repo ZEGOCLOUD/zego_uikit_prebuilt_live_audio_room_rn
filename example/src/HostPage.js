@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {StyleSheet, View, Text, Image, ImageBackground, Button} from 'react-native';
 import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
@@ -159,86 +159,100 @@ export default function HostPage(props) {
       <View style={styles.placeholder}></View>
     </View>
   }
-
-  setTimeout(() => {
-    console.log('#####prebuiltRef#####', prebuiltRef.current);
-  }, 0);
-
+  const [showBtn, setShowBtn] = useState(false);
+  useEffect(() => {
+    setShowBtn(true);
+  }, []);
   return (
     <View style={styles.container}>
-      <ZegoUIKitPrebuiltLiveAudioRoom
-        ref={prebuiltRef}
-        appID={KeyCenter.appID}
-        appSign={KeyCenter.appSign}
-        userID={userID}
-        userName={userName}
-        roomID={roomID}
-        config={{
-          ...HOST_DEFAULT_CONFIG,
-          avatar: 'https://www.zegocloud.com/_nuxt/img/github_nav@2x.3596ec6.png',
-          userInRoomAttributes: { test: '123' },
-          onUserCountOrPropertyChanged: (userList) => {
-            console.log('HostPage onUserCountOrPropertyChanged', userList);
-          },
-          layoutConfig: {
-            rowConfigs,
-            rowSpacing,
-          },
-          takeSeatIndexWhenJoining,
-          hostSeatIndexes,
-          seatConfig: {
-            backgroundColor,
-            foregroundBuilder,
-          },
-          background,
-          onLeaveConfirmation: () => {
-            props.navigation.navigate('HomePage');
-          },
-          inRoomMessageViewConfig: {
-            itemBuilder
-          },
-          onSeatTakingRequested: (audience) => {
-            console.log('[Demo]HostPage onSeatTakingRequested ', audience);
-          },
-          onSeatTakingRequestCanceled: (audience) => {
-            console.log('[Demo]HostPage onSeatTakingRequestCanceled ', audience);
-          },
-          onInviteAudienceToTakeSeatFailed: () => {
-            console.log('[Demo]HostPage onInviteAudienceToTakeSeatFailed ');
-          },
-          onSeatTakingInviteRejected: () => {
-            console.log('[Demo]HostPage onSeatTakingInviteRejected ');
-          },
-          // onMemberListMoreButtonPressed: (user) => {
-          //   console.log('[Demo]HostPage onMemberListMoreButtonPressed ', user);
-          // },
-          onSeatsChanged: (takenSeats, untakenSeats) => {
-            console.log('[Demo]HostPage onSeatsChanged ', takenSeats, untakenSeats);
-          },
-          onSeatClosed: () => {
-            console.log('[Demo]HostPage onSeatClosed ');
-          },
-          onSeatsOpened: () => {
-            console.log('[Demo]HostPage onSeatsOpened ');
-          },
-          onTurnOnYourMicrophoneRequest: (fromUser) => {
-            console.log('[Demo]HostPage onTurnOnYourMicrophoneRequest ', fromUser);
-          },
-          // onSeatClicked: (index, user) => {
-          //   console.log('[Demo]HostPage onSeatClicked ', index, user);
-          // },
-        }}
-      />
+      <View style={styles.prebuiltContainer}>
+        <ZegoUIKitPrebuiltLiveAudioRoom
+          ref={prebuiltRef}
+          appID={KeyCenter.appID}
+          appSign={KeyCenter.appSign}
+          userID={'3378'}
+          userName={userName}
+          roomID={roomID}
+          config={{
+            ...HOST_DEFAULT_CONFIG,
+            avatar: 'https://www.zegocloud.com/_nuxt/img/github_nav@2x.3596ec6.png',
+            userInRoomAttributes: { test: '123' },
+            onUserCountOrPropertyChanged: (userList) => {
+              console.log('HostPage onUserCountOrPropertyChanged', userList);
+            },
+            layoutConfig: {
+              rowConfigs,
+              rowSpacing,
+            },
+            takeSeatIndexWhenJoining,
+            hostSeatIndexes,
+            seatConfig: {
+              backgroundColor,
+              foregroundBuilder,
+            },
+            background,
+            onLeaveConfirmation: () => {
+              props.navigation.navigate('HomePage');
+            },
+            inRoomMessageViewConfig: {
+              itemBuilder
+            },
+            onSeatTakingRequested: (audience) => {
+              console.log('[Demo]HostPage onSeatTakingRequested ', audience);
+            },
+            onSeatTakingRequestCanceled: (audience) => {
+              console.log('[Demo]HostPage onSeatTakingRequestCanceled ', audience);
+            },
+            onSeatTakingInviteRejected: () => {
+              console.log('[Demo]HostPage onSeatTakingInviteRejected ');
+            },
+            // onMemberListMoreButtonPressed: (user) => {
+            //   console.log('[Demo]HostPage onMemberListMoreButtonPressed ', user);
+            // },
+            onSeatsChanged: (takenSeats, untakenSeats) => {
+              console.log('[Demo]HostPage onSeatsChanged ', takenSeats, untakenSeats);
+            },
+            onSeatClosed: () => {
+              console.log('[Demo]HostPage onSeatClosed ');
+            },
+            onSeatsOpened: () => {
+              console.log('[Demo]HostPage onSeatsOpened ');
+            },
+            onTurnOnYourMicrophoneRequest: (fromUser) => {
+              console.log('[Demo]HostPage onTurnOnYourMicrophoneRequest ', fromUser);
+            },
+            // onSeatClicked: (index, user) => {
+            //   console.log('[Demo]HostPage onSeatClicked ', index, user);
+            // },
+          }}
+        />
+      </View>
+      {
+        showBtn ? <View style={styles.btnContainer}>
+          <Button title='inviteAudienceToTakeSeat' onPress={prebuiltRef.current.inviteAudienceToTakeSeat.bind(this, '3379')}></Button>
+          <Button title='acceptSeatTakingRequest' onPress={prebuiltRef.current.acceptSeatTakingRequest.bind(this, '3379')}></Button>
+          <Button title='rejectSeatTakingRequest' onPress={prebuiltRef.current.rejectSeatTakingRequest.bind(this, '3379')}></Button>
+          <Button title='openSeats' onPress={prebuiltRef.current.openSeats}></Button>
+          <Button title='closeSeats' onPress={prebuiltRef.current.closeSeats}></Button>
+          <Button title='turnMicrophoneOn' onPress={prebuiltRef.current.turnMicrophoneOn.bind(this, '3379', true)}></Button>
+          <Button title='removeSpeakerFromSeat' onPress={prebuiltRef.current.removeSpeakerFromSeat.bind(this, '3379')}></Button>
+        </View> : null
+      }
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'column',
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     zIndex: 0,
+  },
+  btnContainer: {
+    alignItems: 'flex-start',
+  },
+  prebuiltContainer: {
+    flex: 1,
   },
   builder: {
     flex: 1,

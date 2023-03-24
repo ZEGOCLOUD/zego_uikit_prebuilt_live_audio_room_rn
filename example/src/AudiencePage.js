@@ -1,12 +1,12 @@
-import React from 'react';
-
-import {StyleSheet, View, Image, Text, ImageBackground} from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import {StyleSheet, View, Image, Text, ImageBackground,Button} from 'react-native';
 import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   AUDIENCE_DEFAULT_CONFIG,
   ZegoLiveAudioRoomLayoutAlignment,
 } from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
 export default function AudiencePage(props) {
+  const prebuiltRef = useRef();
   const {route} = props;
   const {params} = route;
   const {userID, userName, roomID, layoutType} = params;
@@ -159,67 +159,80 @@ export default function AudiencePage(props) {
       <View style={styles.placeholder}></View>
     </View>
   }
+  const [showBtn, setShowBtn] = useState(false);
+  useEffect(() => {
+    setShowBtn(true);
+  }, []);
   return (
     <View style={styles.container}>
-      <ZegoUIKitPrebuiltLiveAudioRoom
-        appID={KeyCenter.appID}
-        appSign={KeyCenter.appSign}
-        userID={userID}
-        userName={userName}
-        roomID={roomID}
-        config={{
-          ...AUDIENCE_DEFAULT_CONFIG,
-          avatar: 'https://www.zegocloud.com/_nuxt/img/discord_nav@2x.8739674.png',
-          userInRoomAttributes: { test: '123' },
-          onUserCountOrPropertyChanged: (userList) => {
-            console.log('[Demo]AudiencePage onUserCountOrPropertyChanged', userList);
-          },
-          layoutConfig: {
-            rowConfigs,
-            rowSpacing,
-          },
-          takeSeatIndexWhenJoining,
-          hostSeatIndexes,
-          seatConfig: {
-            foregroundBuilder,
-            backgroundColor,
-          },
-          background,
-          onLeaveConfirmation: () => {
-            props.navigation.navigate('HomePage');
-          },
-          inRoomMessageViewConfig: {
-            itemBuilder
-          },
-          onSeatTakingRequestFailed: () => {
-            console.log('[Demo]AudiencePage onSeatTakingRequestFailed ');
-          },
-          onSeatTakingRequestRejected: () => {
-            console.log('[Demo]AudiencePage onSeatTakingRequestRejected ');
-          },
-          onHostSeatTakingInviteSent: () => {
-            console.log('[Demo]AudiencePage onHostSeatTakingInviteSent ');
-          },
-          // onMemberListMoreButtonPressed: (user) => {
-          //   console.log('[Demo]AudiencePage onMemberListMoreButtonPressed ', user);
-          // },
-          onSeatsChanged: (takenSeats, untakenSeats) => {
-            console.log('[Demo]AudiencePage onSeatsChanged ', takenSeats, untakenSeats);
-          },
-          onSeatClosed: () => {
-            console.log('[Demo]AudiencePage onSeatClosed ');
-          },
-          onSeatsOpened: () => {
-            console.log('[Demo]AudiencePage onSeatsOpened ');
-          },
-          onTurnOnYourMicrophoneRequest: (fromUser) => {
-            console.log('[Demo]AudiencePage onTurnOnYourMicrophoneRequest ', fromUser);
-          },
-          // onSeatClicked: (index, user) => {
-          //   console.log('[Demo]AudiencePage onSeatClicked ', index, user);
-          // },
-        }}
-      />
+      <View style={styles.prebuiltContainer}>
+        <ZegoUIKitPrebuiltLiveAudioRoom
+          ref={prebuiltRef}
+          appID={KeyCenter.appID}
+          appSign={KeyCenter.appSign}
+          userID={'3379'}
+          userName={userName}
+          roomID={roomID}
+          config={{
+            ...AUDIENCE_DEFAULT_CONFIG,
+            avatar: 'https://www.zegocloud.com/_nuxt/img/discord_nav@2x.8739674.png',
+            userInRoomAttributes: { test: '123' },
+            onUserCountOrPropertyChanged: (userList) => {
+              console.log('[Demo]AudiencePage onUserCountOrPropertyChanged', userList);
+            },
+            layoutConfig: {
+              rowConfigs,
+              rowSpacing,
+            },
+            takeSeatIndexWhenJoining,
+            hostSeatIndexes,
+            seatConfig: {
+              foregroundBuilder,
+              backgroundColor,
+            },
+            background,
+            onLeaveConfirmation: () => {
+              props.navigation.navigate('HomePage');
+            },
+            inRoomMessageViewConfig: {
+              itemBuilder
+            },
+            onSeatTakingRequestRejected: () => {
+              console.log('[Demo]AudiencePage onSeatTakingRequestRejected ');
+            },
+            onHostSeatTakingInviteSent: () => {
+              console.log('[Demo]AudiencePage onHostSeatTakingInviteSent ');
+            },
+            // onMemberListMoreButtonPressed: (user) => {
+            //   console.log('[Demo]AudiencePage onMemberListMoreButtonPressed ', user);
+            // },
+            onSeatsChanged: (takenSeats, untakenSeats) => {
+              console.log('[Demo]AudiencePage onSeatsChanged ', takenSeats, untakenSeats);
+            },
+            onSeatClosed: () => {
+              console.log('[Demo]AudiencePage onSeatClosed ');
+            },
+            onSeatsOpened: () => {
+              console.log('[Demo]AudiencePage onSeatsOpened ');
+            },
+            onTurnOnYourMicrophoneRequest: (fromUser) => {
+              console.log('[Demo]AudiencePage onTurnOnYourMicrophoneRequest ', fromUser);
+            },
+            // onSeatClicked: (index, user) => {
+            //   console.log('[Demo]AudiencePage onSeatClicked ', index, user);
+            // },
+          }}
+        />
+      </View>
+      {
+        showBtn ? <View style={styles.btnContainer}>
+          <Button title='applyToTakeSeat' onPress={prebuiltRef.current.applyToTakeSeat}></Button>
+          <Button title='cancelSeatTakingRequest' onPress={prebuiltRef.current.cancelSeatTakingRequest}></Button>
+          <Button title='takeSeat' onPress={prebuiltRef.current.takeSeat.bind(this, 2)}></Button>
+          <Button title='leaveSeat' onPress={prebuiltRef.current.leaveSeat}></Button>
+          <Button title='acceptHostTakeSeatInvitation' onPress={prebuiltRef.current.acceptHostTakeSeatInvitation}></Button>
+        </View> : null
+      }
     </View>
   );
 }
@@ -227,9 +240,13 @@ export default function AudiencePage(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     zIndex: 0,
+  },
+  btnContainer: {
+    alignItems: 'flex-start',
+  },
+  prebuiltContainer: {
+    flex: 1,
   },
   builder: {
     flex: 1,
