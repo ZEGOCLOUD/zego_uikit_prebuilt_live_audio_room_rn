@@ -835,9 +835,12 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     }
   };
 
-  const takeSeat = (index, isDeleteAfterOwnerLeft, isForce, isUpdateOwner) => {
+  const takeSeat = async (index, isDeleteAfterOwnerLeft, isForce, isUpdateOwner) => {
     if (role === ZegoLiveAudioRoomRole.audience) {
-      grantPermissions();
+      try {
+        await grantPermissions();
+      } catch (error) {
+      }
     }
     return ZegoUIKit.getSignalingPlugin()
       .updateRoomProperty(
