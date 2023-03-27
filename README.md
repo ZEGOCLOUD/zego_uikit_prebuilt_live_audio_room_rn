@@ -30,12 +30,13 @@ To build a live audio app from scratch, you may check our [Voice Call](https://d
 
 - Ready-to-use Live Audio Room
 - Remove speakers
-- Speaker seats changing
+- Speaker seats changing & management
 - Customizable seat layout
 - Extendable menu bar
 - Device management
 - Customizable UI style
 - Real-time interactive text chat
+- Seat-taking (Invite & apply to take speaker seats)
 
 # Quick start
 
@@ -64,7 +65,7 @@ yarn add @zegocloud/zego-uikit-prebuilt-live-audio-room-rn
 Run the following command to install other dependencies for making sure the `@zegocloud/zego-uikit-prebuilt-live-audio-room-rn` can work properly:
 
 ```bash
-yarn add react-delegate-component @react-navigation/native @react-navigation/native-stack react-native-screens react-native-safe-area-context zego-express-engine-reactnative@3.0.3 zego-zim-react-native@2.4.0 @zegocloud/zego-uikit-rn @zegocloud/zego-uikit-signaling-plugin-rn
+yarn add react-delegate-component zego-express-engine-reactnative@3.2.0 zego-zim-react-native@2.7.0 zego-zpns-react-native@2.2.0 @zegocloud/zego-uikit-rn @zegocloud/zego-uikit-signaling-plugin-rn
 ```
 
 ### Using the ZegoUIKitPrebuiltLiveAudioRoom Component in your project
@@ -96,7 +97,6 @@ export default function LiveAudioRoomPage(props) {
         userName={userName}
         roomID={roomID} // roomID can be any unique string.
         config={{
-          // You can also use HOST_DEFAULT_CONFIG/AUDIENCE_DEFAULT_CONFIG to make more types of calls.
           ...HOST_DEFAULT_CONFIG,
           onLeaveConfirmation: () => {
             props.navigation.navigate('HomePage');
