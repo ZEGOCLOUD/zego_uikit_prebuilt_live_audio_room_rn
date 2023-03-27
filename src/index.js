@@ -77,7 +77,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
     onMemberListMoreButtonPressed,
     onSeatsChanged,
-    onSeatClosed,
+    onSeatsClosed,
     onSeatsOpened,
     onTurnOnYourMicrophoneRequest,
     onSeatClicked,
@@ -441,6 +441,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }
   // Get free seat index of the most front
   const getFreeSeatIndex = (seatingAreaData) => {
+    console.log('#####getFreeSeatIndex#####', seatingAreaData);
     let freeSeatIndex;
     for (let index = 0, len = seatingAreaData.length; index < len; index++) {
       const element = seatingAreaData[index];
@@ -454,7 +455,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           break;
         }
       }
-      if (freeSeatIndex) {
+      if (freeSeatIndex !== undefined) {
         break;
       }
     }
@@ -468,7 +469,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       // There are closures, status values cannot be used directly
       const temp = realTimeData.current.seatingAreaData;
       const freeSeatIndex = getFreeSeatIndex(temp);
-      if (freeSeatIndex) {
+      console.log('freeSeatIndex', freeSeatIndex);
+      if (freeSeatIndex !== undefined) {
         // Take seat
         takeSeat(freeSeatIndex, true, false, false).then(() => {
           realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.connected;
@@ -548,7 +550,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         setIsLocked(isLocked);
         realTimeData.current.isLocked = isLocked;
         if (isLocked) {
-          typeof onSeatClosed === 'function' && onSeatClosed();
+          typeof onSeatsClosed === 'function' && onSeatsClosed();
         } else {
           const { role, hostID } = realTimeData.current;
           if (role === ZegoLiveAudioRoomRole.host) {

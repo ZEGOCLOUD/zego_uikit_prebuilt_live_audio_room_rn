@@ -161,7 +161,7 @@ export default function AudiencePage(props) {
   }
   const [showBtn, setShowBtn] = useState(false);
   useEffect(() => {
-    setShowBtn(true);
+    setShowBtn(false);
   }, []);
   return (
     <View style={styles.container}>
@@ -170,7 +170,7 @@ export default function AudiencePage(props) {
           ref={prebuiltRef}
           appID={KeyCenter.appID}
           appSign={KeyCenter.appSign}
-          userID={'3379'}
+          userID={userID}
           userName={userName}
           roomID={roomID}
           config={{
@@ -209,8 +209,8 @@ export default function AudiencePage(props) {
             onSeatsChanged: (takenSeats, untakenSeats) => {
               console.log('[Demo]AudiencePage onSeatsChanged ', takenSeats, untakenSeats);
             },
-            onSeatClosed: () => {
-              console.log('[Demo]AudiencePage onSeatClosed ');
+            onSeatsClosed: () => {
+              console.log('[Demo]AudiencePage onSeatsClosed ');
             },
             onSeatsOpened: () => {
               console.log('[Demo]AudiencePage onSeatsOpened ');

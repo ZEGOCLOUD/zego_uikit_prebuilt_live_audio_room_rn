@@ -161,7 +161,7 @@ export default function HostPage(props) {
   }
   const [showBtn, setShowBtn] = useState(false);
   useEffect(() => {
-    setShowBtn(true);
+    setShowBtn(false);
   }, []);
   return (
     <View style={styles.container}>
@@ -170,7 +170,7 @@ export default function HostPage(props) {
           ref={prebuiltRef}
           appID={KeyCenter.appID}
           appSign={KeyCenter.appSign}
-          userID={'3378'}
+          userID={userID}
           userName={userName}
           roomID={roomID}
           config={{
@@ -212,8 +212,8 @@ export default function HostPage(props) {
             onSeatsChanged: (takenSeats, untakenSeats) => {
               console.log('[Demo]HostPage onSeatsChanged ', takenSeats, untakenSeats);
             },
-            onSeatClosed: () => {
-              console.log('[Demo]HostPage onSeatClosed ');
+            onSeatsClosed: () => {
+              console.log('[Demo]HostPage onSeatsClosed ');
             },
             onSeatsOpened: () => {
               console.log('[Demo]HostPage onSeatsOpened ');
