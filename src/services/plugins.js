@@ -2,7 +2,7 @@ import ZegoUIKit, {
   ZegoUIKitPluginType,
   ZegoInvitationConnectionState,
 } from '@zegocloud/zego-uikit-rn';
-import { zloginfo } from './logger';
+import { zloginfo } from '../utils/logger';
 import ZegoUIKitSignalingPlugin from '@zegocloud/zego-uikit-signaling-plugin-rn';
 
 const _appInfo = {};

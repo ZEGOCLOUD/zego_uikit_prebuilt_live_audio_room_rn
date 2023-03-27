@@ -6,10 +6,12 @@ import {
   ZegoLeaveButton,
 } from '@zegocloud/zego-uikit-rn';
 
-import ZegoMoreButton from './ZegoMoreButton';
-import ZegoMessageButton from './ZegoMessageButton';
-import ZegoMenuBarButtonName from './ZegoMenuBarButtonName';
-import ZegoMemberButton from './ZegoMemberButton';
+import ZegoMoreButton from '../components/ZegoMoreButton';
+import ZegoMessageButton from '../components/ZegoMessageButton';
+import ZegoMenuBarButtonName from '../components/ZegoMenuBarButtonName';
+import ZegoMemberButton from '../components/ZegoMemberButton';
+import ZegoCoHostControlButton from '../components/ZegoCoHostControlButton';
+import ZegoLockButton from '../components/ZegoLockButton';
 
 export default function ZegoBottomBar(props) {
   const {
@@ -20,10 +22,19 @@ export default function ZegoBottomBar(props) {
     onMoreButtonPress,
     onMessageButtonPress,
     showInRoomMessageButton = false,
-    onOpenCallMemberList,
+    onOpenMemberList,
     useSpeakerWhenJoining,
     onLeaveLiveStreamingConfirming,
     onLeaveLiveStreaming,
+    onSeatTakingRequestRejected,
+    onConnectStateChanged,
+    onCoHostAccepted,
+    hostID,
+    closeSeatsWhenJoin,
+    isPluginsInit,
+    isLocked,
+    requestCoHostCount,
+    memberConnectState,
   } = props;
   const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -37,18 +48,21 @@ export default function ZegoBottomBar(props) {
             isOn={turnOnMicrophoneWhenJoining}
             width={buttonSize}
             height={buttonSize}
-            iconMicOn={require('./resources/bottom_button_mic_on.png')}
-            iconMicOff={require('./resources/bottom_button_mic_off.png')}
+            iconMicOn={require('../resources/bottom_button_mic_on.png')}
+            iconMicOff={require('../resources/bottom_button_mic_off.png')}
           />
         );
       case ZegoMenuBarButtonName.showMemberListButton:
         return (
-          <ZegoMemberButton
-            key={buttonIndex}
-            onPressed={onOpenCallMemberList}
-            width={buttonSize}
-            height={buttonSize}
-          />
+          <View>
+            <ZegoMemberButton
+              key={buttonIndex}
+              onPressed={onOpenMemberList}
+              width={buttonSize}
+              height={buttonSize}
+            />
+            { requestCoHostCount ? <View style={styles.memberRedDot}></View> : null }
+          </View>
         );
       case ZegoMenuBarButtonName.switchAudioOutputButton:
         return (
@@ -65,10 +79,26 @@ export default function ZegoBottomBar(props) {
             key={buttonIndex}
             onLeaveConfirmation={onLeaveLiveStreamingConfirming}
             onPressed={onLeaveLiveStreaming}
-            iconLeave={require('./resources/white_bottom_button_close.png')}
+            iconLeave={require('../resources/white_bottom_button_close.png')}
             width={buttonSize}
             height={buttonSize}
           />
+        );
+      case ZegoMenuBarButtonName.applyToTakeSeatButton:
+        return (
+          isLocked ? <ZegoCoHostControlButton
+            key={buttonIndex}
+            hostID={hostID}
+            isPluginsInit={isPluginsInit}
+            memberConnectState={memberConnectState}
+            onSeatTakingRequestRejected={onSeatTakingRequestRejected}
+            onConnectStateChanged={onConnectStateChanged}
+            onCoHostAccepted={onCoHostAccepted}
+          /> : null
+        );
+      case ZegoMenuBarButtonName.closeSeatButton:
+        return (
+          <ZegoLockButton key={buttonIndex} closeSeatsWhenJoin={closeSeatsWhenJoin} />
         );
     }
   };
@@ -220,5 +250,14 @@ const styles = StyleSheet.create({
   },
   rightBtn: {
     marginRight: 16,
+  },
+  memberRedDot: {
+    backgroundColor: '#FF0D23',
+    borderRadius: 1000,
+    width: 8,
+    height: 8,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 });

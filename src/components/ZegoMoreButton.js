@@ -10,7 +10,7 @@ export default function ZegoMoreButton(props) {
       onPress={onPress}
     >
       <Image
-        source={require('./resources/white_button_more.png')}
+        source={require('../resources/white_button_more.png')}
         style={{ width: '100%', height: '100%' }}
       />
     </TouchableOpacity>

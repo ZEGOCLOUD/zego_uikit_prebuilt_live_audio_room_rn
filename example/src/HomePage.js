@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, View, StyleSheet, Text, TextInput} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+
 export default function HomePage(props) {
   const navigation = useNavigation();
   const onJoinPress = isHost => {
@@ -25,6 +26,7 @@ export default function HomePage(props) {
     {name: '全排满样式', color: '#ccc'},
     {name: 'Host首行居中样式', color: '#ccc'},
     {name: 'Host居中样式', color: '#ccc'},
+    {name: 'Test', color: '#ccc'},
   ];
   const [newlayoutArr, setLayoutArr] = useState(layoutArr);
   const onLayoutBtnPress = index => {

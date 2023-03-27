@@ -1,11 +1,12 @@
-import React from 'react';
-import {StyleSheet, View, Text, Image, ImageBackground} from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import {StyleSheet, View, Text, Image, ImageBackground, Button} from 'react-native';
 import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   HOST_DEFAULT_CONFIG,
   ZegoLiveAudioRoomLayoutAlignment,
 } from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
 export default function HostPage(props) {
+  const prebuiltRef = useRef();
   const {route} = props;
   const {params} = route;
   const {userID, userName, roomID, layoutType} = params;
@@ -104,6 +105,16 @@ export default function HostPage(props) {
       takeSeatIndexWhenJoining = 4;
       hostSeatIndexes = [4];
       break;
+    default:
+      rowConfigs = [
+        {
+          count: 2,
+          seatSpacing: 16,
+          alignment: ZegoLiveAudioRoomLayoutAlignment.spaceAround,
+        },
+      ];
+      takeSeatIndexWhenJoining = 0;
+      break;
   }
   const foregroundBuilder = ({userInfo, seatIndex}) => {
     return (
@@ -139,48 +150,109 @@ export default function HostPage(props) {
       </View>
     );
   };
-
+  const itemBuilder = ({ message }) => {
+    return <View style={styles.messageContainer}>
+      <Text style={styles.nameLabel}>
+        {message.sender.userName}
+        <Text style={styles.messageLabel}> {message.message}</Text>
+      </Text>
+      <View style={styles.placeholder}></View>
+    </View>
+  }
+  const [showBtn, setShowBtn] = useState(false);
+  useEffect(() => {
+    setShowBtn(false);
+  }, []);
   return (
     <View style={styles.container}>
-      <ZegoUIKitPrebuiltLiveAudioRoom
-        appID={KeyCenter.appID}
-        appSign={KeyCenter.appSign}
-        userID={userID}
-        userName={userName}
-        roomID={roomID}
-        config={{
-          ...HOST_DEFAULT_CONFIG,
-          avatar: 'https://www.zegocloud.com/_nuxt/img/discord_nav@2x.8739674.png',
-          userInRoomAttributes: { test: '123' },
-          onUserCountOrPropertyChanged: (userList) => {
-            console.log('AudiencePage onUserCountOrPropertyChanged', userList);
-          },
-          layoutConfig: {
-            rowConfigs,
-            rowSpacing,
-          },
-          takeSeatIndexWhenJoining,
-          hostSeatIndexes,
-          seatConfig: {
-            backgroundColor,
-            foregroundBuilder,
-          },
-          background,
-          onLeaveConfirmation: () => {
-            props.navigation.navigate('HomePage');
-          },
-        }}
-      />
+      <View style={styles.prebuiltContainer}>
+        <ZegoUIKitPrebuiltLiveAudioRoom
+          ref={prebuiltRef}
+          appID={KeyCenter.appID}
+          appSign={KeyCenter.appSign}
+          userID={userID}
+          userName={userName}
+          roomID={roomID}
+          config={{
+            ...HOST_DEFAULT_CONFIG,
+            avatar: 'https://www.zegocloud.com/_nuxt/img/github_nav@2x.3596ec6.png',
+            userInRoomAttributes: { test: '123' },
+            onUserCountOrPropertyChanged: (userList) => {
+              console.log('HostPage onUserCountOrPropertyChanged', userList);
+            },
+            layoutConfig: {
+              rowConfigs,
+              rowSpacing,
+            },
+            takeSeatIndexWhenJoining,
+            hostSeatIndexes,
+            seatConfig: {
+              backgroundColor,
+              foregroundBuilder,
+            },
+            background,
+            onLeaveConfirmation: () => {
+              props.navigation.navigate('HomePage');
+            },
+            inRoomMessageViewConfig: {
+              itemBuilder
+            },
+            onSeatTakingRequested: (audience) => {
+              console.log('[Demo]HostPage onSeatTakingRequested ', audience);
+            },
+            onSeatTakingRequestCanceled: (audience) => {
+              console.log('[Demo]HostPage onSeatTakingRequestCanceled ', audience);
+            },
+            onSeatTakingInviteRejected: () => {
+              console.log('[Demo]HostPage onSeatTakingInviteRejected ');
+            },
+            // onMemberListMoreButtonPressed: (user) => {
+            //   console.log('[Demo]HostPage onMemberListMoreButtonPressed ', user);
+            // },
+            onSeatsChanged: (takenSeats, untakenSeats) => {
+              console.log('[Demo]HostPage onSeatsChanged ', takenSeats, untakenSeats);
+            },
+            onSeatsClosed: () => {
+              console.log('[Demo]HostPage onSeatsClosed ');
+            },
+            onSeatsOpened: () => {
+              console.log('[Demo]HostPage onSeatsOpened ');
+            },
+            onTurnOnYourMicrophoneRequest: (fromUser) => {
+              console.log('[Demo]HostPage onTurnOnYourMicrophoneRequest ', fromUser);
+            },
+            // onSeatClicked: (index, user) => {
+            //   console.log('[Demo]HostPage onSeatClicked ', index, user);
+            // },
+          }}
+        />
+      </View>
+      {
+        showBtn ? <View style={styles.btnContainer}>
+          <Button title='inviteAudienceToTakeSeat' onPress={prebuiltRef.current.inviteAudienceToTakeSeat.bind(this, '3379')}></Button>
+          <Button title='acceptSeatTakingRequest' onPress={prebuiltRef.current.acceptSeatTakingRequest.bind(this, '3379')}></Button>
+          <Button title='rejectSeatTakingRequest' onPress={prebuiltRef.current.rejectSeatTakingRequest.bind(this, '3379')}></Button>
+          <Button title='openSeats' onPress={prebuiltRef.current.openSeats}></Button>
+          <Button title='closeSeats' onPress={prebuiltRef.current.closeSeats}></Button>
+          <Button title='turnMicrophoneOn' onPress={prebuiltRef.current.turnMicrophoneOn.bind(this, '3379', true)}></Button>
+          <Button title='removeSpeakerFromSeat' onPress={prebuiltRef.current.removeSpeakerFromSeat.bind(this, '3379')}></Button>
+        </View> : null
+      }
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'column',
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     zIndex: 0,
+  },
+  btnContainer: {
+    alignItems: 'flex-start',
+  },
+  prebuiltContainer: {
+    flex: 1,
   },
   builder: {
     flex: 1,
@@ -238,5 +310,35 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
+  },
+  // message
+  messageContainer: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(1, 7, 18, 0.3000)',
+    borderRadius: 13,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 4,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingRight: 10,
+    paddingLeft: 10,
+  },
+  nameLabel: {
+    color: '#8BE7FF',
+    fontSize: 13,
+    // marginLeft: 10
+  },
+  messageLabel: {
+    color: 'white',
+    fontSize: 13,
+    marginLeft: 5,
+  },
+  placeholder: {
+    backgroundColor: 'red',
+    width: 10,
+    height: 10,
+    marginLeft: 10,
   },
 });

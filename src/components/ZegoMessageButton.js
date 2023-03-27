@@ -11,7 +11,7 @@ export default function ZegoMessageButton(props) {
     >
       <Image
         resizeMode="contain"
-        source={require('./resources/white_bottom_button_message.png')}
+        source={require('../resources/white_bottom_button_message.png')}
         onLoad={({
           nativeEvent: {
             source: { width, height },

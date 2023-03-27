@@ -16,6 +16,10 @@ export default function ZegoSeatingArea(props) {
     backgroundImage,
     seatingAreaData,
     showSoundWaveInAudioMode,
+    foregroundColor,
+    openIcon,
+    closeIcon,
+    isLocked,
   } = props;
   const flexStyle = [
     'space-around',
@@ -77,7 +81,9 @@ export default function ZegoSeatingArea(props) {
             ) : (
               <Image
                 style={styles.icon}
-                source={require('./resources/seating-area-default-icon.png')}
+                source={
+                  isLocked ? closeIcon : openIcon
+                }
               />
             )}
           </View>

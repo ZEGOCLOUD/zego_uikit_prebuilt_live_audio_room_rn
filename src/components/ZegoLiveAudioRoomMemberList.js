@@ -1,17 +1,32 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import ZegoUIKit, { ZegoMemberList } from '@zegocloud/zego-uikit-rn';
-import { StyleSheet, View, Text } from 'react-native';
-import { ZegoLiveAudioRoomRole } from './define';
+import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import {
+  ZegoLiveAudioRoomRole,
+  ZegoInnerText,
+  ZegoCoHostConnectState,
+  ZegoInvitationType,
+} from '../services/defines';
+import { getShotName } from '../utils';
+import ZegoAgreeCoHostButton from "./ZegoAgreeCoHostButton";
+import ZegoDisagreeCoHostButton from "./ZegoDisagreeCoHostButton";
 
 export default function ZegoLiveAudioRoomMemberList(props) {
   const {
     showMicrophoneState,
-    onCloseCallMemberList,
+    onCloseMemberList,
     seatingAreaData,
-    memberListTitle,
+    memberConnectStateMap,
+    hostID,
+    isLocked,
+    memberCount,
+    onMemberListMoreButtonPressed,
+    onCoHostDisagree,
+    onCoHostAgree,
+    setIsCoHostDialogVisable,
+    setCoHostDialogExtendedData,
   } = props;
-  const memberList = ZegoUIKit.getAllUsers();
-  console.log('===ZegoLiveAudioRoomMemberList memberList', memberList);
+  const localUserID = ZegoUIKit.getLocalUserInfo().userID;
 
   const sortUserList = (userList) => {
     // Sort by seatingAreaData
@@ -19,8 +34,6 @@ export default function ZegoLiveAudioRoomMemberList(props) {
     // you are host: you(host) -> other host -> speaker -> audience
     // yor are not host: host -> you -> speaker -> audience
 
-    console.warn('========sortUserList==========', userList);
-    const localUserID = ZegoUIKit.getLocalUserInfo().userID;
     // Find out the role of everyone
     const userIDRoleMap = new Map();
     const hostArr = [],
@@ -28,7 +41,6 @@ export default function ZegoLiveAudioRoomMemberList(props) {
       audienceArr = [];
     seatingAreaData.forEach((element) => {
       Array.from(element.seatList.values()).forEach((item) => {
-        console.log('========sortUserList==========', item);
         if (item.userID) {
           userIDRoleMap.set(
             item.userID,
@@ -37,7 +49,6 @@ export default function ZegoLiveAudioRoomMemberList(props) {
         }
       });
     });
-
     userList.forEach((item) => {
       if (
         userIDRoleMap.get(item.userID) === ZegoLiveAudioRoomRole.host.toString()
@@ -61,17 +72,18 @@ export default function ZegoLiveAudioRoomMemberList(props) {
           // localUser is audience, sort after hostArr
           speakerArr.unshift(item);
         } else {
-          audienceArr.push(item);
+          if (memberConnectStateMap[item.userID] === ZegoCoHostConnectState.connecting) {
+            audienceArr.unshift(item);
+          } else {
+            audienceArr.push(item);
+          }
         }
       }
     });
     const allArr = hostArr.concat(speakerArr, audienceArr);
     return allArr;
   };
-
   const roleDescription = (item) => {
-    console.warn('===============roleDescription==============', item);
-    const localUserID = ZegoUIKit.getLocalUserInfo().userID;
     const showMe = item.userID == localUserID ? 'You' : '';
     let roleName = '';
     seatingAreaData.forEach((element) => {
@@ -95,35 +107,74 @@ export default function ZegoLiveAudioRoomMemberList(props) {
       return `(${showMe + (showMe && roleName ? ',' : '') + roleName})`;
     }
   };
-
-  const getShotName = (name) => {
-    if (!name) {
-      return '';
-    }
-    const nl = name.split(' ');
-    var shotName = '';
-    nl.forEach((part) => {
-      if (part !== '') {
-        shotName += part.substring(0, 1);
-      }
-    });
-    return shotName;
+  // Determine whether you are the host and whether the current member has sent a cohost request
+  const showOperationButton = (userID) => {
+    return isLocked && localUserID === hostID && memberConnectStateMap[userID] === ZegoCoHostConnectState.connecting;
   };
-
+  const showOperationIcon = (userID) => {
+    return localUserID === hostID && userID !== localUserID && memberConnectStateMap[userID] !== ZegoCoHostConnectState.connecting;
+  };
+  const showAvatar = (userInfo) => {
+    return userInfo.inRoomAttributes && userInfo.inRoomAttributes.avatar;
+  };
+  const operateHandle = (userInfo) => {
+    onCloseMemberList();
+    const { userID } = userInfo;
+    if (typeof onMemberListMoreButtonPressed === 'function') {
+      onMemberListMoreButtonPressed(userInfo);
+    } else {
+      setIsCoHostDialogVisable(true);
+      // You can invite to cohost
+      setCoHostDialogExtendedData({
+        inviteeID: userID,
+        invitationType: ZegoInvitationType.inviteToCoHost,
+        onOk: () => {
+          setIsCoHostDialogVisable(false);
+        },
+        onCancel: () => {
+          setIsCoHostDialogVisable(false);
+        },
+      });
+    }
+  };
   const itemBuilder = ({ userInfo }) => {
     return (
       <View style={styles.item}>
         <View style={styles.itemLeft}>
-          <View style={styles.avatar}>
-            <Text style={styles.nameLabel}>
-              {getShotName(userInfo.userName)}
-            </Text>
+          <View style={[styles.avatar, { backgroundColor: showAvatar(userInfo) ? 'transparent' : '#DBDDE3' }]}>
+            {
+              showAvatar(userInfo) ? 
+              <Image 
+                source={{ uri: userInfo.inRoomAttributes.avatar }} 
+                style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
+                resizeMode="contain"
+              /> :
+              <Text style={styles.nameLabel}>
+                {getShotName(userInfo.userName)}
+              </Text>
+            }
           </View>
           <Text style={styles.name}>
             {userInfo.userName + roleDescription(userInfo)}
           </Text>
         </View>
-        <View style={styles.itemRight}></View>
+        <View style={styles.itemRight}>
+        {
+          showOperationButton(userInfo.userID) ? <Fragment>
+            <View style={{marginRight: 6}}>
+              <ZegoDisagreeCoHostButton onPressed={onCoHostDisagree.bind(this, userInfo.userID)} inviterID={userInfo.userID} />
+            </View>
+            <View>
+              <ZegoAgreeCoHostButton onPressed={onCoHostAgree.bind(this, userInfo.userID)} inviterID={userInfo.userID} />
+            </View>
+          </Fragment> : null
+        }
+        {
+          showOperationIcon(userInfo.userID) ? <TouchableOpacity onPress={operateHandle.bind(this, userInfo)}>
+            <Image source={require('../resources/icon_more_vertical.png')} />
+            </TouchableOpacity> : null
+        }
+        </View>
       </View>
     );
   };
@@ -133,7 +184,7 @@ export default function ZegoLiveAudioRoomMemberList(props) {
       <View style={styles.topLine} />
       <View style={styles.header}>
         <Text style={styles.title}>
-          {memberListTitle} · {memberList.length}
+          {ZegoInnerText.memberListTitle} · {memberCount}
         </Text>
       </View>
       <View style={styles.memberListContainer}>
