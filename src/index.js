@@ -234,7 +234,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           setTimeout(() => {
             // The sorting will not be triggered if the member list pop-up is not reopened, the sorting must be forced
             ZegoUIKit.forceSortMemberList();
-          }, 50);
+          }, 100);
 
           typeof onSeatTakingRequested === 'function' && onSeatTakingRequested(ZegoUIKit.getUser(inviter.id));
         } else if (type === ZegoInvitationType.inviteToCoHost) {

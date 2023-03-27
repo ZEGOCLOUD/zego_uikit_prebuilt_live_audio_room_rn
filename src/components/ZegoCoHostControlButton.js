@@ -29,6 +29,9 @@ export default function ZegoCoHostControlButton(props) {
         }
         onConnectStateChanged('', newConnectState);
     };
+    const cancelUnsuccessfullyHandle = () => {
+        onConnectStateChanged('', ZegoCoHostConnectState.idle);
+    };
 
     useEffect(() => {
         const callbackID = 'ZegoCoHostControlButton' + String(Math.floor(Math.random() * 10000));
@@ -70,6 +73,7 @@ export default function ZegoCoHostControlButton(props) {
                 /> :
                 memberConnectState === ZegoCoHostConnectState.connecting ? <ZegoCancelRequestCoHostButton
                     hostID={hostID}
+                    onCancelUnsuccessfully={cancelUnsuccessfullyHandle}
                     onCancelSuccessfully={coHostControlHandle.bind(this, ZegoCoHostControlButtonType.cancel)}
                 /> : null
             }

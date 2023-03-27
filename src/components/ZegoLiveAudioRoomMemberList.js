@@ -72,7 +72,11 @@ export default function ZegoLiveAudioRoomMemberList(props) {
           // localUser is audience, sort after hostArr
           speakerArr.unshift(item);
         } else {
-          audienceArr.push(item);
+          if (memberConnectStateMap[item.userID] === ZegoCoHostConnectState.connecting) {
+            audienceArr.unshift(item);
+          } else {
+            audienceArr.push(item);
+          }
         }
       }
     });

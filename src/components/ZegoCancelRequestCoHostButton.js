@@ -7,10 +7,19 @@ export default function ZegoCancelRequestCoHostButton(props) {
     const {
         hostID,
         onCancelSuccessfully,
+        onCancelUnsuccessfully,
     } = props;
 
     const pressedHandle = () => {
         onCancelSuccessfully();
+    };
+    const willPressedHandle = () => {
+        let result = true;
+        if (!hostID) {
+            result = false;
+            onCancelUnsuccessfully();
+        }
+        return result;
     };
 
     return (
@@ -24,6 +33,7 @@ export default function ZegoCancelRequestCoHostButton(props) {
             text={ZegoInnerText.cancelTheTakeSeatApplicationButton}
             verticalLayout={false}
             invitees={[hostID]}
+            onWillPressed={willPressedHandle}
             onPressed={pressedHandle}
         ></ZegoCancelInvitationButton>
     )
