@@ -1,33 +1,35 @@
 import ZegoUIKit, {
-  ZegoUIKitPluginType,
   ZegoInvitationConnectionState,
 } from '@zegocloud/zego-uikit-rn';
 import { zloginfo } from '../utils/logger';
-import ZegoUIKitSignalingPlugin from '@zegocloud/zego-uikit-signaling-plugin-rn';
+import * as ZIM from 'zego-zim-react-native';
+import * as ZPNs from 'zego-zpns-react-native';
 
 const _appInfo = {};
 const _localUser = {};
 let _pluginConnectionState;
+let ZIMKitPlugin = null;
 const _install = (plugins) => {
   ZegoUIKit.installPlugins(plugins);
-  Object.values(ZegoUIKitPluginType).forEach((pluginType) => {
-    const plugin = ZegoUIKit.getPlugin(pluginType);
-    plugin &&
-      ZegoUIKit.getPlugin(pluginType)
-        .getVersion()
-        .then((pluginVersion) => {
-          zloginfo(
-            `[Plugins] install success, pluginType: ${pluginType}, version: ${pluginVersion}`
-          );
-        });
-  });
+  plugins.forEach(plugin => {
+    if (plugin.ZIMKit) {
+      zloginfo('[Plugins] install ZIMKit success.');
+      ZIMKitPlugin = plugin;
+    } else if (plugin.default && typeof plugin.default.getModuleName === 'function') {
+      const temp = plugin.default.getModuleName();
+      if (temp === 'ZIMKit') {
+        zloginfo('[Plugins] install ZIMKit success.');
+        ZIMKitPlugin = plugin;
+      }
+    }
+  })
 };
 
 const ZegoPrebuiltPlugins = {
   init: (appID, appSign, userID, userName, plugins = []) => {
     const callbackID =
       'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
-    plugins.push(ZegoUIKitSignalingPlugin);
+    plugins.push(ZIM, ZPNs);
     _install(plugins);
     ZegoUIKit.getSignalingPlugin().init(appID, appSign);
     ZegoUIKit.getSignalingPlugin().onConnectionStateChanged(

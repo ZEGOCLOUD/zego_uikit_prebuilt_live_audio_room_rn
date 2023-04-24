@@ -50,7 +50,7 @@ export {
 };
 
 function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
-  const { appID, appSign, userID, userName, roomID, config } = props;
+  const { appID, appSign, userID, userName, roomID, config, plugins = [] } = props;
   Object.assign(ZegoInnerText, config.innerText || {}, config.translationText || {});
   const {
     turnOnMicrophoneWhenJoining = false,
@@ -593,7 +593,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }, []);
 
   const pluginInit = () => {
-    return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName)
+    return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins)
       .then(() => {
         setIsInit(true);
         console.log('===init success');
