@@ -76,7 +76,7 @@
   },
   "peerDependencies": {
     "@zegocloud/zego-uikit-rn": ">=1.12.0",
-    "@zegocloud/zego-uikit-signaling-plugin-rn": ">=1.2.7",
+    "zego-zim-react-native": "^2.7.1",
     "react": "*",
     "react-native": "*"
   },
@@ -152,8 +152,5 @@
         }
       ]
     ]
-  },
-  "dependencies": {
-    "@zegocloud/zimkit-react": "^1.2.1"
   }
 }

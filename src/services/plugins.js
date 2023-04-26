@@ -3,7 +3,6 @@ import ZegoUIKit, {
 } from '@zegocloud/zego-uikit-rn';
 import { zloginfo } from '../utils/logger';
 import * as ZIM from 'zego-zim-react-native';
-import * as ZPNs from 'zego-zpns-react-native';
 
 const _appInfo = {};
 const _localUser = {};
@@ -29,7 +28,7 @@ const ZegoPrebuiltPlugins = {
   init: (appID, appSign, userID, userName, plugins = []) => {
     const callbackID =
       'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
-    plugins.push(ZIM, ZPNs);
+    plugins.push(ZIM);
     _install(plugins);
     ZegoUIKit.getSignalingPlugin().init(appID, appSign);
     ZegoUIKit.getSignalingPlugin().onConnectionStateChanged(
@@ -74,6 +73,9 @@ const ZegoPrebuiltPlugins = {
   },
   getAppInfo: () => {
     return _appInfo;
+  },
+  getZIMKitPlugin: () => {
+    return ZIMKitPlugin;
   },
 };
 
