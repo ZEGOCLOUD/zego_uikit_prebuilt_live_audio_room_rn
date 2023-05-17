@@ -174,9 +174,6 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }
   const stateData = useRef(LiveAudioRoomHelper.getInstance().getStateData());
 
-  // Initialize after use
-  MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
-
   const keyboardHeight = useKeyboard();
   const [isRoomAttributesBatching, setIsRoomAttributesBatching] = useState(stateData.current.isRoomAttributesBatching || false);
   const [roomProperties, setRoomProperties] = useState(stateData.current.roomProperties || {});
@@ -216,8 +213,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
   const hideCountdownOn_Dialog = useRef();
   const hideCountdownOn_DialogTimer = useRef();
-  const [isDialogVisable, setIsDialogVisable] = useState(false);
-  const [dialogExtendedData, setDialogExtendedData] = useState({});
+  const [isDialogVisable, setIsDialogVisable] = useState(stateData.current.isDialogVisable || false);
+  const [dialogExtendedData, setDialogExtendedData] = useState(stateData.current.dialogExtendedData || {});
   const hideCountdownOnDialogLimit = 60;
 
   // CoHost Dialog
@@ -240,9 +237,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   // Seats lock
   const [isLocked, setIsLocked] = useState(stateData.current.isLocked || false);
 
-  const callbackID =
-    'ZegoUIKitPrebuiltLiveAudioRoom' +
+  if (stateData.current.callbackID) {
+    stateData.current.callbackID  = 'ZegoUIKitPrebuiltLiveAudioRoom' +
     String(Math.floor(Math.random() * 10000));
+  }
+  const callbackID = stateData.current.callbackID;
 
   // Plugin callback
   const registerPluginCallback = () => {
@@ -301,6 +300,30 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
               });
             }
           });
+          stateData.current.dialogExtendedData = {
+            title: ZegoInnerText.hostInviteTakeSeatDialog.title,
+            content: ZegoInnerText.hostInviteTakeSeatDialog.message,
+            cancelText: ZegoInnerText.hostInviteTakeSeatDialog.cancelButtonName,
+            okText: ZegoInnerText.hostInviteTakeSeatDialog.confirmButtonName,
+            onCancel: () => {
+              // Refuse the cohost request of the host
+              ZegoUIKit.getSignalingPlugin().refuseInvitation(inviter.id).then(() => {
+                realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.idle;
+                setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+                stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
+
+                ZegoUIKit.turnMicrophoneOn('', false);
+                setIsDialogVisableHandle(false);
+              });
+            },
+            onOk: () => {
+              // Accept the cohost request of the host
+              ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id).then(async () => {
+                setIsDialogVisableHandle(false);
+                coHostAcceptedHandle(true);
+              });
+            }
+          };
 
           typeof onHostSeatTakingInviteSent === 'function' && onHostSeatTakingInviteSent();
         }
@@ -411,11 +434,13 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }
   const setIsDialogVisableHandle = (visable) => {
     setIsDialogVisable(visable);
+    stateData.current.isDialogVisable = true;
     if (visable) {
       startDialogTimer();
     } else {
       initDialogTimer();
       setDialogExtendedData({});
+      stateData.current.dialogExtendedData = {};
     }
   }
   // Connect state changed
@@ -632,20 +657,22 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       setMemberCount(count);
       stateData.current.memberCount = count;
     });
+    // Initialize after use
+    MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
     return () => {
-      // ZegoUIKit.leaveRoom();
-      ZegoUIKit.onUserLeave(callbackID);
-      ZegoUIKit.onUserCountOrPropertyChanged(callbackID);
-      ZegoUIKit.onRoomPropertyUpdated(callbackID);
-      ZegoUIKit.onTurnOnYourMicrophoneRequest(callbackID);
-      ZegoUIKit.onUserJoin(callbackID);
-    
-      unRegisterPluginCallback();
-      ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(callbackID);
-      ZegoUIKit.getSignalingPlugin().onUsersInRoomAttributesUpdated(callbackID);
-      
       const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
       if (!isMinimizeSwitch) {
+        // Callbacks cannot be cleared when minimized, and cannot be cleared before the page is opened
+        // ZegoUIKit.leaveRoom();
+        ZegoUIKit.onUserLeave(callbackID);
+        ZegoUIKit.onUserCountOrPropertyChanged(callbackID);
+        ZegoUIKit.onRoomPropertyUpdated(callbackID);
+        ZegoUIKit.onTurnOnYourMicrophoneRequest(callbackID);
+        ZegoUIKit.onUserJoin(callbackID);
+      
+        unRegisterPluginCallback();
+        ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(callbackID);
+        ZegoUIKit.getSignalingPlugin().onUsersInRoomAttributesUpdated(callbackID);
         ZegoPrebuiltPlugins.uninit();
         LiveAudioRoomHelper.getInstance().clearState();
         LiveAudioRoomHelper.getInstance().clearNotify();
