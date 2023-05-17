@@ -5,6 +5,7 @@ const ZegoMenuBarButtonName = {
   showMemberListButton: 5,
   applyToTakeSeatButton: 6,
   closeSeatButton: 7,
+  minimizingButton: 8,
 };
 
 export default ZegoMenuBarButtonName;

@@ -17,7 +17,10 @@ export default function AppNavigation(props) {
         component={HomePage}
       />
       <Stack.Screen
-        options={{headerShown: false}}
+        options={{
+          headerShown: false,
+          keepAlive: true,
+        }}
         name="HostPage"
         component={HostPage}
       />

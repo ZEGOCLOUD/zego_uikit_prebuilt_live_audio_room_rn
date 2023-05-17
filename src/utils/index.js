@@ -55,4 +55,30 @@ const grantPermissions = async (callback) => {
     }
 };
 
-export { getShotName, grantPermissions };
+const getMethodReturnValue = async (func) => {
+    let result = true;
+    if (func) {
+        if (typeof func === 'object' && typeof (func.then) === 'function' && typeof (func.catch) === 'function') {
+          // Promise
+          try {
+            result = await func;
+          } catch (error) {
+            result = false;
+          }
+        } else if (typeof func === 'function') {
+          const temp = func();
+          if (typeof temp === 'object' && typeof (temp.then) === 'function' && typeof (temp.catch) === 'function') {
+            try {
+              result = await temp;
+            } catch (error) {
+              result = false;
+            }
+          } else {
+            result = temp;
+          }
+        }
+    }
+    return result;
+}
+
+export { getShotName, grantPermissions, getMethodReturnValue };

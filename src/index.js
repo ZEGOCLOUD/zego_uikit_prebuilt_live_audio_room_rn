@@ -27,6 +27,9 @@ import ZegoToast from './components/ZegoToast';
 import ZegoDialog from './components/ZegoDialog';
 import ZegoCoHostMenuDialog from './components/ZegoCoHostMenuDialog';
 import ZegoPrebuiltPlugins from './services/plugins';
+import ZegoMinimizingButton from './components/ZegoMinimizingButton';
+import ZegoMinimizeRoomFloat from "./components/ZegoMinimizeRoomFloat";
+import MinimizingHelper from "./services/minimizing_helper";
 import {
   HOST_DEFAULT_CONFIG,
   AUDIENCE_DEFAULT_CONFIG,
@@ -46,12 +49,47 @@ export {
   AUDIENCE_DEFAULT_CONFIG,
   ZegoLiveAudioRoomRole,
   ZegoMenuBarButtonName,
+  ZegoMinimizeRoomFloat,
   ZegoLiveAudioRoomLayoutAlignment,
 };
 
 function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
-  const { appID, appSign, userID, userName, roomID, config, plugins = [] } = props;
-  Object.assign(ZegoInnerText, config.innerText || {}, config.translationText || {});
+  let { appID, appSign, userID, userName, roomID, config, plugins } = props;
+  const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
+  if (isMinimizeSwitch) {
+    const initAppInfo = MinimizingHelper.getInstance().getInitAppInfo();
+    const initUser = MinimizingHelper.getInstance().getInitUser();
+    const initRoomID = MinimizingHelper.getInstance().getInitRoomID();
+    const initConfig = MinimizingHelper.getInstance().getInitConfig();
+    const initPlugins = MinimizingHelper.getInstance().getInitPlugins();
+    appID = initAppInfo.appID;
+    appSign = initAppInfo.appSign
+    userID = initUser.userID;
+    userName = initUser.userName;
+    roomID = initRoomID;
+    config = initConfig;
+    plugins = initPlugins;
+  } else {
+    Object.assign(ZegoInnerText, config.innerText || {}, config.translationText || {});
+    // When entering the room, if there is a seat conflict, change the role to the audience
+    config.role === undefined && (config.role = ZegoLiveAudioRoomRole.audience);
+    config.takeSeatIndexWhenJoining === undefined && (config.takeSeatIndexWhenJoining = -1);
+    if (
+      (config.role == ZegoLiveAudioRoomRole.host ||
+        config.role == ZegoLiveAudioRoomRole.speaker) &&
+        config.takeSeatIndexWhenJoining < 0
+    ) {
+      config.role = ZegoLiveAudioRoomRole.audience;
+      config.takeSeatIndexWhenJoining = -1;
+    } else if (
+      config.role == ZegoLiveAudioRoomRole.speaker &&
+      hostSeatIndexes.some((item) => item === config.takeSeatIndexWhenJoining)
+    ) {
+      config.role = ZegoLiveAudioRoomRole.audience;
+      config.takeSeatIndexWhenJoining = -1;
+    }
+    MinimizingHelper.getInstance().setInitParams(appID, appSign, userID, userName, roomID, config);
+  }
   const {
     turnOnMicrophoneWhenJoining = false,
     useSpeakerWhenJoining = true,
@@ -84,23 +122,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   
     inRoomMessageViewConfig = {},
   } = config;
-  // When entering the room, if there is a seat conflict, change the role to the audience
-  config.role === undefined && (config.role = ZegoLiveAudioRoomRole.audience);
-  config.takeSeatIndexWhenJoining === undefined && (config.takeSeatIndexWhenJoining = -1);
-  if (
-    (config.role == ZegoLiveAudioRoomRole.host ||
-      config.role == ZegoLiveAudioRoomRole.speaker) &&
-      config.takeSeatIndexWhenJoining < 0
-  ) {
-    config.role = ZegoLiveAudioRoomRole.audience;
-    config.takeSeatIndexWhenJoining = -1;
-  } else if (
-    config.role == ZegoLiveAudioRoomRole.speaker &&
-    hostSeatIndexes.some((item) => item === config.takeSeatIndexWhenJoining)
-  ) {
-    config.role = ZegoLiveAudioRoomRole.audience;
-    config.takeSeatIndexWhenJoining = -1;
-  }
+  
   const { takeSeatIndexWhenJoining } = config;
 
   const {
@@ -578,17 +600,21 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       setMemberCount(ZegoUIKit.getAllUsers().length);
     });
     return () => {
-      ZegoUIKit.leaveRoom();
-      ZegoUIKit.onUserLeave(callbackID);
-      ZegoUIKit.onUserCountOrPropertyChanged(callbackID);
-      ZegoUIKit.onRoomPropertyUpdated(callbackID);
-      ZegoUIKit.onTurnOnYourMicrophoneRequest(callbackID);
-      ZegoUIKit.onUserJoin(callbackID);
-    
-      unRegisterPluginCallback();
-      ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(callbackID);
-      ZegoUIKit.getSignalingPlugin().onUsersInRoomAttributesUpdated(callbackID);
-      ZegoPrebuiltPlugins.uninit();
+      const isMinimize = MinimizingHelper.getInstance().getIsMinimizeSwitch();
+      if (!isMinimize) {
+        // ZegoUIKit.leaveRoom();
+        ZegoUIKit.onUserLeave(callbackID);
+        ZegoUIKit.onUserCountOrPropertyChanged(callbackID);
+        ZegoUIKit.onRoomPropertyUpdated(callbackID);
+        ZegoUIKit.onTurnOnYourMicrophoneRequest(callbackID);
+        ZegoUIKit.onUserJoin(callbackID);
+      
+        unRegisterPluginCallback();
+        ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(callbackID);
+        ZegoUIKit.getSignalingPlugin().onUsersInRoomAttributesUpdated(callbackID);
+        ZegoPrebuiltPlugins.uninit();
+      }
+      MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
     };
   }, []);
 
@@ -596,6 +622,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins)
       .then(() => {
         setIsInit(true);
+        MinimizingHelper.getInstance().notifyLiveAudioRoomInit();
         console.log('===init success');
         registerPluginCallback();
         pluginJoinRoom();
@@ -1183,11 +1210,15 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         return Promise.reject();
       }
     },
+    minimize: () => {
+      MinimizingHelper.getInstance().minimize();
+    }
   }));
 
   return (
     <View style={styles.container}>
-      <View style={styles.leaveButton}>
+      <View style={styles.topRightBar}>
+        <ZegoMinimizingButton />
         <ZegoLeaveButton
           onLeaveConfirmation={showDefaultLeaveDialog}
           onPressed={onLeaveConfirmation}
@@ -1427,11 +1458,14 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
-  leaveButton: {
+  topRightBar: {
     zIndex: 5,
     position: 'absolute',
     top: 65,
     right: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',    
   },
   messageListView: {
     zIndex: 3,

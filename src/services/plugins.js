@@ -4,21 +4,22 @@ import ZegoUIKit, {
 import { zloginfo } from '../utils/logger';
 import * as ZIM from 'zego-zim-react-native';
 
-const _appInfo = {};
-const _localUser = {};
+let _ZIMKitPlugin = null;
 let _pluginConnectionState;
-let ZIMKitPlugin = null;
+const _callbackID = 'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
+
 const _install = (plugins) => {
   ZegoUIKit.installPlugins(plugins);
+
   plugins.forEach(plugin => {
     if (plugin.ZIMKit) {
       zloginfo('[Plugins] install ZIMKit success.');
-      ZIMKitPlugin = plugin;
+      _ZIMKitPlugin = plugin;
     } else if (plugin.default && typeof plugin.default.getModuleName === 'function') {
       const temp = plugin.default.getModuleName();
       if (temp === 'ZIMKit') {
         zloginfo('[Plugins] install ZIMKit success.');
-        ZIMKitPlugin = plugin;
+        _ZIMKitPlugin = plugin;
       }
     }
   })
@@ -26,21 +27,16 @@ const _install = (plugins) => {
 
 const ZegoPrebuiltPlugins = {
   init: (appID, appSign, userID, userName, plugins = []) => {
-    const callbackID =
-      'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
-    plugins.push(ZIM);
+    plugins.push(ZIM)
     _install(plugins);
+
     ZegoUIKit.getSignalingPlugin().init(appID, appSign);
     ZegoUIKit.getSignalingPlugin().onConnectionStateChanged(
-      callbackID,
+      _callbackID,
       ({ state }) => {
         _pluginConnectionState = state;
       }
     );
-    _appInfo.appID = appID;
-    _appInfo.appSign = appSign;
-    _localUser.userID = userID;
-    _localUser.userName = userName;
     return ZegoUIKit.getSignalingPlugin()
       .login(userID, userName)
       .then(() => {
@@ -56,8 +52,9 @@ const ZegoPrebuiltPlugins = {
     if (_pluginConnectionState === ZegoInvitationConnectionState.disconnected) {
       ZegoUIKit.getSignalingPlugin().logout.then(() => {
         zloginfo('[Plugins] auto logout success.');
+        const localUser = ZegoUIKit.getLocalUserInfo();
         ZegoUIKit.getSignalingPlugin()
-          .login(_localUser.userID, _localUser.userName)
+          .login(localUser.userID, localUser.userName)
           .then(() => {
             zloginfo('[Plugins] auto reconnect success.');
           });
@@ -65,17 +62,15 @@ const ZegoPrebuiltPlugins = {
     }
   },
   uninit: () => {
+    ZegoUIKit.getSignalingPlugin().onConnectionStateChanged(_callbackID);
     ZegoUIKit.getSignalingPlugin().logout();
     ZegoUIKit.getSignalingPlugin().uninit();
-  },
-  getLocalUser: () => {
-    return _localUser;
-  },
-  getAppInfo: () => {
-    return _appInfo;
+
+    _pluginConnectionState = undefined;
+    _ZIMKitPlugin = null;
   },
   getZIMKitPlugin: () => {
-    return ZIMKitPlugin;
+    return _ZIMKitPlugin;
   },
 };
 
