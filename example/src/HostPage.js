@@ -230,7 +230,12 @@ export default function HostPage(props) {
             },
             onMaximize: () => {
               console.log('[Demo]HostPage onMaximize');
-              props.navigation.navigate('HostPage');
+              props.navigation.navigate('HostPage', {
+                userID: userID,
+                userName: userID,
+                roomID: roomID,
+                layoutType,
+              });
             }
           }}
         />
