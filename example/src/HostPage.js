@@ -224,13 +224,13 @@ export default function HostPage(props) {
             // onSeatClicked: (index, user) => {
             //   console.log('[Demo]HostPage onSeatClicked ', index, user);
             // },
-            onMinimize: (data) => {
+            onMinimize: () => {
               console.log('[Demo]HostPage onMinimize');
-              props.navigation.navigate('HomePage', data);
+              props.navigation.navigate('HomePage');
             },
-            onMaximize: (data) => {
+            onMaximize: () => {
               console.log('[Demo]HostPage onMaximize');
-              props.navigation.navigate('HostPage', data);
+              props.navigation.navigate('HostPage');
             }
           }}
         />

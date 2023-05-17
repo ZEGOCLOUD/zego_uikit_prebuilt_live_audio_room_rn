@@ -90,6 +90,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     }
     MinimizingHelper.getInstance().setInitParams(appID, appSign, userID, userName, roomID, config);
   }
+  // Initialize after use
+  MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
   const {
     turnOnMicrophoneWhenJoining = false,
     useSpeakerWhenJoining = true,
@@ -600,8 +602,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       setMemberCount(ZegoUIKit.getAllUsers().length);
     });
     return () => {
-      const isMinimize = MinimizingHelper.getInstance().getIsMinimizeSwitch();
-      if (!isMinimize) {
+      const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
+      if (!isMinimizeSwitch) {
         // ZegoUIKit.leaveRoom();
         ZegoUIKit.onUserLeave(callbackID);
         ZegoUIKit.onUserCountOrPropertyChanged(callbackID);
@@ -614,6 +616,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         ZegoUIKit.getSignalingPlugin().onUsersInRoomAttributesUpdated(callbackID);
         ZegoPrebuiltPlugins.uninit();
       }
+      // Initialize after use
       MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
     };
   }, []);

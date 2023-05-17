@@ -19,8 +19,8 @@ export default class MinimizingHelper {
     static getInstance() {
         return this._instance || (this._instance = new MinimizingHelper());
     }
-    setIsMinimizeSwitch(isMinimize) {
-        this._isMinimizeSwitch = !!isMinimize;
+    setIsMinimizeSwitch(isMinimizeSwitch) {
+        this._isMinimizeSwitch = !!isMinimizeSwitch;
     }
     getIsMinimizeSwitch() {
         return this._isMinimizeSwitch;

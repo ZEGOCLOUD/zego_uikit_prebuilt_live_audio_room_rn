@@ -107,9 +107,7 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
                 const { onMinimize } = initConfig;
 
                 if (typeof onMinimize === 'function') {
-                    onMinimize({
-                        origin: 'ZegoMinimizeRoomFloat'
-                    });
+                    onMinimize();
                     MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
                 }
             });
@@ -119,9 +117,7 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
                 const { onMaximize } = initConfig;
 
                 if (typeof onMaximize === 'function') {
-                    onMaximize({
-                        origin: 'ZegoMinimizeRoomFloat'
-                    });
+                    onMaximize();
                     MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
                 }
             });
