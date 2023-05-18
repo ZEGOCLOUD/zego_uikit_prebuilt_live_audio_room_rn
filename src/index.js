@@ -243,6 +243,12 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }
   const callbackID = stateData.current.callbackID;
 
+  const isPageInBackground = () => {
+    const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
+    console.log('######isPageInBackground', isMinimize);
+    return isMinimize;
+  }
+
   // Plugin callback
   const registerPluginCallback = () => {
     if (ZegoUIKit.getPlugin(ZegoUIKitPluginType.signaling)) {
@@ -252,12 +258,12 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         if (type === ZegoInvitationType.requestCoHost && userID === realTimeData.current.hostID) {
           // The audience created a cohost request
           realTimeData.current.requestCoHostCount += 1;
-          setRequestCoHostCount(realTimeData.current.requestCoHostCount);
+          !isPageInBackground() && setRequestCoHostCount(realTimeData.current.requestCoHostCount);
           stateData.current.requestCoHostCount = realTimeData.current.requestCoHostCount;
 
           realTimeData.current.memberConnectStateMap[inviter.id] = ZegoCoHostConnectState.connecting;
           // memberConnectStateMap = realTimeData.current.memberConnectStateMap;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+          !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
 
           setTimeout(() => {
@@ -272,11 +278,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           ZegoUIKit.getSignalingPlugin().cancelInvitation([realTimeData.current.hostID]).catch(() => {});
           // Update own connection state
           realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.idle;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+          !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
 
           setIsDialogVisableHandle(true);
-          setDialogExtendedData({
+          !isPageInBackground() && setDialogExtendedData({
             title: ZegoInnerText.hostInviteTakeSeatDialog.title,
             content: ZegoInnerText.hostInviteTakeSeatDialog.message,
             cancelText: ZegoInnerText.hostInviteTakeSeatDialog.cancelButtonName,
@@ -332,11 +338,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         if (userID === realTimeData.current.hostID) {
           // The audience canceled the cohost request
           realTimeData.current.requestCoHostCount && (realTimeData.current.requestCoHostCount -= 1);
-          setRequestCoHostCount(realTimeData.current.requestCoHostCount);
+          !isPageInBackground() && setRequestCoHostCount(realTimeData.current.requestCoHostCount);
           stateData.current.requestCoHostCount = realTimeData.current.requestCoHostCount;
 
           realTimeData.current.memberConnectStateMap[inviter.id] = ZegoCoHostConnectState.idle;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+          !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
 
           typeof onSeatTakingRequestCanceled === 'function' && onSeatTakingRequestCanceled(ZegoUIKit.getUser(inviter.id));
@@ -346,11 +352,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         if (userID === realTimeData.current.hostID) {
           // The host did not process the cohost request, resulting in a timeout
           realTimeData.current.requestCoHostCount && (realTimeData.current.requestCoHostCount -= 1);
-          setRequestCoHostCount(realTimeData.current.requestCoHostCount);
+          !isPageInBackground() && setRequestCoHostCount(realTimeData.current.requestCoHostCount);
           stateData.current.requestCoHostCount = realTimeData.current.requestCoHostCount;
 
           realTimeData.current.memberConnectStateMap[inviter.id] = ZegoCoHostConnectState.idle;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+          !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
         }
       });
@@ -358,22 +364,22 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         if (userID === realTimeData.current.hostID) {
           // The audience accept the cohost request
           realTimeData.current.memberConnectStateMap[invitee.id] = ZegoCoHostConnectState.connected;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+          !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
 
           // Reset invitation timer
-          setCoHostDialogExtendedData({ resetTimer: true, inviteeID: invitee.id });
+          !isPageInBackground() && setCoHostDialogExtendedData({ resetTimer: true, inviteeID: invitee.id });
         }
       });
       ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, ({ callID, invitee, data }) => {
         if (userID === realTimeData.current.hostID) {
           // The audience reject the cohost request
           realTimeData.current.memberConnectStateMap[invitee.id] = ZegoCoHostConnectState.idle;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+          !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
 
           // Reset invitation timer
-          setCoHostDialogExtendedData({ resetTimer: true, inviteeID: invitee.id });
+          !isPageInBackground() && setCoHostDialogExtendedData({ resetTimer: true, inviteeID: invitee.id });
 
           typeof onSeatTakingInviteRejected === 'function' && onSeatTakingInviteRejected();
         }
@@ -434,7 +440,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }
   const setIsDialogVisableHandle = (visable) => {
     setIsDialogVisable(visable);
-    stateData.current.isDialogVisable = true;
+    stateData.current.isDialogVisable = visable;
     if (visable) {
       startDialogTimer();
     } else {
@@ -583,8 +589,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }, [changedSeatItem]);
 
   useEffect(() => {
-    initToastTimer();
-    initDialogTimer();
+    const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
+    if (!isMinimizeSwitch) {
+      initToastTimer();
+      initDialogTimer();
+    }
     ZegoUIKit.init(appID, appSign, { userID: userID, userName: userName })
       .then(() => {
         console.log('===zego uikit init success');
@@ -663,7 +672,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
       if (!isMinimizeSwitch) {
         // Callbacks cannot be cleared when minimized, and cannot be cleared before the page is opened
-        // ZegoUIKit.leaveRoom();
+        // Avoid abnormal exit
+        ZegoUIKit.leaveRoom();
+
         ZegoUIKit.onUserLeave(callbackID);
         ZegoUIKit.onUserCountOrPropertyChanged(callbackID);
         ZegoUIKit.onRoomPropertyUpdated(callbackID);
@@ -765,7 +776,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         // Only host can set role, so it's the host who sets the role
         if (keys.includes('role')) {
           // hostID = editor;
-          setHostID(editor);
+          !isPageInBackground() && setHostID(editor);
           stateData.current.hostID = editor;
           realTimeData.current.hostID = editor;
           updateLayout();
@@ -785,15 +796,15 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           modalText,
           roomProperties[key]
         );
-        setChangedSeatItem({ index: parseInt(key), userID: newValue });
+        !isPageInBackground() && setChangedSeatItem({ index: parseInt(key), userID: newValue });
         stateData.current.changedSeatItem = { index: parseInt(key), userID: newValue };
         if (oldValue == userID && !newValue) {
           // config.role = ZegoLiveAudioRoomRole.audience;
-          setRole(ZegoLiveAudioRoomRole.audience);
+          !isPageInBackground() && setRole(ZegoLiveAudioRoomRole.audience);
           stateData.current.role = ZegoLiveAudioRoomRole.audience;
           realTimeData.current.role = ZegoLiveAudioRoomRole.audience;
           realTimeData.current.memberConnectStateMap[oldValue] = ZegoCoHostConnectState.idle;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+          !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
 
           replaceBottomMenuBarButtons(audienceButtons);
@@ -802,12 +813,12 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         } else if (oldValue && !newValue) {
           // Users become audience
           realTimeData.current.memberConnectStateMap[oldValue] = ZegoCoHostConnectState.idle;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+          !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
         } else if (!oldValue && newValue) {
           // Users become speaker
           realTimeData.current.memberConnectStateMap[newValue] = ZegoCoHostConnectState.connected;
-          setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
+          !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
         }
         updateLayout().then(() => {
@@ -820,12 +831,12 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     ZegoUIKit.onUserLeave(callbackID, (userList) => {
       console.log('===onUserLeave', userList);
       const count = ZegoUIKit.getAllUsers().length;
-      setMemberCount(count);
+      !isPageInBackground() && setMemberCount(count);
       stateData.current.memberCount = count;
       const isHostLeft = userList.find((user) => { return user.userID === realTimeData.current.hostID; });
       if (isHostLeft) {
         setIsDialogVisableHandle(false);
-        setHostID('');
+        !isPageInBackground() && setHostID('');
         stateData.current.hostID = '';
         realTimeData.current.hostID = '';
       }
@@ -838,7 +849,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       .then((data) => {
         if (!data.code) {
           const roomProperties = data._roomAttributes;
-          setRoomProperties(data._roomAttributes);
+          !isPageInBackground() && setRoomProperties(data._roomAttributes);
           stateData.current.roomProperties = data._roomAttributes;
           realTimeData.current.roomProperties = data._roomAttributes;
           const arr = [];
@@ -867,7 +878,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
             rowObj.seatList = rowSeatObj;
             arr.push(rowObj);
           });
-          setSeatingAreaData(arr);
+          !isPageInBackground() && setSeatingAreaData(arr);
           stateData.current.seatingAreaData = [...arr];
           realTimeData.current.seatingAreaData = [...arr];
         }
@@ -1196,11 +1207,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
   // replace BottomMenuBarButtons
   const replaceBottomMenuBarButtons = (buttons) => {
-    setMenuBarButtons(buttons);
+    !isPageInBackground() && setMenuBarButtons(buttons);
     stateData.current.menuBarButtons = buttons;
   };
   const replaceBottomMenuBarExtendButtons = (extendButtons) => {
-    setMenuBarExtendedButtons(extendButtons);
+    !isPageInBackground() && setMenuBarExtendedButtons(extendButtons);
     stateData.current.menuBarExtendedButtons = extendButtons;
   };
 

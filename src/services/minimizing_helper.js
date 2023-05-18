@@ -2,6 +2,7 @@ import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 
 export default class MinimizingHelper {
     _instance;
+    _isMinimize = false;
     _isMinimizeSwitch = false;
     _activeUserID = '';
     _rangeSoundLevels = {};
@@ -18,6 +19,9 @@ export default class MinimizingHelper {
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new MinimizingHelper());
+    }
+    getIsMinimize() {
+        return this._isMinimize;
     }
     setIsMinimizeSwitch(isMinimizeSwitch) {
         this._isMinimizeSwitch = !!isMinimizeSwitch;
@@ -131,6 +135,8 @@ export default class MinimizingHelper {
         })
     }
     notifyMinimize() {
+        this._isMinimize = true;
+
         Object.keys(this._onMinimizeCallbackMap).forEach((callbackID) => {
             if (this._onMinimizeCallbackMap[callbackID]) {
                 this._onMinimizeCallbackMap[callbackID]();
@@ -138,6 +144,8 @@ export default class MinimizingHelper {
         })
     }
     notifyMaximize() {
+        this._isMinimize = false;
+
         Object.keys(this._onMaximizeCallbackMap).forEach((callbackID) => {
             if (this._onMaximizeCallbackMap[callbackID]) {
                 this._onMaximizeCallbackMap[callbackID]();
