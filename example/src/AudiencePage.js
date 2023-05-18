@@ -229,7 +229,7 @@ export default function AudiencePage(props) {
               console.log('[Demo]AudiencePage onMaximize');
               props.navigation.navigate('AudiencePage', {
                 userID: userID,
-                userName: userID,
+                userName: 'user_' + userID,
                 roomID: roomID,
                 layoutType,
               });

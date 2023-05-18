@@ -70,6 +70,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     config = initConfig;
     plugins = initPlugins;
   } else {
+    MinimizingHelper.getInstance().notifyEntryNormal();
     Object.assign(ZegoInnerText, config.innerText || {}, config.translationText || {});
     // When entering the room, if there is a seat conflict, change the role to the audience
     config.role === undefined && (config.role = ZegoLiveAudioRoomRole.audience);
@@ -448,7 +449,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       startDialogTimer();
     } else {
       initDialogTimer();
-      setDialogExtendedData({});
+      !isPageInBackground() && setDialogExtendedData({});
       stateData.current.dialogExtendedData = {};
     }
   }
@@ -626,17 +627,17 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         // Clear all connect state
         realTimeData.current.requestCoHostCount = 0;
         realTimeData.current.memberConnectStateMap = {};
-        setRequestCoHostCount(0);
+        !isPageInBackground() && setRequestCoHostCount(0);
         stateData.current.requestCoHostCount = 0;
-        setMemberConnectStateMap({});
+        !isPageInBackground() && setMemberConnectStateMap({});
         stateData.current.memberConnectStateMap = {};
         // Hidden dialog
         setIsDialogVisableHandle(false);
         // Reset invitation timer
-        setCoHostDialogExtendedData({ resetTimer: true });
+        !isPageInBackground() && setCoHostDialogExtendedData({ resetTimer: true });
 
         const isLocked = newValue === ZegoSeatsState.lock;
-        setIsLocked(isLocked);
+        !isPageInBackground() && setIsLocked(isLocked);
         stateData.current.isLocked = isLocked;
         realTimeData.current.isLocked = isLocked;
         if (isLocked) {
@@ -666,7 +667,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     });
     ZegoUIKit.onUserJoin(callbackID, (userList) => {
       const count = ZegoUIKit.getAllUsers().length;
-      setMemberCount(count);
+      !isPageInBackground() && setMemberCount(count);
       stateData.current.memberCount = count;
     });
     // Initialize after use

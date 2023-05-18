@@ -9,6 +9,7 @@ export default class MinimizingHelper {
     _onActiveUserIDUpdateCallbackMap = {};
     _onMinimizeCallbackMap = {};
     _onMaximizeCallbackMap = {};
+    _onEntryNormalCallbackMap = {};
     _updateTimer = null;
     _appInfo = {};
     _localUser = {};
@@ -64,7 +65,7 @@ export default class MinimizingHelper {
         this.initUpdateTimer();
         this._updateTimer = setInterval(() => {
             this.updateActiveUserIDByTimer();
-        }, 10000)
+        }, 1000)
     }
     initUpdateTimer() {
         clearInterval(this._updateTimer);
@@ -152,6 +153,15 @@ export default class MinimizingHelper {
             }
         })
     }
+    notifyEntryNormal() {
+        this._isMinimize = false;
+
+        Object.keys(this._onEntryNormalCallbackMap).forEach((callbackID) => {
+            if (this._onEntryNormalCallbackMap[callbackID]) {
+                this._onEntryNormalCallbackMap[callbackID]();
+            }
+        })
+    }
     onLiveAudioRoomInit(callbackID, callback) {
         if (typeof callback !== 'function') {
             delete this._onLiveAudioRoomInitCallbackMap[callbackID];
@@ -178,6 +188,13 @@ export default class MinimizingHelper {
             delete this._onMaximizeCallbackMap[callbackID];
         } else {
             this._onMaximizeCallbackMap[callbackID] = callback;
+        }
+    }
+    onEntryNormal(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            delete this._onEntryNormalCallbackMap[callbackID];
+        } else {
+            this._onEntryNormalCallbackMap[callbackID] = callback;
         }
     }
 }

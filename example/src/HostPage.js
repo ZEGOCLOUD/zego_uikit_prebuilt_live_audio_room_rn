@@ -232,7 +232,7 @@ export default function HostPage(props) {
               console.log('[Demo]HostPage onMaximize');
               props.navigation.navigate('HostPage', {
                 userID: userID,
-                userName: userID,
+                userName: 'user_' + userID,
                 roomID: roomID,
                 layoutType,
               });

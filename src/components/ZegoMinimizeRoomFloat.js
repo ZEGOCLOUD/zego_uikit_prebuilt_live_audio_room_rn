@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
     View,
     Text,
+    Image,
     Animated,
     PanResponder,
     StyleSheet,
@@ -13,22 +14,29 @@ import { zloginfo } from "../utils/logger";
   
 export default function ZegoMinimizeRoomFloat(props, ref) {
     const window = useWindowDimensions();
-    const { width, height } = window;
-
+    const {
+        width = 90,
+        height = 90,
+        borderRadius = 10,
+        left = window.width / 2 || 100,
+        top = 10,
+        showSoundWaveInAudioMode = true,
+        foregroundBuilder,
+        backgroundColor = '#ffffff',
+        backgroundImage,
+        avatarBackgroundColor = '#ffffff',
+        avatarSize = { width: 54, height: 54 },
+        avatarAlignment = 0,
+        soundWaveColor = "#3655ff"
+    } = props;
     const [isInit, setIsInit] = useState(false);
     const [isVisable, setIsVisable] = useState(false);
     const [layout, setLayout] = useState({
-        left: 0,
-        top: 0,
+        left,
+        top,
     });
     const [floatViewInfo, setFloatViewInfo] = useState({
         width: 0, height: 0,
-    });
-    const [seatConfig, setSeatConfig] = useState({
-        showSoundWaveInAudioMode: true,
-        foregroundBuilder: null,
-        backgroundColor: 'transparent',
-        backgroundImage: null,
     });
     const [activeUserID, setActiveUserID] = useState('');
     const [isMoving, setIsMoving] = useState(false);
@@ -53,7 +61,7 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
                 setIsMoving(true);
                 const newLeft = layout.left + gestureState.dx;
                 const newTop = layout.top + gestureState.dy;
-                if (newLeft >= (width - floatViewInfo.width) || newTop >= (height - floatViewInfo.height) || newLeft <= 0 || newTop <= 0) return;
+                if (newLeft >= (window.width - floatViewInfo.width) || newTop >= (window.height - floatViewInfo.height) || newLeft <= 0 || newTop <= 0) return;
                 setLayout({
                     left: newLeft,
                     top: newTop,
@@ -84,16 +92,24 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
         zloginfo('[ZegoMinimizeRoomFloat] pressedHandle');
         MinimizingHelper.getInstance().notifyMaximize();
     }
+    const defaultForegroundBuilder = ({ userInfo }) => {
+        console.log('defaultForegroundBuilder', userInfo);
+        return <View style={styles.foreground}>
+            {
+                userInfo.inRoomAttributes && userInfo.inRoomAttributes.role === '0' ? <Image
+                    resizeMode="contain"
+                    style={styles.hostIcon}
+                    source={require('../resources/host_icon.png')}
+                /> : null
+            }
+            <Text style={styles.foregroundText}>{ userInfo.userName }</Text>
+        </View>
+    }
 
     useEffect(() => {
         MinimizingHelper.getInstance().onLiveAudioRoomInit(callbackID, () => {
             zloginfo('[ZegoMinimizeRoomFloat] init success');
             setIsInit(true);
-
-            const initConfig = MinimizingHelper.getInstance().getInitConfig();
-            const { seatConfig: _seatConfig = {} } = initConfig;
-            setSeatConfig({ ...seatConfig, ..._seatConfig });
-            zloginfo('[ZegoMinimizeRoomFloat] seatConfig', initConfig.seatConfig);
         });
         return () => {
             MinimizingHelper.getInstance().onLiveAudioRoomInit(callbackID);
@@ -121,6 +137,9 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
                     MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
                 }
             });
+            MinimizingHelper.getInstance().onEntryNormal(callbackID, () => {
+                setIsVisable(false);
+            });
             MinimizingHelper.getInstance().onActiveUserIDUpdate(callbackID, (activeUserID) => {
                 zloginfo(`[ZegoMinimizeRoomFloat] onActiveUserIDUpdate`, activeUserID);
                 setActiveUserID(activeUserID);
@@ -129,6 +148,7 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
         return () => {
             MinimizingHelper.getInstance().onMinimize(callbackID);
             MinimizingHelper.getInstance().onMaximize(callbackID);
+            MinimizingHelper.getInstance().onEntryNormal(callbackID);
             MinimizingHelper.getInstance().onActiveUserIDUpdate(callbackID);
         }
     }, [isInit]);
@@ -142,24 +162,31 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
             {...panResponder.panHandlers}
         >
             <View
-                style={styles.floatAudioView}
+                style={[
+                    styles.floatAudioView,
+                    {
+                        width,
+                        height,
+                        borderRadius,
+                    }
+                ]}
             >
                 {
                     activeUserID ? <ZegoAudioVideoView
                         key={activeUserID}
                         userID={activeUserID}
                         foregroundBuilder={
-                            seatConfig.foregroundBuilder
-                                ? ({ userInfo }) => seatConfig.foregroundBuilder({ userInfo, seatIndex: 1 })
-                                : ({ userInfo }) => <View />
+                            foregroundBuilder
+                                ? ({ userInfo }) => foregroundBuilder({ userInfo })
+                                : ({ userInfo }) => defaultForegroundBuilder({ userInfo })
                         }
-                        useVideoViewAspectFill={true}
-                        showSoundWave={seatConfig.showSoundWaveInAudioMode}
-                        audioViewBackgroudColor={seatConfig.backgroundColor}
-                        audioViewBackgroudImage={seatConfig.backgroundImage}
-                        avatarSize={{ width: 54, height: 54 }}
-                        avatarAlignment={0}
-                        soundWaveColor="#3655ff"
+                        showSoundWave={showSoundWaveInAudioMode}
+                        audioViewBackgroudColor={backgroundColor}
+                        audioViewBackgroudImage={backgroundImage}
+                        avatarBackgroundColor={avatarBackgroundColor}
+                        avatarSize={avatarSize}
+                        avatarAlignment={avatarAlignment}
+                        soundWaveColor={soundWaveColor}
                     /> : <View />
                 }
             </View>
@@ -169,13 +196,35 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
 
 const styles = StyleSheet.create({
     floatAudioView: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        overflow: 'hidden',
         zIndex: 10000,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 8
     },
     floatAudioViewText: {
         color: 'white',
         fontSize: 16,
     },
+    foreground: {
+        position: 'absolute',
+        zIndex: 2,
+        bottom: 0,
+        width: '100%',
+        alignItems: 'center',
+    },
+    hostIcon: {
+        width: 47,
+        height: 12,
+        position: 'absolute',
+        bottom: 12,
+    },
+    foregroundText: {
+        fontSize: 10,
+    }
 });
