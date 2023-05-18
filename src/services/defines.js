@@ -104,10 +104,16 @@ const HOST_DEFAULT_CONFIG = {
     cancelButtonName: 'Cancel',
     confirmButtonName: 'OK',
   },
+  topMenuBarConfig: {
+    buttons: [ZegoMenuBarButtonName.minimizingButton, ZegoMenuBarButtonName.leaveButton],
+  },
 };
 
 const AUDIENCE_DEFAULT_CONFIG = {
   role: ZegoLiveAudioRoomRole.audience,
+  topMenuBarConfig: {
+    buttons: [ZegoMenuBarButtonName.minimizingButton, ZegoMenuBarButtonName.leaveButton],
+  },
 };
 
 export {

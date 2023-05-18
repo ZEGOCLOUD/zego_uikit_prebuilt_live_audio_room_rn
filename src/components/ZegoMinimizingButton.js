@@ -5,8 +5,8 @@ import { getMethodReturnValue } from "../utils"
 
 export default function ZegoMinimizingButton(props) {
     const {
-        width = 24,
-        height = 24,
+        width = 20,
+        height = 20,
         icon = require('../resources/icon_minimize.png'),
         onPressed,
         onWillPressed,
@@ -23,7 +23,7 @@ export default function ZegoMinimizingButton(props) {
 
     return (
         <TouchableOpacity
-            style={{ width, height, backgroundColor: 'red' }}
+            style={{ width, height }}
             onPress={pressedHandle}
         >
             <Image

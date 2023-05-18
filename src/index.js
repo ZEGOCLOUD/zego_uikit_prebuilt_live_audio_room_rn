@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import Delegate from 'react-delegate-component';
 import ZegoUIKit, {
-  ZegoLeaveButton,
   ZegoInRoomMessageInput,
   ZegoInRoomMessageView,
   ZegoAudioVideoResourceMode,
@@ -27,8 +26,8 @@ import ZegoToast from './components/ZegoToast';
 import ZegoDialog from './components/ZegoDialog';
 import ZegoCoHostMenuDialog from './components/ZegoCoHostMenuDialog';
 import ZegoPrebuiltPlugins from './services/plugins';
-import ZegoMinimizingButton from './components/ZegoMinimizingButton';
 import ZegoMinimizeRoomFloat from "./components/ZegoMinimizeRoomFloat";
+import ZegoTopBar from "./components/ZegoTopBar";
 import MinimizingHelper from "./services/minimizing_helper";
 import {
   HOST_DEFAULT_CONFIG,
@@ -122,6 +121,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     onSeatClicked,
   
     inRoomMessageViewConfig = {},
+    topMenuBarConfig = {},
   } = config;
   
   const { takeSeatIndexWhenJoining } = config;
@@ -143,6 +143,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     audienceExtendButtons = [],
     maxCount = 5,
   } = bottomMenuBarConfig;
+  const {
+    buttons = [ZegoMenuBarButtonName.leaveButton],
+  } = topMenuBarConfig;
 
   const {
     foregroundColor = 'transparent',
@@ -1337,16 +1340,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.topRightBar}>
-        <ZegoMinimizingButton />
-        <ZegoLeaveButton
-          onLeaveConfirmation={showDefaultLeaveDialog}
-          onPressed={onLeaveConfirmation}
-          iconLeave={require('./resources/top_button_logout.png')}
-          width={34}
-          height={34}
-        />
-      </View>
+      <ZegoTopBar
+        menuBarButtons={buttons}
+        onLeave={onLeaveConfirmation}
+        onLeaveConfirmation={showDefaultLeaveDialog}
+      />
 
       <View style={styles.seatingArea}>
         {isInit ? (
@@ -1598,15 +1596,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'absolute',
-  },
-  topRightBar: {
-    zIndex: 5,
-    position: 'absolute',
-    top: 65,
-    right: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',    
   },
   messageListView: {
     zIndex: 3,
