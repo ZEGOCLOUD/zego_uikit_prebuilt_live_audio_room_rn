@@ -1,9 +1,10 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import MinimizingHelper from "../services/minimizing_helper";
 
 export default function ZegoDialog(props) {
     const {
-        visable = false,
         title = '',
         content = '',
         cancelText = 'cancel',
@@ -12,12 +13,24 @@ export default function ZegoDialog(props) {
         onOk,
     } = props;
 
+    const [visable, setVisable] = useState(false);
+    
     const getCustomContainerStyle = (visable) => StyleSheet.create({
         customContainer: {
             display: visable ? 'flex' : 'none',
         },
     });
 
+    useEffect(() => {
+        const callbackID = 'ZegoDialog' + String(Math.floor(Math.random() * 10000));
+        MinimizingHelper.getInstance().onZegoDialogTrigger(callbackID, (visable) => {
+            setVisable(visable);
+        });
+        return () => {
+            MinimizingHelper.getInstance().onZegoDialogTrigger(callbackID);
+        };
+    }, []);
+   
     return (
         <View style={[styles.container, getCustomContainerStyle(visable).customContainer]}>
             <View style={styles.mask}>

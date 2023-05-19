@@ -220,7 +220,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
   const hideCountdownOn_Dialog = useRef();
   const hideCountdownOn_DialogTimer = useRef();
-  const [isDialogVisable, setIsDialogVisable] = useState(stateData.current.isDialogVisable || false);
+  MinimizingHelper.getInstance().notifyZegoDialogTrigger(stateData.current.isDialogVisable || false);
   const [dialogExtendedData, setDialogExtendedData] = useState(stateData.current.dialogExtendedData || {});
   const hideCountdownOnDialogLimit = 60;
 
@@ -289,31 +289,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
 
           setIsDialogVisableHandle(true);
-          !isPageInBackground() && setDialogExtendedData({
-            title: ZegoInnerText.hostInviteTakeSeatDialog.title,
-            content: ZegoInnerText.hostInviteTakeSeatDialog.message,
-            cancelText: ZegoInnerText.hostInviteTakeSeatDialog.cancelButtonName,
-            okText: ZegoInnerText.hostInviteTakeSeatDialog.confirmButtonName,
-            onCancel: () => {
-              // Refuse the cohost request of the host
-              ZegoUIKit.getSignalingPlugin().refuseInvitation(inviter.id).then(() => {
-                realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.idle;
-                setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
-                stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
-
-                ZegoUIKit.turnMicrophoneOn('', false);
-                setIsDialogVisableHandle(false);
-              });
-            },
-            onOk: () => {
-              // Accept the cohost request of the host
-              ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id).then(async () => {
-                setIsDialogVisableHandle(false);
-                coHostAcceptedHandle(true);
-              });
-            }
-          });
-          stateData.current.dialogExtendedData = {
+          const temp = {
             title: ZegoInnerText.hostInviteTakeSeatDialog.title,
             content: ZegoInnerText.hostInviteTakeSeatDialog.message,
             cancelText: ZegoInnerText.hostInviteTakeSeatDialog.cancelButtonName,
@@ -337,6 +313,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
               });
             }
           };
+          !isPageInBackground() && setDialogExtendedData(temp);
+          stateData.current.dialogExtendedData = temp;
 
           typeof onHostSeatTakingInviteSent === 'function' && onHostSeatTakingInviteSent();
         }
@@ -446,7 +424,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     }, 1000);
   }
   const setIsDialogVisableHandle = (visable) => {
-    !isPageInBackground() && setIsDialogVisable(visable);
+    !isPageInBackground() && MinimizingHelper.getInstance().notifyZegoDialogTrigger(visable);
     stateData.current.isDialogVisable = visable;
     if (visable) {
       startDialogTimer();
@@ -1579,7 +1557,6 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       />
       {/* Common dialog */}
       <ZegoDialog
-        visable={isDialogVisable}
         title={dialogExtendedData.title}
         content={dialogExtendedData.content}
         cancelText={dialogExtendedData.cancelText}

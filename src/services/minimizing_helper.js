@@ -17,6 +17,7 @@ export default class MinimizingHelper {
     _config = {};
     _plugins = [];
     _onLiveAudioRoomInitCallbackMap = {};
+    _onZegoDialogTriggerCallbackMap = {};
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new MinimizingHelper());
@@ -162,6 +163,13 @@ export default class MinimizingHelper {
             }
         })
     }
+    notifyZegoDialogTrigger(visable) {
+        Object.keys(this._onZegoDialogTriggerCallbackMap).forEach((callbackID) => {
+            if (this._onZegoDialogTriggerCallbackMap[callbackID]) {
+                this._onZegoDialogTriggerCallbackMap[callbackID](visable);
+            }
+        })
+    }
     onLiveAudioRoomInit(callbackID, callback) {
         if (typeof callback !== 'function') {
             delete this._onLiveAudioRoomInitCallbackMap[callbackID];
@@ -195,6 +203,14 @@ export default class MinimizingHelper {
             delete this._onEntryNormalCallbackMap[callbackID];
         } else {
             this._onEntryNormalCallbackMap[callbackID] = callback;
+        }
+    }
+    // Temporarily resolved an issue where dialog shutdown could not be triggered
+    onZegoDialogTrigger(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            delete this._onZegoDialogTriggerCallbackMap[callbackID];
+        } else {
+            this._onZegoDialogTriggerCallbackMap[callbackID] = callback;
         }
     }
 }
