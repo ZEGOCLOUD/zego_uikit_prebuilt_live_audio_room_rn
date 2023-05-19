@@ -1333,6 +1333,18 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     },
     minimizeWindow: () => {
       MinimizingHelper.getInstance().minimizeWindow();
+    },
+    leave: (showConfirmation = false) => {
+      console.log('showConfirmation', showConfirmation);
+      if (!showConfirmation) {
+        ZegoUIKit.leaveRoom();
+        typeof onLeaveConfirmation == 'function' && onLeaveConfirmation();
+      } else {
+        showDefaultLeaveDialog().then(() => {
+          ZegoUIKit.leaveRoom();
+          typeof onLeaveConfirmation == 'function' && onLeaveConfirmation();
+        });
+      }
     }
   }));
 

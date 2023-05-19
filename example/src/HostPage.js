@@ -3,6 +3,7 @@ import {StyleSheet, View, Text, Image, ImageBackground, Button} from 'react-nati
 import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   HOST_DEFAULT_CONFIG,
+  ZegoMenuBarButtonName,
   ZegoLiveAudioRoomLayoutAlignment,
 } from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
 export default function HostPage(props) {
@@ -197,6 +198,9 @@ export default function HostPage(props) {
             inRoomMessageViewConfig: {
               itemBuilder
             },
+            topMenuBarConfig: {
+              buttons: [ZegoMenuBarButtonName.minimizingButton, ZegoMenuBarButtonName.leaveButton],
+            },
             onSeatTakingRequested: (audience) => {
               console.log('[Demo]HostPage onSeatTakingRequested ', audience);
             },
@@ -242,6 +246,16 @@ export default function HostPage(props) {
       </View>
       {
         showBtn ? <View style={styles.btnContainer}>
+          <Button title='minimizeWindow' onPress={
+            () => {
+              prebuiltRef.current.minimizeWindow();
+            }
+          }></Button>
+          <Button title='leave' onPress={
+            () => {
+              prebuiltRef.current.leave();
+            }
+          }></Button>
           <Button title='inviteAudienceToTakeSeat' onPress={prebuiltRef.current.inviteAudienceToTakeSeat.bind(this, '3379')}></Button>
           <Button title='acceptSeatTakingRequest' onPress={prebuiltRef.current.acceptSeatTakingRequest.bind(this, '3379')}></Button>
           <Button title='rejectSeatTakingRequest' onPress={prebuiltRef.current.rejectSeatTakingRequest.bind(this, '3379')}></Button>

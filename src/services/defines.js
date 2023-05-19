@@ -105,14 +105,14 @@ const HOST_DEFAULT_CONFIG = {
     confirmButtonName: 'OK',
   },
   topMenuBarConfig: {
-    buttons: [ZegoMenuBarButtonName.minimizingButton, ZegoMenuBarButtonName.leaveButton],
+    buttons: [ZegoMenuBarButtonName.leaveButton],
   },
 };
 
 const AUDIENCE_DEFAULT_CONFIG = {
   role: ZegoLiveAudioRoomRole.audience,
   topMenuBarConfig: {
-    buttons: [ZegoMenuBarButtonName.minimizingButton, ZegoMenuBarButtonName.leaveButton],
+    buttons: [ZegoMenuBarButtonName.leaveButton],
   },
 };
 
