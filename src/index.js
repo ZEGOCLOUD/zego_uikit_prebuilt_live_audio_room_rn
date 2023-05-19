@@ -92,8 +92,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     MinimizingHelper.getInstance().setInitParams(appID, appSign, userID, userName, roomID, config);
   }
   const {
-    turnOnMicrophoneWhenJoining = false,
-    useSpeakerWhenJoining = true,
+    // turnOnMicrophoneWhenJoining = false,
+    // useSpeakerWhenJoining = true,
     bottomMenuBarConfig = {},
     confirmDialogInfo = {},
     onLeaveConfirmation,
@@ -177,6 +177,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     realTimeData.current.role = config.role;
   }
   const stateData = useRef(LiveAudioRoomHelper.getInstance().getStateData());
+
+  const [turnOnMicrophoneWhenJoining, setTurnOnMicrophoneWhenJoining] = useState(stateData.current.turnOnMicrophoneWhenJoining !== undefined ? stateData.current.turnOnMicrophoneWhenJoining : (config.turnOnMicrophoneWhenJoining || false));
+  const [useSpeakerWhenJoining, setUseSpeakerWhenJoining] = useState(stateData.current.useSpeakerWhenJoining !== undefined ? stateData.current.useSpeakerWhenJoining : (config.useSpeakerWhenJoining || true));
 
   const keyboardHeight = useKeyboard();
   const [isRoomAttributesBatching, setIsRoomAttributesBatching] = useState(stateData.current.isRoomAttributesBatching || false);
@@ -443,7 +446,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     }, 1000);
   }
   const setIsDialogVisableHandle = (visable) => {
-    setIsDialogVisable(visable);
+    !isPageInBackground() && setIsDialogVisable(visable);
     stateData.current.isDialogVisable = visable;
     if (visable) {
       startDialogTimer();
@@ -670,6 +673,19 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       !isPageInBackground() && setMemberCount(count);
       stateData.current.memberCount = count;
     });
+    ZegoUIKit.onMicrophoneOn(callbackID, (targetUserID, isOn) => {
+      if (targetUserID === userID) {
+        console.log('onMicrophoneOn', targetUserID, isOn);
+        stateData.current.turnOnMicrophoneWhenJoining = !!isOn;
+      }
+    });
+    ZegoUIKit.onAudioOutputDeviceChanged(callbackID, (type) => {
+      console.log('onAudioOutputDeviceChanged', type);
+      stateData.current.useSpeakerWhenJoining = (type === 0);
+    });
+    MinimizingHelper.getInstance().onMinimize(callbackID, () => {
+      setTextInputVisable(false);
+    });
     // Initialize after use
     MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
     return () => {
@@ -684,6 +700,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         ZegoUIKit.onRoomPropertyUpdated(callbackID);
         ZegoUIKit.onTurnOnYourMicrophoneRequest(callbackID);
         ZegoUIKit.onUserJoin(callbackID);
+        ZegoUIKit.onMicrophoneOn(callbackID);
+        ZegoUIKit.onAudioOutputDeviceChanged(callbackID);
+        MinimizingHelper.getInstance().onMinimize(callbackID);
       
         unRegisterPluginCallback();
         ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(callbackID);

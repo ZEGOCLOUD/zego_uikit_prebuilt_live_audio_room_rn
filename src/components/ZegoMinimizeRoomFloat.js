@@ -93,7 +93,6 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
         MinimizingHelper.getInstance().notifyMaximize();
     }
     const defaultForegroundBuilder = ({ userInfo }) => {
-        console.log('defaultForegroundBuilder', userInfo);
         return <View style={styles.foreground}>
             {
                 userInfo.inRoomAttributes && userInfo.inRoomAttributes.role === '0' ? <Image
@@ -141,7 +140,7 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
                 setIsVisable(false);
             });
             MinimizingHelper.getInstance().onActiveUserIDUpdate(callbackID, (activeUserID) => {
-                zloginfo(`[ZegoMinimizeRoomFloat] onActiveUserIDUpdate`, activeUserID);
+                // zloginfo(`[ZegoMinimizeRoomFloat] onActiveUserIDUpdate`, activeUserID);
                 setActiveUserID(activeUserID);
             });
         }
