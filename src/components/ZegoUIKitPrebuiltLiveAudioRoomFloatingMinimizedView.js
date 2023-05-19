@@ -12,7 +12,7 @@ import { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
 import MinimizingHelper from "../services/minimizing_helper";
 import { zloginfo } from "../utils/logger";
   
-export default function ZegoMinimizeRoomFloat(props, ref) {
+export default function ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView(props, ref) {
     const window = useWindowDimensions();
     const {
         width = 90,
@@ -45,12 +45,12 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
         onStartShouldSetPanResponder: (evt, gestureState) => true,
         onMoveShouldSetPanResponder: (evt, gestureState) => true,
         onPanResponderGrant: (evt, gestureState) => {
-            zloginfo('[ZegoMinimizeRoomFloat] onPanResponderGrant gestureState', gestureState);
+            zloginfo('[ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView] onPanResponderGrant gestureState', gestureState);
             setIsMoving(false);
         },
         onPanResponderMove: (evt, gestureState) => {
-            // zloginfo('[ZegoMinimizeRoomFloat] onPanResponderMove layout', layout);
-            // zloginfo('[ZegoMinimizeRoomFloat] onPanResponderMove gestureState', gestureState);
+            // zloginfo('[ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView] onPanResponderMove layout', layout);
+            // zloginfo('[ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView] onPanResponderMove gestureState', gestureState);
             if (
                 Math.abs(gestureState.dx) < 5 &&
                 Math.abs(gestureState.dy) < 5 &&
@@ -69,8 +69,8 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
             }
         },
         onPanResponderEnd: (evt, gestureState) => {
-            zloginfo('[ZegoMinimizeRoomFloat] onPanResponderEnd layout', layout);
-            zloginfo('[ZegoMinimizeRoomFloat] onPanResponderEnd gestureState', gestureState);
+            zloginfo('[ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView] onPanResponderEnd layout', layout);
+            zloginfo('[ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView] onPanResponderEnd gestureState', gestureState);
         },
         onPanResponderRelease: () => {
             if (!isMoving) {
@@ -85,11 +85,11 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
     
     const layoutHandle = useCallback((e) => {
         const  { x, y, width, height } = e.nativeEvent.layout;
-        zloginfo('[ZegoMinimizeRoomFloat] layoutHandle', x, y, width, height);
+        zloginfo('[ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView] layoutHandle', x, y, width, height);
         setFloatViewInfo({ width, height });
     }, []);
     const pressedHandle = async () => {
-        zloginfo('[ZegoMinimizeRoomFloat] pressedHandle');
+        zloginfo('[ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView] pressedHandle');
         MinimizingHelper.getInstance().notifyMaximize();
     }
     const defaultForegroundBuilder = ({ userInfo }) => {
@@ -107,7 +107,7 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
 
     useEffect(() => {
         MinimizingHelper.getInstance().onLiveAudioRoomInit(callbackID, () => {
-            zloginfo('[ZegoMinimizeRoomFloat] init success');
+            zloginfo('[ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView] init success');
             setIsInit(true);
         });
         return () => {
@@ -116,23 +116,23 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
     }, []);
     useEffect(() => {
         if (isInit) {
-            MinimizingHelper.getInstance().onMinimize(callbackID, () => {
+            MinimizingHelper.getInstance().onWindowMinimized(callbackID, () => {
                 setIsVisable(true);
                 const initConfig = MinimizingHelper.getInstance().getInitConfig();
-                const { onMinimize } = initConfig;
+                const { onWindowMinimized } = initConfig;
 
-                if (typeof onMinimize === 'function') {
-                    onMinimize();
+                if (typeof onWindowMinimized === 'function') {
+                    onWindowMinimized();
                     MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
                 }
             });
-            MinimizingHelper.getInstance().onMaximize(callbackID, () => {
+            MinimizingHelper.getInstance().onWindowMaximized(callbackID, () => {
                 setIsVisable(false);
                 const initConfig = MinimizingHelper.getInstance().getInitConfig();
-                const { onMaximize } = initConfig;
+                const { onWindowMaximized } = initConfig;
 
-                if (typeof onMaximize === 'function') {
-                    onMaximize();
+                if (typeof onWindowMaximized === 'function') {
+                    onWindowMaximized();
                     MinimizingHelper.getInstance().setIsMinimizeSwitch(true);
                 }
             });
@@ -140,13 +140,13 @@ export default function ZegoMinimizeRoomFloat(props, ref) {
                 setIsVisable(false);
             });
             MinimizingHelper.getInstance().onActiveUserIDUpdate(callbackID, (activeUserID) => {
-                // zloginfo(`[ZegoMinimizeRoomFloat] onActiveUserIDUpdate`, activeUserID);
+                // zloginfo(`[ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView] onActiveUserIDUpdate`, activeUserID);
                 setActiveUserID(activeUserID);
             });
         }
         return () => {
-            MinimizingHelper.getInstance().onMinimize(callbackID);
-            MinimizingHelper.getInstance().onMaximize(callbackID);
+            MinimizingHelper.getInstance().onWindowMinimized(callbackID);
+            MinimizingHelper.getInstance().onWindowMaximized(callbackID);
             MinimizingHelper.getInstance().onEntryNormal(callbackID);
             MinimizingHelper.getInstance().onActiveUserIDUpdate(callbackID);
         }

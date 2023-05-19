@@ -15,7 +15,7 @@ export default function ZegoMinimizingButton(props) {
     const pressedHandle = async () => {
         const canMinimize = await getMethodReturnValue(onWillPressed);
         if (canMinimize) {
-            MinimizingHelper.getInstance().minimize();
+            MinimizingHelper.getInstance().minimizeWindow();
 
             typeof onPressed === 'function' && onPressed();
         }

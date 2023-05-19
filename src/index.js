@@ -26,7 +26,7 @@ import ZegoToast from './components/ZegoToast';
 import ZegoDialog from './components/ZegoDialog';
 import ZegoCoHostMenuDialog from './components/ZegoCoHostMenuDialog';
 import ZegoPrebuiltPlugins from './services/plugins';
-import ZegoMinimizeRoomFloat from "./components/ZegoMinimizeRoomFloat";
+import ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView from "./components/ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView";
 import ZegoTopBar from "./components/ZegoTopBar";
 import MinimizingHelper from "./services/minimizing_helper";
 import {
@@ -49,7 +49,7 @@ export {
   AUDIENCE_DEFAULT_CONFIG,
   ZegoLiveAudioRoomRole,
   ZegoMenuBarButtonName,
-  ZegoMinimizeRoomFloat,
+  ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView,
   ZegoLiveAudioRoomLayoutAlignment,
 };
 
@@ -661,7 +661,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       console.log('onAudioOutputDeviceChanged', type);
       stateData.current.useSpeakerWhenJoining = (type === 0);
     });
-    MinimizingHelper.getInstance().onMinimize(callbackID, () => {
+    MinimizingHelper.getInstance().onWindowMinimized(callbackID, () => {
       setTextInputVisable(false);
     });
     // Initialize after use
@@ -680,7 +680,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         ZegoUIKit.onUserJoin(callbackID);
         ZegoUIKit.onMicrophoneOn(callbackID);
         ZegoUIKit.onAudioOutputDeviceChanged(callbackID);
-        MinimizingHelper.getInstance().onMinimize(callbackID);
+        MinimizingHelper.getInstance().onWindowMinimized(callbackID);
       
         unRegisterPluginCallback();
         ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(callbackID);
@@ -1331,8 +1331,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         return Promise.reject();
       }
     },
-    minimize: () => {
-      MinimizingHelper.getInstance().minimize();
+    minimizeWindow: () => {
+      MinimizingHelper.getInstance().minimizeWindow();
     }
   }));
 

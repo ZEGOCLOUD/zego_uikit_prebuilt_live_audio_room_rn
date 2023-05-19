@@ -224,12 +224,12 @@ export default function HostPage(props) {
             // onSeatClicked: (index, user) => {
             //   console.log('[Demo]HostPage onSeatClicked ', index, user);
             // },
-            onMinimize: () => {
-              console.log('[Demo]HostPage onMinimize');
+            onWindowMinimized: () => {
+              console.log('[Demo]HostPage onWindowMinimized');
               props.navigation.navigate('HomePage');
             },
-            onMaximize: () => {
-              console.log('[Demo]HostPage onMaximize');
+            onWindowMaximized: () => {
+              console.log('[Demo]HostPage onWindowMaximized');
               props.navigation.navigate('HostPage', {
                 userID: userID,
                 userName: 'user_' + userID,

@@ -221,12 +221,12 @@ export default function AudiencePage(props) {
             // onSeatClicked: (index, user) => {
             //   console.log('[Demo]AudiencePage onSeatClicked ', index, user);
             // },
-            onMinimize: () => {
-              console.log('[Demo]AudiencePage onMinimize');
+            onWindowMinimized: () => {
+              console.log('[Demo]AudiencePage onWindowMinimized');
               props.navigation.navigate('HomePage');
             },
-            onMaximize: () => {
-              console.log('[Demo]AudiencePage onMaximize');
+            onWindowMaximized: () => {
+              console.log('[Demo]AudiencePage onWindowMaximized');
               props.navigation.navigate('AudiencePage', {
                 userID: userID,
                 userName: 'user_' + userID,

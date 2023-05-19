@@ -7,8 +7,8 @@ export default class MinimizingHelper {
     _activeUserID = '';
     _rangeSoundLevels = {};
     _onActiveUserIDUpdateCallbackMap = {};
-    _onMinimizeCallbackMap = {};
-    _onMaximizeCallbackMap = {};
+    _onWindowMinimizeCallbackMap = {};
+    _onWindowMaximizeCallbackMap = {};
     _onEntryNormalCallbackMap = {};
     _updateTimer = null;
     _appInfo = {};
@@ -52,7 +52,7 @@ export default class MinimizingHelper {
     getInitPlugins() {
         return this._plugins;
     }
-    minimize() {
+    minimizeWindow() {
         const callbackID = 'MinimizingHelper' + String(Math.floor(Math.random() * 10000));
         this.unRegisterAudioVideoListCallback(callbackID);
         this.registerAudioVideoListCallback(callbackID);
@@ -139,18 +139,18 @@ export default class MinimizingHelper {
     notifyMinimize() {
         this._isMinimize = true;
 
-        Object.keys(this._onMinimizeCallbackMap).forEach((callbackID) => {
-            if (this._onMinimizeCallbackMap[callbackID]) {
-                this._onMinimizeCallbackMap[callbackID]();
+        Object.keys(this._onWindowMinimizeCallbackMap).forEach((callbackID) => {
+            if (this._onWindowMinimizeCallbackMap[callbackID]) {
+                this._onWindowMinimizeCallbackMap[callbackID]();
             }
         })
     }
     notifyMaximize() {
         this._isMinimize = false;
 
-        Object.keys(this._onMaximizeCallbackMap).forEach((callbackID) => {
-            if (this._onMaximizeCallbackMap[callbackID]) {
-                this._onMaximizeCallbackMap[callbackID]();
+        Object.keys(this._onWindowMaximizeCallbackMap).forEach((callbackID) => {
+            if (this._onWindowMaximizeCallbackMap[callbackID]) {
+                this._onWindowMaximizeCallbackMap[callbackID]();
             }
         })
     }
@@ -184,18 +184,18 @@ export default class MinimizingHelper {
             this._onActiveUserIDUpdateCallbackMap[callbackID] = callback;
         }
     }
-    onMinimize(callbackID, callback) {
+    onWindowMinimized(callbackID, callback) {
         if (typeof callback !== 'function') {
-            delete this._onMinimizeCallbackMap[callbackID];
+            delete this._onWindowMinimizeCallbackMap[callbackID];
         } else {
-            this._onMinimizeCallbackMap[callbackID] = callback;
+            this._onWindowMinimizeCallbackMap[callbackID] = callback;
         }
     }
-    onMaximize(callbackID, callback) {
+    onWindowMaximized(callbackID, callback) {
         if (typeof callback !== 'function') {
-            delete this._onMaximizeCallbackMap[callbackID];
+            delete this._onWindowMaximizeCallbackMap[callbackID];
         } else {
-            this._onMaximizeCallbackMap[callbackID] = callback;
+            this._onWindowMaximizeCallbackMap[callbackID] = callback;
         }
     }
     onEntryNormal(callbackID, callback) {
