@@ -57,18 +57,18 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   let { appID, appSign, userID, userName, roomID, config, plugins } = props;
   const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
   if (isMinimizeSwitch) {
-    const initAppInfo = MinimizingHelper.getInstance().getInitAppInfo();
-    const initUser = MinimizingHelper.getInstance().getInitUser();
-    const initRoomID = MinimizingHelper.getInstance().getInitRoomID();
-    const initConfig = MinimizingHelper.getInstance().getInitConfig();
-    const initPlugins = MinimizingHelper.getInstance().getInitPlugins();
-    appID = initAppInfo.appID;
-    appSign = initAppInfo.appSign
-    userID = initUser.userID;
-    userName = initUser.userName;
-    roomID = initRoomID;
-    config = initConfig;
-    plugins = initPlugins;
+    // const initAppInfo = MinimizingHelper.getInstance().getInitAppInfo();
+    // const initUser = MinimizingHelper.getInstance().getInitUser();
+    // const initRoomID = MinimizingHelper.getInstance().getInitRoomID();
+    // const initConfig = MinimizingHelper.getInstance().getInitConfig();
+    // const initPlugins = MinimizingHelper.getInstance().getInitPlugins();
+    // appID = initAppInfo.appID;
+    // appSign = initAppInfo.appSign
+    // userID = initUser.userID;
+    // userName = initUser.userName;
+    // roomID = initRoomID;
+    // config = initConfig;
+    // plugins = initPlugins;
   } else {
     MinimizingHelper.getInstance().notifyEntryNormal();
     Object.assign(ZegoInnerText, config.innerText || {}, config.translationText || {});
