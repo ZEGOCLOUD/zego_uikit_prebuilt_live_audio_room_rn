@@ -16,7 +16,7 @@ export default function ZegoCoHostMenuDialog(props) {
         resetTimer,
         isLocked,
         memberConnectStateMap,
-        seatIndex,
+        getSeatIndexByUserID,
     } = props;
 
     if (visable) {
@@ -98,7 +98,7 @@ export default function ZegoCoHostMenuDialog(props) {
         <View style={styles.main}>
             {
                 // seatIndex = -1 : it's accepting an invitation but failing to get on the mic
-                isLocked && seatIndex === -1 ?
+                isLocked && getSeatIndexByUserID(inviteeID) === -1 ?
                     <ZegoSendInvitationButton
                         backgroundColor={'transparent'}
                         width='100%'

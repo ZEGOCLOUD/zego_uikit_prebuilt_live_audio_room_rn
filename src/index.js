@@ -1559,7 +1559,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         resetTimer={coHostDialogExtendedData.resetTimer}
         isLocked={isLocked}
         memberConnectStateMap={memberConnectStateMap}
-        seatIndex={getSeatIndexByUserID(coHostDialogExtendedData.inviteeID)}
+        getSeatIndexByUserID={getSeatIndexByUserID}
       />
       {/* Common toast */}
       <ZegoToast
