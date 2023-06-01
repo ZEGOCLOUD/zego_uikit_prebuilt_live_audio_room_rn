@@ -309,6 +309,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
               // Accept the cohost request of the host
               ZegoUIKit.getSignalingPlugin().acceptInvitation(inviter.id).then(async () => {
                 setIsDialogVisableHandle(false);
+                LiveAudioRoomHelper.getInstance().setCacheSeatIndex(-1);
                 coHostAcceptedHandle(true);
               });
             }
@@ -354,6 +355,10 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
           // Reset invitation timer
           !isPageInBackground() && setCoHostDialogExtendedData({ resetTimer: true, inviteeID: invitee.id });
+        } else if (realTimeData.current.role !== ZegoLiveAudioRoomRole.host) {
+          // The host accepted your cohost request
+          console.log('#######onInvitationAccepted, The host accepted your cohost request');
+          coHostAcceptedHandle(true);
         }
       });
       ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, ({ callID, invitee, data }) => {
@@ -537,7 +542,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     if (isClosure) {
       // There are closures, status values cannot be used directly
       const temp = realTimeData.current.seatingAreaData;
-      const freeSeatIndex = getFreeSeatIndex(temp);
+      const cacheSeatIndex = LiveAudioRoomHelper.getInstance().getCacheSeatIndex();
+      const freeSeatIndex =  cacheSeatIndex === -1 ? getFreeSeatIndex(temp) : cacheSeatIndex;
       console.log('freeSeatIndex', freeSeatIndex);
       if (freeSeatIndex !== undefined) {
         // Take seat
@@ -1217,8 +1223,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   };
 
   useImperativeHandle(ref, () => ({
-    applyToTakeSeat: () => {
+    applyToTakeSeat: (index = -1) => {
       // There are closures, status values cannot be used directly
+      LiveAudioRoomHelper.getInstance().setCacheSeatIndex(index);
       return new Promise((resolve, reject) => {
         ZegoUIKit.getSignalingPlugin().sendInvitation(
           [realTimeData.current.hostID],
@@ -1302,6 +1309,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       return ZegoUIKit.getSignalingPlugin().acceptInvitation(realTimeData.current.hostID).then(() => {
         // Cancel request
         ZegoUIKit.getSignalingPlugin().cancelInvitation([realTimeData.current.hostID]).catch(() => {});
+        LiveAudioRoomHelper.getInstance().setCacheSeatIndex(-1);
         coHostAcceptedHandle(true);
       });
     },

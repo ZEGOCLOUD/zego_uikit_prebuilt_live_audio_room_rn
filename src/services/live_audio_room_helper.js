@@ -11,6 +11,7 @@ export default class LiveAudioRoomHelper {
     };
     _stateData = {};
     _notifyData = {};
+    _cacheSeatIndex = -1;
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new LiveAudioRoomHelper());
@@ -24,6 +25,12 @@ export default class LiveAudioRoomHelper {
     }
     getNotifyData() {
         return this._notifyData;
+    }
+    setCacheSeatIndex(cacheSeatIndex) {
+        this._cacheSeatIndex = cacheSeatIndex;
+    }
+    getCacheSeatIndex() {
+        return this._cacheSeatIndex;
     }
     clearRealTimeData() {
         this._realTimeData = {
