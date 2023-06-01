@@ -372,6 +372,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           !isPageInBackground() && setCoHostDialogExtendedData({ resetTimer: true, inviteeID: invitee.id });
 
           typeof onSeatTakingInviteRejected === 'function' && onSeatTakingInviteRejected();
+        } else if (realTimeData.current.role !== ZegoLiveAudioRoomRole.host) {
+          // The host rejected your cohost request
+          console.log('#######onInvitationRefused, The host rejected your cohost request');
+          connectStateChangedHandle('', ZegoCoHostConnectState.idle, true);
+          typeof onSeatTakingRequestRejected === 'function' && onSeatTakingRequestRejected();
         }
       });
     }

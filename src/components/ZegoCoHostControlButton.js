@@ -43,17 +43,17 @@ export default function ZegoCoHostControlButton(props) {
                 console.log('#######onInvitationResponseTimeout, The host did not process your cohost request, resulting in a timeout');
                 onConnectStateChanged('', ZegoCoHostConnectState.idle, true);
             });
-            ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID, async ({ callID, invitee, data }) => {
-                // The host accepted your cohost request
-                console.log('#######onInvitationAccepted, The host accepted your cohost request');
-                onCoHostAccepted(true);
-            });
-            ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, ({ callID, invitee, data }) => {
-                // The host rejected your cohost request
-                console.log('#######onInvitationRefused, The host rejected your cohost request');
-                onConnectStateChanged('', ZegoCoHostConnectState.idle, true);
-                typeof onSeatTakingRequestRejected === 'function' && onSeatTakingRequestRejected();
-            });
+            // ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID, async ({ callID, invitee, data }) => {
+            //     // The host accepted your cohost request
+            //     console.log('#######onInvitationAccepted, The host accepted your cohost request');
+            //     onCoHostAccepted(true);
+            // });
+            // ZegoUIKit.getSignalingPlugin().onInvitationRefused(callbackID, ({ callID, invitee, data }) => {
+            //     // The host rejected your cohost request
+            //     console.log('#######onInvitationRefused, The host rejected your cohost request');
+            //     onConnectStateChanged('', ZegoCoHostConnectState.idle, true);
+            //     typeof onSeatTakingRequestRejected === 'function' && onSeatTakingRequestRejected();
+            // });
         }
         return () => {
             if (isPluginsInit) {
