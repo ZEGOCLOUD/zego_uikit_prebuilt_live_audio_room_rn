@@ -17,6 +17,7 @@ export default function ZegoSeatingArea(props) {
     seatingAreaData,
     showSoundWaveInAudioMode,
     foregroundColor,
+    avatarBuilder,
     openIcon,
     closeIcon,
     isLocked,
@@ -76,6 +77,7 @@ export default function ZegoSeatingArea(props) {
                 audioViewBackgroudImage={backgroundImage}
                 avatarSize={{ width: 54, height: 54 }}
                 avatarAlignment={0}
+                avatarBuilder={avatarBuilder}
                 soundWaveColor="#3655ff"
               />
             ) : (

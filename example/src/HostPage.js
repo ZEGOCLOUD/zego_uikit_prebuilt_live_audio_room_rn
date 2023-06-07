@@ -138,6 +138,17 @@ export default function HostPage(props) {
       </View>
     );
   };
+  const avatarBuilder = ({userInfo}) => {
+    return <View style={styles.avatarBuilder}>
+      {
+        userInfo.inRoomAttributes && userInfo.inRoomAttributes.avatar ? <Image 
+          style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
+          resizeMode="cover"
+          source={{ uri: userInfo.inRoomAttributes.avatar }}
+        /> : null
+      }
+    </View>
+  }
   const image = {uri: 'xxx'};
   const background = () => {
     return (
@@ -176,7 +187,7 @@ export default function HostPage(props) {
           roomID={roomID}
           config={{
             ...HOST_DEFAULT_CONFIG,
-            avatar: 'https://www.zegocloud.com/_nuxt/img/github_nav@2x.3596ec6.png',
+            avatar: 'https://www.zegocloud.com/_nuxt/img/photo_3.fc8eb61.webp',
             userInRoomAttributes: { test: '123' },
             onUserCountOrPropertyChanged: (userList) => {
               console.log('HostPage onUserCountOrPropertyChanged', userList);
@@ -190,6 +201,7 @@ export default function HostPage(props) {
             seatConfig: {
               backgroundColor,
               foregroundBuilder,
+              avatarBuilder,
             },
             background,
             onLeaveConfirmation: () => {
@@ -311,6 +323,10 @@ const styles = StyleSheet.create({
     width: 47,
     height: 12,
     zIndex: 3,
+  },
+  avatarBuilder: {
+    width: '100%',
+    height: '100%',
   },
   backgroundView: {
     zIndex: -1,
