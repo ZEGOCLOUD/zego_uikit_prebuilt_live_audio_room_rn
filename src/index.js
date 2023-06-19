@@ -751,8 +751,10 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
             replaceBottomMenuBarButtons(hostButtons);
             replaceBottomMenuBarExtendButtons(hostExtendButtons);
           } else {
-            replaceBottomMenuBarButtons(audienceButtons);
-            replaceBottomMenuBarExtendButtons(audienceExtendButtons);
+            if (role === ZegoLiveAudioRoomRole.audience) {
+              replaceBottomMenuBarButtons(audienceButtons);
+              replaceBottomMenuBarExtendButtons(audienceExtendButtons);
+            }
             ZegoUIKit.getSignalingPlugin()
               .queryUsersInRoomAttributes()
               .then((data) => {
@@ -1009,7 +1011,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           } else {
             // config.role = ZegoLiveAudioRoomRole.speaker;
             setRole(ZegoLiveAudioRoomRole.speaker);
-            stateData.current.role = ZegoLiveAudioRoomRole.audience;
+            stateData.current.role = ZegoLiveAudioRoomRole.speaker;
             realTimeData.current.role = ZegoLiveAudioRoomRole.speaker;
             replaceBottomMenuBarButtons(speakerButtons);
             replaceBottomMenuBarExtendButtons(speakerExtendButtons);
