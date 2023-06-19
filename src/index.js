@@ -778,7 +778,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
             takeSeat(takeSeatIndexWhenJoining, true, true, true);
           } else if (role == ZegoLiveAudioRoomRole.speaker) {
             // If it is a speaker, try to grab the mic
-            takeSeat(takeSeatIndexWhenJoining, true, false, false);
+            // takeSeat(takeSeatIndexWhenJoining, true, false, false);
           }
         }
       });
