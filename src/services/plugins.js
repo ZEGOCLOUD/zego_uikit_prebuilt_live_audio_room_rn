@@ -50,7 +50,7 @@ const ZegoPrebuiltPlugins = {
       ZegoInvitationConnectionState.disconnected
     );
     if (_pluginConnectionState === ZegoInvitationConnectionState.disconnected) {
-      ZegoUIKit.getSignalingPlugin().logout.then(() => {
+      ZegoUIKit.getSignalingPlugin().logout().then(() => {
         zloginfo('[Plugins] auto logout success.');
         const localUser = ZegoUIKit.getLocalUserInfo();
         ZegoUIKit.getSignalingPlugin()
