@@ -173,7 +173,7 @@ export default function HostPage(props) {
   }
   const [showBtn, setShowBtn] = useState(false);
   useEffect(() => {
-    setShowBtn(true);
+    setShowBtn(false);
   }, []);
   return (
     <View style={styles.container}>

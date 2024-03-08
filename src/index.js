@@ -1244,6 +1244,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     stateData.current.menuBarExtendedButtons = extendButtons;
   };
 
+  const getUserName = (userID) => {
+    const user = ZegoUIKit.getUser(userID);
+    return user ? user.userName : userID;
+  }
+
   useImperativeHandle(ref, () => ({
     applyToTakeSeat: (index = -1) => {
       // There are closures, status values cannot be used directly
@@ -1552,7 +1557,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
               >
                 {
                   ZegoInnerText.muteCoHostButton.includes('%0') ?
-                  ZegoInnerText.muteCoHostButton.replace('%0', clickSeatItem.userID) : 
+                  ZegoInnerText.muteCoHostButton.replace('%0', getUserName(clickSeatItem.userID)) : 
                   ZegoInnerText.muteCoHostButton
                 }
               </Text>

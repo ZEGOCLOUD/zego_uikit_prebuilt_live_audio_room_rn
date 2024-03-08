@@ -74,6 +74,11 @@ export default function ZegoCoHostMenuDialog(props) {
         return result;
     }
 
+    const getUserName = (userID) => {
+      const user = ZegoUIKit.getUser(userID);
+      return user ? user.userName : userID;
+    }
+
     // 
 
     useEffect(() => {
@@ -107,7 +112,7 @@ export default function ZegoCoHostMenuDialog(props) {
                         color='#fff'
                         text={
                             ZegoInnerText.inviteToTakeSeatMenuDialogButton.includes('%0') ? 
-                                ZegoInnerText.inviteToTakeSeatMenuDialogButton.replace('%0', inviteeID) :
+                                ZegoInnerText.inviteToTakeSeatMenuDialogButton.replace('%0', getUserName(inviteeID)) :
                                 ZegoInnerText.inviteToTakeSeatMenuDialogButton
                         }
                         invitees={[inviteeID]}
