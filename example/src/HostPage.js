@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import {StyleSheet, View, Text, Image, ImageBackground, Button} from 'react-native';
+import {StyleSheet, View, Text, Image, ImageBackground, Button, Alert} from 'react-native';
 import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   HOST_DEFAULT_CONFIG,
@@ -173,7 +173,7 @@ export default function HostPage(props) {
   }
   const [showBtn, setShowBtn] = useState(false);
   useEffect(() => {
-    setShowBtn(false);
+    setShowBtn(true);
   }, []);
   return (
     <View style={styles.container}>
@@ -196,6 +196,12 @@ export default function HostPage(props) {
               rowConfigs,
               rowSpacing,
             },
+            confirmDialogInfo: {
+              title: 'Leave the room',
+              message: 'Are you sure to leave the room?',
+              cancelButtonName: 'Cancel',
+              confirmButtonName: 'OK',
+            },
             takeSeatIndexWhenJoining,
             hostSeatIndexes,
             seatConfig: {
@@ -204,8 +210,30 @@ export default function HostPage(props) {
               avatarBuilder,
             },
             background,
-            onLeaveConfirmation: () => {
+            // onLeaveConfirmation: () => {
+            //   props.navigation.navigate('HomePage');
+            // },
+            onLeave: () => {
               props.navigation.navigate('HomePage');
+            },
+            onLeaveConfirming: () => {
+              return new Promise((resolve, reject) => {
+                Alert.alert(
+                  'This is your custom dialog.',
+                  'You can customize this dialog as needed.',
+                  [
+                    {
+                      text: 'Cancel',
+                      onPress: () => reject(),
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'Exit',
+                      onPress: () => resolve(),
+                    },
+                  ],
+                );
+              });
             },
             inRoomMessageViewConfig: {
               itemBuilder
@@ -265,7 +293,7 @@ export default function HostPage(props) {
           }></Button>
           <Button title='leave' onPress={
             () => {
-              prebuiltRef.current.leave();
+              prebuiltRef.current.leave(true);
             }
           }></Button>
           <Button title='inviteAudienceToTakeSeat' onPress={prebuiltRef.current.inviteAudienceToTakeSeat.bind(this, '3379')}></Button>

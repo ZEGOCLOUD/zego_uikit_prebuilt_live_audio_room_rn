@@ -24,8 +24,8 @@ export default function ZegoBottomBar(props) {
     showInRoomMessageButton = false,
     onOpenMemberList,
     useSpeakerWhenJoining,
-    onLeaveLiveStreamingConfirming,
-    onLeaveLiveStreaming,
+    onLeaveConfirmation,
+    onLeave,
     onSeatTakingRequestRejected,
     onConnectStateChanged,
     onCoHostAccepted,
@@ -77,8 +77,8 @@ export default function ZegoBottomBar(props) {
         return (
           <ZegoLeaveButton
             key={buttonIndex}
-            onLeaveConfirmation={onLeaveLiveStreamingConfirming}
-            onPressed={onLeaveLiveStreaming}
+            onLeaveConfirmation={onLeaveConfirmation}
+            onPressed={onLeave}
             iconLeave={require('../resources/white_bottom_button_close.png')}
             width={buttonSize}
             height={buttonSize}

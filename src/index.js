@@ -96,7 +96,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     // useSpeakerWhenJoining = true,
     bottomMenuBarConfig = {},
     confirmDialogInfo = {},
-    onLeaveConfirmation,
+    onLeaveConfirmation, // == onLeave
+    onLeave = onLeaveConfirmation, // == onLeaveConfirmation
+    onLeaveConfirming,
     layoutConfig = {},
     hostSeatIndexes = [0],
     seatConfig = {},
@@ -1190,6 +1192,18 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     return index;
   };
 
+  const onLeaveConfirmingWrap = () => {
+    const temp = onLeaveConfirming || showDefaultLeaveDialog;
+    return new Promise((resolve, reject) => {
+      temp().then(async () => {
+        resolve();
+      }).catch(() => {
+        // Intercept confirm cancel
+        reject();
+      });
+    });
+  };
+
   const showDefaultLeaveDialog = () => {
     return new Promise((resolve, reject) => {
       console.log('===confirmDialogInfo', confirmDialogInfo);
@@ -1354,11 +1368,11 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       console.log('showConfirmation', showConfirmation);
       if (!showConfirmation) {
         ZegoUIKit.leaveRoom();
-        typeof onLeaveConfirmation == 'function' && onLeaveConfirmation();
+        typeof onLeave == 'function' && onLeave();
       } else {
-        showDefaultLeaveDialog().then(() => {
+        onLeaveConfirmingWrap().then(() => {
           ZegoUIKit.leaveRoom();
-          typeof onLeaveConfirmation == 'function' && onLeaveConfirmation();
+          typeof onLeave == 'function' && onLeave();
         });
       }
     }
@@ -1368,8 +1382,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     <View style={styles.container}>
       <ZegoTopBar
         menuBarButtons={buttons}
-        onLeave={onLeaveConfirmation}
-        onLeaveConfirmation={showDefaultLeaveDialog}
+        onLeave={onLeave}
+        onLeaveConfirmation={onLeaveConfirmingWrap}
       />
 
       <View style={styles.seatingArea}>
@@ -1466,6 +1480,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           requestCoHostCount={requestCoHostCount}
           memberConnectState={memberConnectStateMap[userID]}
           setIsToastVisable={setIsToastVisableHandle}
+          onLeave={onLeave}
+          onLeaveConfirmation={onLeaveConfirmingWrap}
           setToastExtendedData={(toastExtendedData) => {
             setToastExtendedData(toastExtendedData);
             stateData.current.toastExtendedData = toastExtendedData;

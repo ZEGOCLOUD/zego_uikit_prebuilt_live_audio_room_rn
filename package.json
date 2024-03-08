@@ -1,6 +1,6 @@
 {
   "name": "@zegocloud/zego-uikit-prebuilt-live-audio-room-rn",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "description": "PrebuiltLiveAudioRoom is a Live Audio Room kit that provides a ready-made group voice chat that supports up to 8 hosts and co-hosts to connect with millions of users downstage.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -76,7 +76,7 @@
   },
   "peerDependencies": {
     "@zegocloud/zego-uikit-rn": ">=1.12.0",
-    "zego-zim-react-native": "^2.7.1",
+    "zego-zim-react-native": "^2.12.1",
     "react": "*",
     "react-native": "*"
   },
