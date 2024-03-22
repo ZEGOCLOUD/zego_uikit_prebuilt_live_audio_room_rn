@@ -10,6 +10,7 @@ export default function ZegoLockButton(props) {
         iconLock = require('../resources/bottom_button_lock.png'),
         iconUnLock = require('../resources/bottom_button_unlock.png'),
         closeSeatsWhenJoin,
+        onPressed,
     } = props;
 
     const lockseat = ZegoUIKit.getRoomProperties().lockseat;
@@ -18,9 +19,10 @@ export default function ZegoLockButton(props) {
     useEffect(()=> {
         console.log('ZegoLockButton', lockseat, closeSeatsWhenJoin);
         if (lockseat === undefined && closeSeatsWhenJoin) {
-            ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.lock }).then(() => {
-                setIsLocked(true);
-            })
+            // ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.lock }).then(() => {
+            //     setIsLocked(true);
+            // })
+            typeof onPressed == 'function' && onPressed(true);
         }
 
         const callbackID = 'ZegoLockButton' + String(Math.floor(Math.random() * 10000));
@@ -29,13 +31,14 @@ export default function ZegoLockButton(props) {
               const isLocked = newValue === ZegoSeatsState.lock;
               setIsLocked(isLocked);
             }
-          });
+        });
     }, []);
 
     const pressedHandle = () => {
-        ZegoUIKit.updateRoomProperties({ lockseat: isLocked ? ZegoSeatsState.unlock : ZegoSeatsState.lock }).then(() => {
-            setIsLocked(!isLocked);
-        })
+        // ZegoUIKit.updateRoomProperties({ lockseat: isLocked ? ZegoSeatsState.unlock : ZegoSeatsState.lock }).then(() => {
+        //     setIsLocked(!isLocked);
+        // })
+        typeof onPressed == 'function' && onPressed(!isLocked);
     };
 
     return (

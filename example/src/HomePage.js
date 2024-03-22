@@ -18,7 +18,7 @@ export default function HomePage(props) {
   const [layoutType, setLayoutType] = useState(0);
   useEffect(() => {
     setUserID(String(Math.floor(Math.random() * 100000)));
-    setRoomID(String(Math.floor(Math.random() * 10000)));
+    setRoomID(String(Math.floor(Math.random() * 1000)));
   }, []);
   const insets = useSafeAreaInsets();
   const layoutArr = [

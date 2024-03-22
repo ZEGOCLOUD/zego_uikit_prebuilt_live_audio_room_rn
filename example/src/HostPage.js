@@ -187,7 +187,7 @@ export default function HostPage(props) {
           roomID={roomID}
           config={{
             ...HOST_DEFAULT_CONFIG,
-            avatar: 'https://www.zegocloud.com/_nuxt/img/photo_3.fc8eb61.webp',
+            avatar: 'https://robohash.org/1.png',
             userInRoomAttributes: { test: '123' },
             onUserCountOrPropertyChanged: (userList) => {
               console.log('HostPage onUserCountOrPropertyChanged', userList);
@@ -261,6 +261,12 @@ export default function HostPage(props) {
             },
             onSeatsOpened: () => {
               console.log('[Demo]HostPage onSeatsOpened ');
+            },
+            onSeatClosed: (index) => {
+              console.log('[Demo]HostPage onSeatClosed: ', index);
+            },
+            onSeatOpened: (index) => {
+              console.log('[Demo]HostPage onSeatOpened: ', index);
             },
             onTurnOnYourMicrophoneRequest: (fromUser) => {
               console.log('[Demo]HostPage onTurnOnYourMicrophoneRequest ', fromUser);

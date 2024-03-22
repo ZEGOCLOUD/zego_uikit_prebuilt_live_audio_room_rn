@@ -176,7 +176,7 @@ export default function AudiencePage(props) {
           roomID={roomID}
           config={{
             ...AUDIENCE_DEFAULT_CONFIG,
-            avatar: 'https://www.zegocloud.com/_nuxt/img/discord_nav@2x.8739674.png',
+            avatar: 'https://robohash.org/2.png',
             userInRoomAttributes: { test: '123' },
             onUserCountOrPropertyChanged: (userList) => {
               console.log('[Demo]AudiencePage onUserCountOrPropertyChanged', userList);
@@ -218,6 +218,12 @@ export default function AudiencePage(props) {
             },
             onSeatsOpened: () => {
               console.log('[Demo]AudiencePage onSeatsOpened ');
+            },
+            onSeatClosed: (index) => {
+              console.log('[Demo]AudiencePage onSeatClosed: ', index);
+            },
+            onSeatOpened: (index) => {
+              console.log('[Demo]AudiencePage onSeatOpened: ', index);
             },
             onTurnOnYourMicrophoneRequest: (fromUser) => {
               console.log('[Demo]AudiencePage onTurnOnYourMicrophoneRequest ', fromUser);

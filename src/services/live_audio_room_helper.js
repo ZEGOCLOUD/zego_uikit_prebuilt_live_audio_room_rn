@@ -8,6 +8,7 @@ export default class LiveAudioRoomHelper {
         seatingAreaData: [],
         roomProperties: {},
         isLocked: false,
+        seatLockStateMap: {},
     };
     _stateData = {};
     _notifyData = {};

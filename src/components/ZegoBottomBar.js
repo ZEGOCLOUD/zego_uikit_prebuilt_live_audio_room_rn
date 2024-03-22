@@ -35,6 +35,7 @@ export default function ZegoBottomBar(props) {
     isLocked,
     requestCoHostCount,
     memberConnectState,
+    lockButtonOnPressed,
   } = props;
   const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -98,7 +99,7 @@ export default function ZegoBottomBar(props) {
         );
       case ZegoMenuBarButtonName.closeSeatButton:
         return (
-          <ZegoLockButton key={buttonIndex} closeSeatsWhenJoin={closeSeatsWhenJoin} />
+          <ZegoLockButton key={buttonIndex} closeSeatsWhenJoin={closeSeatsWhenJoin} onPressed={lockButtonOnPressed} />
         );
     }
   };

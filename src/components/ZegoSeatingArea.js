@@ -21,6 +21,7 @@ export default function ZegoSeatingArea(props) {
     openIcon,
     closeIcon,
     isLocked,
+    seatLockStateMap,
   } = props;
   const flexStyle = [
     'space-around',
@@ -84,7 +85,7 @@ export default function ZegoSeatingArea(props) {
               <Image
                 style={styles.icon}
                 source={
-                  isLocked ? closeIcon : openIcon
+                  seatLockStateMap[item.seatIndex] ? closeIcon : openIcon
                 }
               />
             )}
