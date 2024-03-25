@@ -952,9 +952,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       } else {
         const isSeatLocked = realTimeData.current.seatLockStateMap[index];
         if (isSeatLocked)  {
-          ref.current.openSeat(index);
+          openSeat(index);
         } else {
-          ref.current.closeSeat(index);
+          closeSeat(index);
         }
       }
     } else {
@@ -1273,13 +1273,67 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     return user ? user.userName : userID;
   }
 
-  const _openOrCloseSeats = (seatLockStateMap) => {
-    console.log('===_openOrCloseSeats', seatLockStateMap);
+  const openOrCloseSeats = (seatLockStateMap) => {
+    console.log('===openOrCloseSeats', seatLockStateMap);
     return ZegoUIKit.updateRoomProperties({ lockseats: seatLockStateMap }).then(() => {
       realTimeData.current.seatLockStateMap = seatLockStateMap;
       stateData.current.seatLockStateMap = seatLockStateMap;
       setSeatLockStateMap(seatLockStateMap);
     })
+  }
+
+  const openSeat = (index) => {
+    const seatLockStateMap = { ...realTimeData.current.seatLockStateMap };
+    seatLockStateMap[index] = 0;
+    seatLockStateMap['updateIndex'] = index;
+    return openOrCloseSeats(seatLockStateMap);
+  }
+
+  const closeSeat = (index) => {
+    const seatLockStateMap = { ...realTimeData.current.seatLockStateMap };
+    seatLockStateMap[index] = 1;
+    seatLockStateMap['updateIndex'] = index;
+    return openOrCloseSeats(seatLockStateMap);
+  }
+
+  const openSeats = () => {
+    const seatLockStateMap = {};
+    let num = 0;
+    rowConfigs.forEach((row) => {
+      for (let i = 0; i < row.count; i++) {
+        seatLockStateMap[num] = 0;
+        num ++;
+      }
+    });
+    seatLockStateMap['updateIndex'] = -1;
+
+    return ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.unlock }).then(() => {
+      setIsLocked(false);
+      stateData.current.isLocked = false;
+      realTimeData.current.isLocked = false;
+
+      openOrCloseSeats(seatLockStateMap);
+    });
+  }
+
+  const closeSeats = () => {
+    const seatLockStateMap = {};
+    let num = 0;
+    rowConfigs.forEach((row) => {
+      for (let i = 0; i < row.count; i++) {
+        seatLockStateMap[num] = 1;
+        num ++;
+      }
+    });
+    seatLockStateMap['updateIndex'] = -1;
+
+    return ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.lock }).then(() => {
+      setIsLocked(true);
+      stateData.current.isLocked = true;
+      realTimeData.current.isLocked = true;
+
+      openOrCloseSeats(seatLockStateMap);
+    });
   }
 
   useImperativeHandle(ref, () => ({
@@ -1336,16 +1390,10 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       }
     },
     openSeat: (index) => {
-      const seatLockStateMap = { ...realTimeData.current.seatLockStateMap };
-      seatLockStateMap[index] = 0;
-      seatLockStateMap['updateIndex'] = index;
-      return _openOrCloseSeats(seatLockStateMap);
+      return openSeat(index);
     },
     closeSeat: (index) => {
-      const seatLockStateMap = { ...realTimeData.current.seatLockStateMap };
-      seatLockStateMap[index] = 1;
-      seatLockStateMap['updateIndex'] = index;
-      return _openOrCloseSeats(seatLockStateMap);
+      return closeSeat(index);
     },
     acceptSeatTakingRequest: (audienceUserID) => {
       return ZegoUIKit.getSignalingPlugin().acceptInvitation(audienceUserID).then(() => {
@@ -1386,42 +1434,10 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       });
     },
     closeSeats: () => {
-      const seatLockStateMap = {};
-      let num = 0;
-      rowConfigs.forEach((row) => {
-        for (let i = 0; i < row.count; i++) {
-          seatLockStateMap[num] = 1;
-          num ++;
-        }
-      });
-      seatLockStateMap['updateIndex'] = -1;
-
-      return ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.lock }).then(() => {
-        setIsLocked(true);
-        stateData.current.isLocked = true;
-        realTimeData.current.isLocked = true;
-
-        _openOrCloseSeats(seatLockStateMap);
-      })
+      return closeSeats();
     },
     openSeats: () => {
-      const seatLockStateMap = {};
-      let num = 0;
-      rowConfigs.forEach((row) => {
-        for (let i = 0; i < row.count; i++) {
-          seatLockStateMap[num] = 0;
-          num ++;
-        }
-      });
-      seatLockStateMap['updateIndex'] = -1;
-
-      return ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.unlock }).then(() => {
-        setIsLocked(false);
-        stateData.current.isLocked = false;
-        realTimeData.current.isLocked = false;
-
-        _openOrCloseSeats(seatLockStateMap);
-      })
+      return openSeats();
     },
     turnMicrophoneOn: (userID, isOn) => {
       return ZegoUIKit.turnMicrophoneOn(userID, isOn);
@@ -1563,9 +1579,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           }}
           lockButtonOnPressed={(isLocked) => {
             if (isLocked) {
-              ref.current.closeSeats();
+              closeSeats();
             } else {
-              ref.current.openSeats();
+              openSeats();
             }
           }}
         />
