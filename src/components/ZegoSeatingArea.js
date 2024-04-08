@@ -6,11 +6,13 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn';
+import Delegate from 'react-delegate-component';
 
 export default function ZegoSeatingArea(props) {
   const {
     rowSpacing,
     foregroundBuilder,
+    rowBackgroundBuilder,
     onSeatItemClick,
     backgroundColor,
     backgroundImage,
@@ -108,6 +110,13 @@ export default function ZegoSeatingArea(props) {
             },
           ]}
         >
+          <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0}}>
+          {rowBackgroundBuilder ? 
+            <Delegate
+              to={rowBackgroundBuilder}
+              props={{rowIndex: index}}
+            /> : null}
+          </View>
           {renderItem(row.seatList, foregroundBuilder)}
         </View>
       ))}

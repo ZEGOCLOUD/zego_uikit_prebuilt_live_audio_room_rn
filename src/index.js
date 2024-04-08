@@ -161,6 +161,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     backgroundColor = 'transparent',
     backgroundImage,
     avatarBuilder,
+    rowBackgroundBuilder,
   } = seatConfig;
 
   const {
@@ -1495,6 +1496,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
             showSoundWaveInAudioMode={showSoundWaveInAudioMode}
             foregroundColor={foregroundColor}
             avatarBuilder={avatarBuilder}
+            rowBackgroundBuilder={rowBackgroundBuilder}
             openIcon={openIcon}
             closeIcon={closeIcon}
             isLocked={isLocked}
