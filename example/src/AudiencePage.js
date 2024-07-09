@@ -3,6 +3,7 @@ import {StyleSheet, View, Image, Text, ImageBackground,Button} from 'react-nativ
 import KeyCenter from './KeyCenter';
 import ZegoUIKitPrebuiltLiveAudioRoom, {
   AUDIENCE_DEFAULT_CONFIG,
+  ZegoLiveAudioRoomRole,
   ZegoMenuBarButtonName,
   ZegoLiveAudioRoomLayoutAlignment,
 } from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
@@ -164,6 +165,7 @@ export default function AudiencePage(props) {
   useEffect(() => {
     setShowBtn(false);
   }, []);
+  var needMuteAudio = false;
   return (
     <View style={styles.container}>
       <View style={styles.prebuiltContainer}>
@@ -212,7 +214,20 @@ export default function AudiencePage(props) {
             // },
             onSeatsChanged: (takenSeats, untakenSeats) => {
               console.log('[Demo]AudiencePage onSeatsChanged ', takenSeats, untakenSeats);
+              if (untakenSeats.length < 7) {
+                needMuteAudio = true;
+              } else {
+                needMuteAudio = false;
+              }
             },
+            // playAudioConfig: (localUserID, localRole, speaker) => {
+            //   console.log('++++++++++++++playAudioConfig', localUserID, localRole, speaker, needMuteAudio);
+            //   if (localRole != ZegoLiveAudioRoomRole.audience) {
+            //     return true;
+            //   } else {
+            //     return !needMuteAudio;
+            //   }
+            // },
             onSeatsClosed: () => {
               console.log('[Demo]AudiencePage onSeatsClosed ');
             },

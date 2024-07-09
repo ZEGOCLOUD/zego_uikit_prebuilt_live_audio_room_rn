@@ -127,6 +127,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   
     inRoomMessageViewConfig = {},
     topMenuBarConfig = {},
+    playAudioConfig,
   } = config;
   
   const { takeSeatIndexWhenJoining } = config;
@@ -693,6 +694,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       console.log('onAudioOutputDeviceChanged', type);
       stateData.current.useSpeakerWhenJoining = (type === 0);
     });
+    ZegoUIKit.onAudioVideoAvailable(callbackID, (users) => {
+      muteCoHostAudio();
+    });
     MinimizingHelper.getInstance().onWindowMinimized(callbackID, () => {
       setTextInputVisable(false);
     });
@@ -712,6 +716,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         ZegoUIKit.onUserJoin(callbackID);
         ZegoUIKit.onMicrophoneOn(callbackID);
         ZegoUIKit.onAudioOutputDeviceChanged(callbackID);
+        ZegoUIKit.onAudioVideoAvailable(callbackID);
         MinimizingHelper.getInstance().onWindowMinimized(callbackID);
       
         unRegisterPluginCallback();
@@ -725,6 +730,16 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       MinimizingHelper.getInstance().setIsMinimizeSwitch(false);
     };
   }, []);
+
+  const muteCoHostAudio = () => {
+    const audioUsers = ZegoUIKit.getAudioVideoUsers().filter((user) => user.userID != userID);
+    audioUsers.forEach(async (user) => {
+      if (typeof playAudioConfig === 'function') {
+        const isPlayAudio = await playAudioConfig(userID, stateData.current.role || role, user);
+        ZegoUIKit.muteUserAudio(user.userID, !isPlayAudio);
+      }
+    });
+  }
 
   const pluginInit = () => {
     return ZegoPrebuiltPlugins.init(appID, appSign, userID, userName, plugins)
@@ -860,6 +875,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           const takenSeats = { [key]: ZegoUIKit.getUser(newValue) };
           const untakenSeats = getFreeSeatIndexList(realTimeData.current.seatingAreaData);
           typeof onSeatsChanged === 'function' && onSeatsChanged(takenSeats, untakenSeats);
+          muteCoHostAudio();
         });
       }
     );
@@ -1051,6 +1067,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           stateData.current.role = ZegoLiveAudioRoomRole.audience;
           realTimeData.current.role = ZegoLiveAudioRoomRole.audience;
         }
+        muteCoHostAudio();
       })
   };
   const leaveSeat = (index, removeUserID, realTimeRoomProperties) => {
@@ -1466,6 +1483,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           typeof onLeave == 'function' && onLeave();
         });
       }
+    },
+    muteUserAudio: (userID, mute) => {
+      return ZegoUIKit.muteUserAudio(userID, mute);
     }
   }));
 
