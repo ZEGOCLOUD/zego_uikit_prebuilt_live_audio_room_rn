@@ -43,6 +43,7 @@ import {
   ZegoSeatsState,
 } from './services/defines';
 import LiveAudioRoomHelper from "./services/live_audio_room_helper"
+import { zloginfo } from './utils/logger';
 
 export {
   HOST_DEFAULT_CONFIG,
@@ -54,6 +55,8 @@ export {
 };
 
 function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
+  const TAG = 'ZegoUIKitPrebuiltLiveAudioRoom';
+
   let { appID, appSign, userID, userName, roomID, config, plugins } = props;
   const isMinimizeSwitch = MinimizingHelper.getInstance().getIsMinimizeSwitch();
   if (isMinimizeSwitch) {
@@ -269,6 +272,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   const registerPluginCallback = () => {
     if (ZegoUIKit.getPlugin(ZegoUIKitPluginType.signaling)) {
       ZegoUIKit.getSignalingPlugin().onInvitationReceived(callbackID, ({ callID, type, inviter, data }) => {
+        zloginfo('onInvitationReceived implement by ' + TAG);
+
         if (!realTimeData.current.isLocked) return;
         console.log('[Prebuilt]onInvitationReceived', JSON.stringify(realTimeData.current), requestCoHostCount, type, userID, inviter);
         if (type === ZegoInvitationType.requestCoHost && userID === realTimeData.current.hostID) {
@@ -328,7 +333,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
           typeof onHostSeatTakingInviteSent === 'function' && onHostSeatTakingInviteSent();
         }
-      });
+      }, TAG);
       ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
         if (userID === realTimeData.current.hostID) {
           // The audience canceled the cohost request
