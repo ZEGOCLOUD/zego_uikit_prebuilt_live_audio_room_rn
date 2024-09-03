@@ -35,7 +35,7 @@ const ZegoLiveStatus = {
   default: 0,
   start: 1,
 };
-const ZegoInvitationType = {
+const ZegoLiveAudioRoomInvitationType = {
   requestCoHost: 2,
   inviteToCoHost: 3,
 };
@@ -125,7 +125,7 @@ export {
   ZegoInnerText,
   ZegoMenuBarButtonName,
   ZegoLiveStatus,
-  ZegoInvitationType,
+  ZegoLiveAudioRoomInvitationType,
   ZegoCoHostConnectState,
   ZegoToastType,
   ZegoSeatsState,

@@ -39,7 +39,7 @@ import {
   ZegoInnerText,
   ZegoToastType,
   ZegoCoHostConnectState,
-  ZegoInvitationType,
+  ZegoLiveAudioRoomInvitationType,
   ZegoSeatsState,
 } from './services/defines';
 import LiveAudioRoomHelper from "./services/live_audio_room_helper"
@@ -276,7 +276,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
         if (!realTimeData.current.isLocked) return;
         console.log('[Prebuilt]onInvitationReceived', JSON.stringify(realTimeData.current), requestCoHostCount, type, userID, inviter);
-        if (type === ZegoInvitationType.requestCoHost && userID === realTimeData.current.hostID) {
+        if (type === ZegoLiveAudioRoomInvitationType.requestCoHost && userID === realTimeData.current.hostID) {
           // The audience created a cohost request
           realTimeData.current.requestCoHostCount += 1;
           !isPageInBackground() && setRequestCoHostCount(realTimeData.current.requestCoHostCount);
@@ -293,7 +293,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           }, 100);
 
           typeof onSeatTakingRequested === 'function' && onSeatTakingRequested(ZegoUIKit.getUser(inviter.id));
-        } else if (type === ZegoInvitationType.inviteToCoHost) {
+        } else if (type === ZegoLiveAudioRoomInvitationType.inviteToCoHost) {
           // The audience is invited to connect the cohost by host
           // Cancel request
           ZegoUIKit.getSignalingPlugin().cancelInvitation([realTimeData.current.hostID]).catch(() => {});
@@ -1367,7 +1367,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         ZegoUIKit.getSignalingPlugin().sendInvitation(
           [realTimeData.current.hostID],
           60,
-          ZegoInvitationType.requestCoHost,
+          ZegoLiveAudioRoomInvitationType.requestCoHost,
           '',
           {},
         ).then(({ errorInvitees }) => {
@@ -1433,7 +1433,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         ZegoUIKit.getSignalingPlugin().sendInvitation(
           [audienceUserID],
           60,
-          ZegoInvitationType.inviteToCoHost,
+          ZegoLiveAudioRoomInvitationType.inviteToCoHost,
           '',
           {},
         ).then(({ errorInvitees }) => {

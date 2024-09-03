@@ -5,7 +5,7 @@ import {
   ZegoLiveAudioRoomRole,
   ZegoInnerText,
   ZegoCoHostConnectState,
-  ZegoInvitationType,
+  ZegoLiveAudioRoomInvitationType,
 } from '../services/defines';
 import { getShotName } from '../utils';
 import ZegoAgreeCoHostButton from "./ZegoAgreeCoHostButton";
@@ -127,7 +127,7 @@ export default function ZegoLiveAudioRoomMemberList(props) {
       // You can invite to cohost
       setCoHostDialogExtendedData({
         inviteeID: userID,
-        invitationType: ZegoInvitationType.inviteToCoHost,
+        invitationType: ZegoLiveAudioRoomInvitationType.inviteToCoHost,
         onOk: () => {
           setIsCoHostDialogVisable(false);
         },

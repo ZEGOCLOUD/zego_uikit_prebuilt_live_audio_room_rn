@@ -1,5 +1,5 @@
 import React from "react";
-import { ZegoInnerText, ZegoInvitationType, ZegoToastType } from "../services/defines";
+import { ZegoInnerText, ZegoLiveAudioRoomInvitationType, ZegoToastType } from "../services/defines";
 import { ZegoSendInvitationButton } from '@zegocloud/zego-uikit-rn';
 
 export default function ZegoRequestCoHostButton(props) {
@@ -33,7 +33,7 @@ export default function ZegoRequestCoHostButton(props) {
             text={ZegoInnerText.applyToTakeSeatButton}
             verticalLayout={false}
             invitees={[hostID]}
-            type={ZegoInvitationType.requestCoHost}
+            type={ZegoLiveAudioRoomInvitationType.requestCoHost}
             onWillPressed={willPressedHandle}
             onPressed={pressedHandle}
         ></ZegoSendInvitationButton>

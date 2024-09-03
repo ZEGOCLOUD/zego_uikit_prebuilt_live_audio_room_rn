@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, Fragment }from "react";
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import { StyleSheet, View, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import { ZegoSendInvitationButton } from '@zegocloud/zego-uikit-rn';
-import { ZegoInnerText, ZegoInvitationType } from "../services/defines";
+import { ZegoInnerText, ZegoLiveAudioRoomInvitationType } from "../services/defines";
 
 export default function ZegoCoHostMenuDialog(props) {
     const countdownMap = useRef();
@@ -10,7 +10,7 @@ export default function ZegoCoHostMenuDialog(props) {
     const {
         visable,
         inviteeID,
-        invitationType = ZegoInvitationType.inviteToCoHost,
+        invitationType = ZegoLiveAudioRoomInvitationType.inviteToCoHost,
         onCancel,
         onOk,
         resetTimer,
@@ -43,7 +43,7 @@ export default function ZegoCoHostMenuDialog(props) {
     // Verify whether invitations can be sent
     const willPressedHandle = () => {
         let result = true;
-        if (invitationType === ZegoInvitationType.inviteToCoHost) {
+        if (invitationType === ZegoLiveAudioRoomInvitationType.inviteToCoHost) {
             // Check whether the timer is running out
             console.log('#########Timer: Check whether the timer is running out', countdownMap.current, countdownTimerMap.current);
 
