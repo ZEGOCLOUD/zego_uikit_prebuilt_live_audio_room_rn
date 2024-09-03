@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, Image } from 'react-native';
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 import { ZegoSeatsState } from '../services/defines';
+import { zloginfo } from "../utils/logger";
 
 export default function ZegoLockButton(props) {
     const {
@@ -17,7 +18,7 @@ export default function ZegoLockButton(props) {
     const [isLocked, setIsLocked] = useState(lockseat === ZegoSeatsState.lock);
 
     useEffect(()=> {
-        console.log('ZegoLockButton', lockseat, closeSeatsWhenJoin);
+        zloginfo('ZegoLockButton', lockseat, closeSeatsWhenJoin);
         if (lockseat === undefined && closeSeatsWhenJoin) {
             // ZegoUIKit.updateRoomProperties({ lockseat: ZegoSeatsState.lock }).then(() => {
             //     setIsLocked(true);

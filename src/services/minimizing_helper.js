@@ -1,4 +1,5 @@
 import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+import { zloginfo } from "../utils/logger";
 
 export default class MinimizingHelper {
     _instance;
@@ -73,7 +74,7 @@ export default class MinimizingHelper {
         this._updateTimer = null;
     }
     updateActiveUserIDByTimer() {
-        // console.log('[MinimizingHelper]updateActiveUserIDByTimer', this._rangeSoundLevels);
+        // zloginfo('[MinimizingHelper]updateActiveUserIDByTimer', this._rangeSoundLevels);
         let maxAverageSoundLevel = 0;
         Object.entries(this._rangeSoundLevels).forEach(([userID, soundLevels]) => {
             const averageSoundLevel =
@@ -88,12 +89,12 @@ export default class MinimizingHelper {
         this._activeUserID = this._activeUserID || ZegoUIKit.getLocalUserInfo().userID || '';
         this._rangeSoundLevels = {};
         
-        // console.log('[MinimizingHelper]updateActiveUserIDByTimer', this._activeUserID);
+        // zloginfo('[MinimizingHelper]updateActiveUserIDByTimer', this._activeUserID);
         this.notifyActiveUserIDUpdate(this._activeUserID);
     }
     registerAudioVideoListCallback(callbackID) {
         ZegoUIKit.onAudioVideoAvailable(callbackID, (userList) => {
-            console.log('[MinimizingHelper]onAudioVideoAvailable', this._activeUserID);
+            zloginfo('[MinimizingHelper]onAudioVideoAvailable', this._activeUserID);
             userList.forEach((user) => {
                 if (this._rangeSoundLevels[user.userID]) {
                     this._rangeSoundLevels[user.userID].push(user.soundLevel);
@@ -103,13 +104,13 @@ export default class MinimizingHelper {
             });
         });
         ZegoUIKit.onAudioVideoUnavailable(callbackID, (userList) => {
-            console.log('[MinimizingHelper]onAudioVideoUnavailable', this._activeUserID);
+            zloginfo('[MinimizingHelper]onAudioVideoUnavailable', this._activeUserID);
             userList.forEach((user) => {
                 delete this._rangeSoundLevels[user.userID];
             });
         });
         ZegoUIKit.onSoundLevelUpdated(callbackID, (userID, soundLevel) => {
-            // console.log('[MinimizingHelper]onSoundLevelUpdated', this._rangeSoundLevels, userID, soundLevel);
+            // zloginfo('[MinimizingHelper]onSoundLevelUpdated', this._rangeSoundLevels, userID, soundLevel);
             if (this._rangeSoundLevels[userID]) {
                 this._rangeSoundLevels[userID].push(soundLevel);
             } else {

@@ -1,6 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Image } from 'react-native';
 
+import { zloginfo } from "../utils/logger";
+
 export default function ZegoMessageButton(props) {
   const { onPress, width = 36, height = 36 } = props;
 
@@ -16,7 +18,7 @@ export default function ZegoMessageButton(props) {
           nativeEvent: {
             source: { width, height },
           },
-        }) => console.log('>>>>>', width, height)}
+        }) => zloginfo('>>>>>', width, height)}
         style={{ width: '100%', height: '100%' }}
       />
     </TouchableOpacity>

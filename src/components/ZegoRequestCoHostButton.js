@@ -1,17 +1,18 @@
 import React from "react";
 import { ZegoInnerText, ZegoLiveAudioRoomInvitationType, ZegoToastType } from "../services/defines";
 import { ZegoSendInvitationButton } from '@zegocloud/zego-uikit-rn';
+import { zloginfo } from "../utils/logger";
 
 export default function ZegoRequestCoHostButton(props) {
     const {
         hostID,
         onRequestSuccessfully,
     } = props;
-    console.log('ZegoRequestCoHostButton hostID', hostID);
+    zloginfo('ZegoRequestCoHostButton hostID', hostID);
 
     // Verify whether invitations can be sent
     const willPressedHandle = () => {
-        console.log('ZegoRequestCoHostButton willPressedHandle hostID', hostID);
+        zloginfo('ZegoRequestCoHostButton willPressedHandle hostID', hostID);
         let result = true;
         if (!hostID) {
             result = false;

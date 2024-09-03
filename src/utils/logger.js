@@ -1,13 +1,13 @@
-import { getLocalDateFormat } from './timer';
+import ZegoUIKit from '@zegocloud/zego-uikit-rn';
 
 export const zloginfo = (...msg) => {
-  console.log(getLocalDateFormat() + ' LiveAudioRoom[INFO]: ', ...msg);
+  ZegoUIKit.kitLogInfo('PrebuiltLiveAudioRoom', ...msg);
 };
 
 export const zlogwarning = (...msg) => {
-  console.warn(getLocalDateFormat() + ' LiveAudioRoom[WARNING]: ', ...msg);
+  ZegoUIKit.kitLogWarning('PrebuiltLiveAudioRoom', ...msg);
 };
 
 export const zlogerror = (...msg) => {
-  console.error(getLocalDateFormat() + ' LiveAudioRoom[ERROR]: ', ...msg);
+  ZegoUIKit.kitLogError('PrebuiltLiveAudioRoom', ...msg);
 };

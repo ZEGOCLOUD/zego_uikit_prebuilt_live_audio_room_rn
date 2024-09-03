@@ -43,7 +43,7 @@ import {
   ZegoSeatsState,
 } from './services/defines';
 import LiveAudioRoomHelper from "./services/live_audio_room_helper"
-import { zloginfo } from './utils/logger';
+import { zloginfo, zlogerror } from './utils/logger';
 
 export {
   HOST_DEFAULT_CONFIG,
@@ -264,7 +264,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
   const isPageInBackground = () => {
     const isMinimize = MinimizingHelper.getInstance().getIsMinimize();
-    console.log('######isPageInBackground', isMinimize);
+    zloginfo('######isPageInBackground', isMinimize);
     return isMinimize;
   }
 
@@ -275,7 +275,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         zloginfo('onInvitationReceived implement by ' + TAG);
 
         if (!realTimeData.current.isLocked) return;
-        console.log('[Prebuilt]onInvitationReceived', JSON.stringify(realTimeData.current), requestCoHostCount, type, userID, inviter);
+        zloginfo('[Prebuilt]onInvitationReceived', JSON.stringify(realTimeData.current), requestCoHostCount, type, userID, inviter);
         if (type === ZegoLiveAudioRoomInvitationType.requestCoHost && userID === realTimeData.current.hostID) {
           // The audience created a cohost request
           realTimeData.current.requestCoHostCount += 1;
@@ -371,7 +371,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           !isPageInBackground() && setCoHostDialogExtendedData({ resetTimer: true, inviteeID: invitee.id });
         } else if (realTimeData.current.role !== ZegoLiveAudioRoomRole.host) {
           // The host accepted your cohost request
-          console.log('#######onInvitationAccepted, The host accepted your cohost request');
+          zloginfo('#######onInvitationAccepted, The host accepted your cohost request');
           coHostAcceptedHandle(true);
         }
       });
@@ -388,7 +388,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           typeof onSeatTakingInviteRejected === 'function' && onSeatTakingInviteRejected();
         } else if (realTimeData.current.role !== ZegoLiveAudioRoomRole.host) {
           // The host rejected your cohost request
-          console.log('#######onInvitationRefused, The host rejected your cohost request');
+          zloginfo('#######onInvitationRefused, The host rejected your cohost request');
           connectStateChangedHandle('', ZegoCoHostConnectState.idle, true);
           typeof onSeatTakingRequestRejected === 'function' && onSeatTakingRequestRejected();
         }
@@ -460,7 +460,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }
   // Connect state changed
   const connectStateChangedHandle = (changedUserID, connectState, isClosure) => {
-    console.log('#########connectStateChangedHandle', changedUserID, connectState, memberConnectStateMap, realTimeData.current.memberConnectStateMap);
+    zloginfo('#########connectStateChangedHandle', changedUserID, connectState, memberConnectStateMap, realTimeData.current.memberConnectStateMap);
     // The audience connection status changes
     changedUserID = changedUserID || userID;
     const temp = connectState === ZegoCoHostConnectState.connected ? ZegoLiveAudioRoomRole.speaker : ZegoLiveAudioRoomRole.audience;
@@ -516,7 +516,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     stateData.current.memberConnectStateMap = { ...memberConnectStateMap };
     setRequestCoHostCount(temp);
     stateData.current.requestCoHostCount = temp;
-    console.log('coHostAgreeHandle #######', temp);
+    zloginfo('coHostAgreeHandle #######', temp);
   }
   // Get free seat index 
   const getFreeSeatIndexList = (seatingAreaData) => {
@@ -534,7 +534,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }
   // Get free seat index of the most front
   const getFreeSeatIndex = (seatingAreaData) => {
-    console.log('#####getFreeSeatIndex#####', seatingAreaData);
+    zloginfo('#####getFreeSeatIndex#####', seatingAreaData);
     let freeSeatIndex;
     for (let index = 0, len = seatingAreaData.length; index < len; index++) {
       const element = seatingAreaData[index];
@@ -563,7 +563,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       const temp = realTimeData.current.seatingAreaData;
       const cacheSeatIndex = LiveAudioRoomHelper.getInstance().getCacheSeatIndex();
       const freeSeatIndex =  cacheSeatIndex === -1 ? getFreeSeatIndex(temp) : cacheSeatIndex;
-      console.log('freeSeatIndex', freeSeatIndex);
+      zloginfo('freeSeatIndex', freeSeatIndex);
       if (freeSeatIndex !== undefined) {
         // Take seat
         takeSeat(freeSeatIndex, true, false, false).then(() => {
@@ -571,9 +571,9 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
         }).catch(() => {
-          console.log('coHostAcceptedHandle error');
+          zloginfo('coHostAcceptedHandle error');
           realTimeData.current.memberConnectStateMap[userID] = ZegoCoHostConnectState.idle;
-          console.log('coHostAcceptedHandle error', realTimeData.current.memberConnectStateMap);
+          zloginfo('coHostAcceptedHandle error', realTimeData.current.memberConnectStateMap);
           setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
         });
@@ -606,13 +606,13 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     }
     ZegoUIKit.init(appID, appSign, { userID: userID, userName: userName })
       .then(() => {
-        console.log('===zego uikit init success');
+        zloginfo('===zego uikit init success');
         ZegoUIKit.setAudioVideoResourceMode(ZegoAudioVideoResourceMode.RTCOnly);
         ZegoUIKit.turnCameraOn('', false);
         ZegoUIKit.turnMicrophoneOn('', turnOnMicrophoneWhenJoining);
         ZegoUIKit.setAudioOutputToSpeaker(useSpeakerWhenJoining);
         ZegoUIKit.joinRoom(roomID).then(() => {
-          console.log('===prebuilt uikit join room success');
+          zloginfo('===prebuilt uikit join room success');
           // It is not a callback that executes later, so you can use 'role' field directly
           if (role !== ZegoLiveAudioRoomRole.audience) {
             grantPermissions();
@@ -621,14 +621,14 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         });
       })
       .catch((err) => {
-        console.log('===err', err);
+        zloginfo('===err', err);
       });
     ZegoUIKit.onUserCountOrPropertyChanged(callbackID, (userList) => {
-      console.log('########### Custom onUserCountOrPropertyChanged', userID, userList);
+      zloginfo('########### Custom onUserCountOrPropertyChanged', userID, userList);
       typeof onUserCountOrPropertyChanged === 'function' && onUserCountOrPropertyChanged(userList);
     });
     ZegoUIKit.onRoomPropertyUpdated(callbackID, (key, oldvalue, newValue) => {
-      console.log('###########onRoomPropertyUpdated', key, oldvalue, newValue);
+      zloginfo('###########onRoomPropertyUpdated', key, oldvalue, newValue);
       if (key === 'lockseat') {
         // Clear all connect state
         realTimeData.current.requestCoHostCount = 0;
@@ -675,7 +675,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       }
     });
     ZegoUIKit.onTurnOnYourMicrophoneRequest(callbackID, async (formUser) => {
-      console.log('########onTurnOnYourMicrophoneRequest', formUser);
+      zloginfo('########onTurnOnYourMicrophoneRequest', formUser);
       // Allow to open
       try {
         await grantPermissions();
@@ -691,12 +691,12 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     });
     ZegoUIKit.onMicrophoneOn(callbackID, (targetUserID, isOn) => {
       if (targetUserID === userID) {
-        console.log('onMicrophoneOn', targetUserID, isOn);
+        zloginfo('onMicrophoneOn', targetUserID, isOn);
         stateData.current.turnOnMicrophoneWhenJoining = !!isOn;
       }
     });
     ZegoUIKit.onAudioOutputDeviceChanged(callbackID, (type) => {
-      console.log('onAudioOutputDeviceChanged', type);
+      zloginfo('onAudioOutputDeviceChanged', type);
       stateData.current.useSpeakerWhenJoining = (type === 0);
     });
     ZegoUIKit.onAudioVideoAvailable(callbackID, (users) => {
@@ -752,32 +752,32 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         setIsInit(true);
         stateData.current.isInit = true;
         MinimizingHelper.getInstance().notifyLiveAudioRoomInit();
-        console.log('===init success');
+        zloginfo('===init success');
         registerPluginCallback();
         pluginJoinRoom();
       })
       .catch((err) => {
-        console.log('===init err', err);
+        zloginfo('===init err', err);
       });
   };
 
   // Set the avatar url and user-defined additional properties
   const setUserCustomRoomAttributes = () => {
-    console.log('###########setUserCustomRoomAttributes', userID, avatar, userInRoomAttributes);
+    zloginfo('###########setUserCustomRoomAttributes', userID, avatar, userInRoomAttributes);
     ZegoUIKit.getSignalingPlugin().setUsersInRoomAttributes('avatar', avatar, [userID]);
     Object.keys(userInRoomAttributes).forEach((key) => {
-      console.log('###########setUserCustomRoomAttributes', userID, key, userInRoomAttributes[key]);
+      zloginfo('###########setUserCustomRoomAttributes', userID, key, userInRoomAttributes[key]);
       ZegoUIKit.getSignalingPlugin().setUsersInRoomAttributes(key, userInRoomAttributes[key], [userID]);
     });
   }
 
   const pluginJoinRoom = () => {
-    console.log('===plugin join room');
+    zloginfo('===plugin join room');
     return ZegoUIKit.getSignalingPlugin()
       .joinRoom(roomID)
       .then((data) => {
         if (!data.code) {
-          console.log('===plugin join room success', role);
+          zloginfo('===plugin join room success', role);
           // Set the avatar url and user-defined additional properties
           setUserCustomRoomAttributes();
           registerUIKitListener();
@@ -799,7 +799,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
               .queryUsersInRoomAttributes()
               .then((data) => {
                 if (!data.code) {
-                  console.log('===queryUsersInRoomAttributes', data);
+                  zloginfo('===queryUsersInRoomAttributes', data);
                   data.usersInRoomAttributes.forEach((v, k) => {
                     if (v.role === ZegoLiveAudioRoomRole.host.toString()) {
                       // hostID = k;
@@ -813,7 +813,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
               });
           }
           if (role == ZegoLiveAudioRoomRole.host) {
-            console.log('===is host', role, config.role);
+            zloginfo('===is host', role, config.role);
             // If the value is host, the specified mic bit is forcibly preempted
             takeSeat(takeSeatIndexWhenJoining, true, true, true);
           } else if (role == ZegoLiveAudioRoomRole.speaker) {
@@ -841,7 +841,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     ZegoUIKit.getSignalingPlugin().onRoomPropertyUpdated(
       callbackID,
       (key, oldValue, newValue) => {
-        console.log(
+        zloginfo(
           '===onRoomPropertyUpdated',
           userID,
           key,
@@ -885,7 +885,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       }
     );
     ZegoUIKit.onUserLeave(callbackID, (userList) => {
-      console.log('===onUserLeave', userList);
+      zloginfo('===onUserLeave', userList);
       const count = ZegoUIKit.getAllUsers().length;
       !isPageInBackground() && setMemberCount(count);
       stateData.current.memberCount = count;
@@ -948,7 +948,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     }
     setClickSeatItem({ index, userID: roomProperties[index] });
     stateData.current.clickSeatItem = { index, userID: roomProperties[index] };
-    console.log(
+    zloginfo(
       '===onSeatItemClick',
       role,
       index,
@@ -992,7 +992,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         }
       }
       if (seated) {
-        console.log('Seat has been taken', index);
+        zloginfo('Seat has been taken', index);
         if (roomProperties[index] == userID) {
           // Seat has been taken by yourself, leave the seat
           setModalVisible(true);
@@ -1002,7 +1002,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         }
       } else {
         if (realTimeData.current.seatLockStateMap[index]) {
-          console.log('Seat has been locked', index);
+          zloginfo('Seat has been locked', index);
           return false;
         }
         // Check if you already have a seat
@@ -1011,7 +1011,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           // switch to seat
           switchToSeat(index, oldIndex);
         } else {
-          console.log('===take seat', clickSeatItem, index);
+          zloginfo('===take seat', clickSeatItem, index);
           setModalVisible(true);
           stateData.current.modalVisible = true;
           setModalText(ZegoInnerText.takeSeatMenuDialogButton);
@@ -1043,12 +1043,12 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
               .setUsersInRoomAttributes('role', role.toString(), [userID])
               .then((data) => {
                 if (!data.code) {
-                  console.log('===setUsersInRoomAttributes success', data);
+                  zloginfo('===setUsersInRoomAttributes success', data);
                   updateLayout();
                   replaceBottomMenuBarButtons(hostButtons);
                   replaceBottomMenuBarExtendButtons(hostExtendButtons);
                 } else {
-                  console.log('===setUsersInRoomAttributes err', data);
+                  zloginfo('===setUsersInRoomAttributes err', data);
                   leaveSeat(takeSeatIndexWhenJoining);
                   // config.role = ZegoLiveAudioRoomRole.audience;
                   setRole(ZegoLiveAudioRoomRole.audience);
@@ -1077,7 +1077,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   };
   const leaveSeat = (index, removeUserID, realTimeRoomProperties) => {
     const temp = realTimeRoomProperties || roomProperties;
-    console.log(
+    zloginfo(
       '===leave seat',
       index,
       temp[index],
@@ -1098,7 +1098,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     return ZegoUIKit.getSignalingPlugin()
       .deleteRoomProperties([index.toString()], true)
       .then((data) => {
-        console.log('===deleteRoomProperties', data, role);
+        zloginfo('===deleteRoomProperties', data, role);
         if (!data.code) {
           if (role !== ZegoLiveAudioRoomRole.host) {
             // config.role = ZegoLiveAudioRoomRole.audience;
@@ -1117,7 +1117,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         }
       })
       .catch((err) => {
-        console.log('==deleteRoomProperties err', err);
+        zloginfo('==deleteRoomProperties err', err);
         if (role === ZegoLiveAudioRoomRole.host) {
           let temp = ZegoInnerText.removeSpeakerFailedToast;
           if (ZegoInnerText.removeSpeakerFailedToast.indexOf('%0') > -1) {
@@ -1147,23 +1147,23 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     ZegoUIKit.getSignalingPlugin()
       .deleteRoomProperties([oldIndex.toString()])
       .then((data) => {
-        console.log('===delete room properties success', data);
+        zloginfo('===delete room properties success', data);
       })
       .catch((err) => {
-        console.log('===delete room properties err', err);
+        zloginfo('===delete room properties err', err);
       });
     await ZegoUIKit.getSignalingPlugin()
       .endRoomPropertiesBatchOperation()
       .then((data) => {
-        console.log('===endRoomPropertiesBatchOperation data', data);
+        zloginfo('===endRoomPropertiesBatchOperation data', data);
         setIsRoomAttributesBatching(false);
         stateData.current.isRoomAttributesBatching = false;
         if (data.code) {
-          console.log('Switch seat failed: ');
+          zloginfo('Switch seat failed: ');
         }
       })
       .catch((err) => {
-        console.log('===end room properties err', err);
+        zloginfo('===end room properties err', err);
         setIsRoomAttributesBatching(false);
         stateData.current.isRoomAttributesBatching = false;
       });
@@ -1218,14 +1218,14 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       setModalVisible(false);
       stateData.current.modalVisible = false;
     }).catch(() => {
-      console.error('Mute failed', clickSeatItem.userID);
+      zlogerror('Mute failed', clickSeatItem.userID);
     });
   }
 
   const getSeatIndexByUserID = (userID, realTimeRoomProperties) => {
     const temp = realTimeRoomProperties || roomProperties;
     let index = -1;
-    console.log(
+    zloginfo(
       '===getSeatIndexByUserID',
       userID,
       temp,
@@ -1253,7 +1253,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
   const showDefaultLeaveDialog = () => {
     return new Promise((resolve, reject) => {
-      console.log('===confirmDialogInfo', confirmDialogInfo);
+      zloginfo('===confirmDialogInfo', confirmDialogInfo);
       if (!confirmDialogInfo.title) {
         resolve();
       } else {
@@ -1297,7 +1297,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   }
 
   const openOrCloseSeats = (seatLockStateMap) => {
-    console.log('===openOrCloseSeats', seatLockStateMap);
+    zloginfo('===openOrCloseSeats', seatLockStateMap);
     return ZegoUIKit.updateRoomProperties({ lockseats: seatLockStateMap }).then(() => {
       realTimeData.current.seatLockStateMap = seatLockStateMap;
       stateData.current.seatLockStateMap = seatLockStateMap;
@@ -1478,7 +1478,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       MinimizingHelper.getInstance().minimizeWindow();
     },
     leave: (showConfirmation = false) => {
-      console.log('showConfirmation', showConfirmation);
+      zloginfo('showConfirmation', showConfirmation);
       if (!showConfirmation) {
         ZegoUIKit.leaveRoom();
         typeof onLeave == 'function' && onLeave();
