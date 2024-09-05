@@ -8,9 +8,12 @@ import ZegoUIKitPrebuiltLiveAudioRoom, {
 } from '@zegocloud/zego-uikit-prebuilt-live-audio-room-rn';
 
 import backgroundImage from './resources/background.png';
+import CohostRequestList from './CohostRequestList';
 
 export default function HostPage(props) {
   const prebuiltRef = useRef();
+  const cohostRequestListRef = useRef();
+
   const {route} = props;
   const {params} = route;
   const {userID, userName, roomID, layoutType} = params;
@@ -186,6 +189,7 @@ export default function HostPage(props) {
   useEffect(() => {
     setShowBtn(false);
   }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.prebuiltContainer}>
@@ -220,6 +224,20 @@ export default function HostPage(props) {
               foregroundBuilder,
               avatarBuilder,
               // rowBackgroundBuilder,
+            },
+            emptyArea: () => {
+              return <CohostRequestList
+                ref={cohostRequestListRef}
+                acceptSeatTakingRequest={ (userID) => {
+                  prebuiltRef.current.acceptSeatTakingRequest(userID)
+                }}
+                rejectSeatTakingRequest={ (userID) => {
+                  prebuiltRef.current.rejectSeatTakingRequest(userID)
+                }}
+              />
+            },
+            onSeatTakingRequestListChange: (requestInfoList) => {
+              cohostRequestListRef.current.onSeatTakingRequestListChange(requestInfoList)
             },
             background,
             // onLeaveConfirmation: () => {
@@ -261,6 +279,9 @@ export default function HostPage(props) {
             },
             onSeatTakingInviteRejected: () => {
               console.log('[Demo]HostPage onSeatTakingInviteRejected ');
+            },
+            onSeatTakingRequestTimeout: (audience) => {
+              console.log('[Demo]HostPage onSeatTakingRequestTimeout ', audience);
             },
             // onMemberListMoreButtonPressed: (user) => {
             //   console.log('[Demo]HostPage onMemberListMoreButtonPressed ', user);

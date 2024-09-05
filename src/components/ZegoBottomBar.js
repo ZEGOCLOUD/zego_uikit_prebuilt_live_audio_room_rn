@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import {
   ZegoToggleMicrophoneButton,
@@ -13,7 +13,7 @@ import ZegoMemberButton from '../components/ZegoMemberButton';
 import ZegoCoHostControlButton from '../components/ZegoCoHostControlButton';
 import ZegoLockButton from '../components/ZegoLockButton';
 
-export default function ZegoBottomBar(props) {
+function ZegoBottomBar(props, ref) {
   const {
     menuBarButtonsMaxCount = 5,
     menuBarButtons = [],
@@ -37,7 +37,9 @@ export default function ZegoBottomBar(props) {
     memberConnectState,
     lockButtonOnPressed,
   } = props;
+
   const [isNormalStyle, setIsNormalStyle] = useState(true);
+  const [bottomBarTop, setBottomBarTop] = useState(0);
 
   const getButtonByButtonIndex = (buttonIndex, isFirstLevel) => {
     const buttonSize = isFirstLevel ? 36 : 48;
@@ -142,12 +144,24 @@ export default function ZegoBottomBar(props) {
     };
   };
 
+  const onBottomBarLayout = (event) => {
+    const { y } = event.nativeEvent.layout;
+    console.log(`bottom layout top: ${y}`)
+    setBottomBarTop(y);
+  };
+
+  useImperativeHandle(ref, () => ({
+    getTop: () => {
+      return bottomBarTop;
+    }
+  }))
+
   var allButtons = getDisplayButtons();
   var firstLevelButtons = allButtons['firstLevelButtons'];
   var secondLevelButtons = allButtons['secondLevelButtons'];
 
   return isNormalStyle ? (
-    <View style={styles.normalBar}>
+    <View style={styles.normalBar} onLayout={onBottomBarLayout}>
       {showInRoomMessageButton ? (
         <ZegoMessageButton
           onPress={() => {
@@ -192,6 +206,8 @@ export default function ZegoBottomBar(props) {
     </View>
   );
 }
+
+export default forwardRef(ZegoBottomBar);
 
 const styles = StyleSheet.create({
   messageButton: {

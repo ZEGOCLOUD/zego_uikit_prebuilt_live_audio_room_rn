@@ -13,6 +13,10 @@ export default class LiveAudioRoomHelper {
     _stateData = {};
     _notifyData = {};
     _cacheSeatIndex = -1;
+    
+    // When you are the host, this map records the request information for each audience who requests to be co-host.
+    _cohostRequestMap = new Map();
+
     constructor() { }
     static getInstance() {
         return this._instance || (this._instance = new LiveAudioRoomHelper());
@@ -49,5 +53,12 @@ export default class LiveAudioRoomHelper {
     }
     clearNotify() {
         this._notifyData = {};
+    }
+
+    getCohostRequestMap() {
+        return this._cohostRequestMap;
+    }
+    clearCohostRequestMap() {
+        this._cohostRequestMap = new Map();
     }
 }

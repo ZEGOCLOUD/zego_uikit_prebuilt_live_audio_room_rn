@@ -41,6 +41,8 @@ import {
   ZegoCoHostConnectState,
   ZegoLiveAudioRoomInvitationType,
   ZegoSeatsState,
+  ZegoLiveAudioRoomCohostRequestState,
+  ZegoLiveAudioRoomCohostRequestInfo,
 } from './services/defines';
 import LiveAudioRoomHelper from "./services/live_audio_room_helper"
 import { zloginfo, zlogerror } from './utils/logger';
@@ -52,6 +54,8 @@ export {
   ZegoMenuBarButtonName,
   ZegoUIKitPrebuiltLiveAudioRoomFloatingMinimizedView,
   ZegoLiveAudioRoomLayoutAlignment,
+  ZegoLiveAudioRoomCohostRequestState,
+  ZegoLiveAudioRoomCohostRequestInfo,
 };
 
 function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
@@ -105,6 +109,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     layoutConfig = {},
     hostSeatIndexes = [0],
     seatConfig = {},
+    emptyArea,
     background,
     avatar = '',
     userInRoomAttributes = { },
@@ -114,6 +119,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     onSeatTakingRequested,
     onSeatTakingRequestCanceled,
     onSeatTakingInviteRejected,
+    onSeatTakingRequestTimeout,
+    onSeatTakingRequestListChange,
     
     // Audience callback
     onSeatTakingRequestRejected,
@@ -248,6 +255,10 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
   // Red dot
   const [requestCoHostCount, setRequestCoHostCount] = useState(stateData.current.requestCoHostCount || 0);
 
+  // custom (example: request list)
+  const [customAreaHeight, setCustomAreaHeight] = useState(0);
+  const bottomBarRef = useRef();  // for calc custom height
+
   // The connection status of the current member
   const [memberConnectStateMap, setMemberConnectStateMap] = useState(stateData.current.memberConnectStateMap || {});
 
@@ -278,6 +289,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         zloginfo('[Prebuilt]onInvitationReceived', JSON.stringify(realTimeData.current), requestCoHostCount, type, userID, inviter);
         if (type === ZegoLiveAudioRoomInvitationType.requestCoHost && userID === realTimeData.current.hostID) {
           // The audience created a cohost request
+          zloginfo(`${inviter.id} requestCoHost`)
+
           realTimeData.current.requestCoHostCount += 1;
           !isPageInBackground() && setRequestCoHostCount(realTimeData.current.requestCoHostCount);
           stateData.current.requestCoHostCount = realTimeData.current.requestCoHostCount;
@@ -286,6 +299,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           // memberConnectStateMap = realTimeData.current.memberConnectStateMap;
           !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
+
+          updateCohostRequestMap(inviter.id, ZegoLiveAudioRoomCohostRequestState.requested, 'onInvitationReceived')
 
           setTimeout(() => {
             // The sorting will not be triggered if the member list pop-up is not reopened, the sorting must be forced
@@ -335,6 +350,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         }
       }, TAG);
       ZegoUIKit.getSignalingPlugin().onInvitationCanceled(callbackID, ({ callID, inviter, data }) => {
+        zloginfo(`${inviter.id} cancel requestCoHost`)
+
         if (userID === realTimeData.current.hostID) {
           // The audience canceled the cohost request
           realTimeData.current.requestCoHostCount && (realTimeData.current.requestCoHostCount -= 1);
@@ -345,10 +362,14 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
 
+          updateCohostRequestMap(inviter.id, ZegoLiveAudioRoomCohostRequestState.canceled, 'onInvitationCanceled')
+
           typeof onSeatTakingRequestCanceled === 'function' && onSeatTakingRequestCanceled(ZegoUIKit.getUser(inviter.id));
         }
       });
       ZegoUIKit.getSignalingPlugin().onInvitationTimeout(callbackID, ({ callID, inviter, data }) => {
+        zloginfo(`${inviter.id} requestCoHost timeout`)
+
         if (userID === realTimeData.current.hostID) {
           // The host did not process the cohost request, resulting in a timeout
           realTimeData.current.requestCoHostCount && (realTimeData.current.requestCoHostCount -= 1);
@@ -358,6 +379,10 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
           realTimeData.current.memberConnectStateMap[inviter.id] = ZegoCoHostConnectState.idle;
           !isPageInBackground() && setMemberConnectStateMap({ ...realTimeData.current.memberConnectStateMap });
           stateData.current.memberConnectStateMap = { ...realTimeData.current.memberConnectStateMap };
+
+          updateCohostRequestMap(inviter.id, ZegoLiveAudioRoomCohostRequestState.timeout, 'onInvitationTimeout')
+
+          typeof onSeatTakingRequestTimeout === 'function' && onSeatTakingRequestTimeout(ZegoUIKit.getUser(inviter.id));
         }
       });
       ZegoUIKit.getSignalingPlugin().onInvitationAccepted(callbackID, ({ callID, invitee, data }) => {
@@ -503,7 +528,10 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     stateData.current.memberConnectStateMap = { ...memberConnectStateMap };
     setRequestCoHostCount(temp);
     stateData.current.requestCoHostCount = temp;
+
+    updateCohostRequestMap(changedUserID, ZegoLiveAudioRoomCohostRequestState.rejected, coHostDisagreeHandle.name)
   }
+
   const coHostAgreeHandle = (changedUserID) => {
     // Just take the value in state, because there's no closure
     memberConnectStateMap[changedUserID] = ZegoCoHostConnectState.connected;
@@ -517,6 +545,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     setRequestCoHostCount(temp);
     stateData.current.requestCoHostCount = temp;
     zloginfo('coHostAgreeHandle #######', temp);
+
+    updateCohostRequestMap(changedUserID, ZegoLiveAudioRoomCohostRequestState.agreed, coHostAgreeHandle.name)
   }
   // Get free seat index 
   const getFreeSeatIndexList = (seatingAreaData) => {
@@ -635,7 +665,12 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         realTimeData.current.memberConnectStateMap = {};
         !isPageInBackground() && setRequestCoHostCount(0);
         stateData.current.requestCoHostCount = 0;
-        !isPageInBackground() && setMemberConnectStateMap({});
+        if (!isPageInBackground()) {
+          setMemberConnectStateMap({});
+          zloginfo('cohostRequestMap clear when Clear all connect state')
+          LiveAudioRoomHelper.getInstance().clearCohostRequestMap();
+          notifySeatTakingRequestListChange();
+        }
         stateData.current.memberConnectStateMap = {};
         // Hidden dialog
         setIsDialogVisableHandle(false);
@@ -820,6 +855,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
             // If it is a speaker, try to grab the mic
             // takeSeat(takeSeatIndexWhenJoining, true, false, false);
           }
+
+          notifySeatTakingRequestListChange();
         }
       });
   };
@@ -1359,6 +1396,45 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
     });
   }
 
+  const onCustomAreaLayout = (event) => {
+    const { y } = event.nativeEvent.layout;
+    let height = bottomBarRef.current.getTop() - (y + SEAT_CUSTOM_AREA_TOP)
+    setCustomAreaHeight(height);
+  };
+
+  const updateCohostRequestMap = (userID, state, from) => {
+    zloginfo(`update cohostRequestMap from: ${from}`);
+
+    // cohostRequestMap is a Map, but it is also a useState, so don't update it directly as a Map.
+    let tmpMap = LiveAudioRoomHelper.getInstance().getCohostRequestMap();
+    if (tmpMap.has(userID)) {
+      zloginfo(`cohostRequestMap update ${userID} state: ${state}`)
+      let reqInfo = tmpMap.get(userID);
+      reqInfo.updateState(state);
+    } else {
+      zloginfo(`cohostRequestMap add ${userID} state: ${state}`)
+      let reqInfo = new ZegoLiveAudioRoomCohostRequestInfo({
+        userID: userID,
+        userName: getUserName(userID), 
+        state: state
+      });
+      tmpMap.set(userID, reqInfo)
+    }
+    zloginfo(tmpMap);
+
+    notifySeatTakingRequestListChange();
+  }
+
+  const notifySeatTakingRequestListChange = () => {
+    let requestInfoList = [];   // ZegoLiveAudioRoomCohostRequestInfo
+    let tmpMap = LiveAudioRoomHelper.getInstance().getCohostRequestMap();
+    tmpMap.forEach((requestInfo, userID) => {
+      requestInfoList.push(requestInfo);
+    })
+    requestInfoList.sort((a, b) => b.timestamp - a.timestamp)
+    typeof onSeatTakingRequestListChange == 'function' && onSeatTakingRequestListChange(requestInfoList);
+  }
+
   useImperativeHandle(ref, () => ({
     applyToTakeSeat: (index = -1) => {
       // There are closures, status values cannot be used directly
@@ -1502,32 +1578,40 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
         onLeaveConfirmation={onLeaveConfirmingWrap}
       />
 
-      <View style={styles.seatingArea}>
-        {isInit ? (
-          <ZegoSeatingArea
-            role={role}
-            userID={userID}
-            rowSpacing={rowSpacing}
-            foregroundBuilder={foregroundBuilder}
-            seatIndex={
-              role !== ZegoLiveAudioRoomRole.audience
-                ? takeSeatIndexWhenJoining
-                : -1
-            }
-            onSeatItemClick={onSeatItemClick}
-            backgroundColor={backgroundColor}
-            backgroundImage={backgroundImage}
-            seatingAreaData={seatingAreaData}
-            showSoundWaveInAudioMode={showSoundWaveInAudioMode}
-            foregroundColor={foregroundColor}
-            avatarBuilder={avatarBuilder}
-            rowBackgroundBuilder={rowBackgroundBuilder}
-            openIcon={openIcon}
-            closeIcon={closeIcon}
-            isLocked={isLocked}
-            seatLockStateMap={seatLockStateMap}
-          />
-        ) : null}
+      <View style={styles.seatingAndCustomArea}      >
+        <View style={styles.seatingArea}>
+          {isInit ? (
+            <ZegoSeatingArea
+              role={role}
+              userID={userID}
+              rowSpacing={rowSpacing}
+              foregroundBuilder={foregroundBuilder}
+              seatIndex={
+                role !== ZegoLiveAudioRoomRole.audience
+                  ? takeSeatIndexWhenJoining
+                  : -1
+              }
+              onSeatItemClick={onSeatItemClick}
+              backgroundColor={backgroundColor}
+              backgroundImage={backgroundImage}
+              seatingAreaData={seatingAreaData}
+              showSoundWaveInAudioMode={showSoundWaveInAudioMode}
+              foregroundColor={foregroundColor}
+              avatarBuilder={avatarBuilder}
+              rowBackgroundBuilder={rowBackgroundBuilder}
+              openIcon={openIcon}
+              closeIcon={closeIcon}
+              isLocked={isLocked}
+              seatLockStateMap={seatLockStateMap}
+            />
+          ) : null}
+        </View>
+
+        <View style={[styles.customArea,
+                      {display: (emptyArea ? 'flex' : 'none'), height: customAreaHeight} ]}
+              onLayout={onCustomAreaLayout}>
+            <Delegate to={emptyArea} props={{ }} />
+        </View>
       </View>
 
       {isMemberListVisable ? (
@@ -1574,6 +1658,7 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
       }
       {Platform.OS != 'ios' && keyboardHeight > 0 ? null : (
         <ZegoBottomBar
+          ref={bottomBarRef}
           menuBarButtonsMaxCount={maxCount}
           menuBarButtons={menuBarButtons}
           menuBarExtendedButtons={menuBarExtendedButtons}
@@ -1741,6 +1826,8 @@ function ZegoUIKitPrebuiltLiveAudioRoom(props, ref) {
 
 export default forwardRef(ZegoUIKitPrebuiltLiveAudioRoom);
 
+const SEAT_CUSTOM_AREA_TOP = 125;
+
 const styles = StyleSheet.create({
   mask: {
     flex: 1,
@@ -1797,10 +1884,16 @@ const styles = StyleSheet.create({
     color: 'white',
     marginLeft: 3,
   },
-  seatingArea: {
+  seatingAndCustomArea: {
     zIndex: 3,
     position: 'absolute',
-    top: 125,
+    top: SEAT_CUSTOM_AREA_TOP,
+    width: '100%',
+  },
+  seatingArea: {
+    width: '100%',
+  },
+  customArea: {
     width: '100%',
   },
   memberListContainer: {

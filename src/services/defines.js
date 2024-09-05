@@ -13,6 +13,35 @@ class ZegoDialogInfo {
   }
 };
 
+const ZegoLiveAudioRoomCohostRequestState = {
+  unknown: 0,
+  requested: 1,
+  canceled: 2,
+  timeout: 3,
+  agreed: 4,
+  rejected: 5,
+};
+
+// audience request to become a co-host
+export class ZegoLiveAudioRoomCohostRequestInfo {
+  userID;     // operator, string
+  userName;   // string
+  state;      // ZegoLiveAudioRoomCohostRequestState
+  timestamp;  // timestamp when the state changed, read only, number
+
+  constructor({ userID, userName, state }) {
+    this.userID = userID;
+    this.userName = userName;
+    this.state = state;
+    this.timestamp = Date.now();
+  }
+
+  updateState(state) {
+    this.state = state;
+    this.timestamp = Date.now();
+  }
+}
+
 const ZegoLiveAudioRoomRole = {
   host: 0,
   speaker: 1,
@@ -129,4 +158,5 @@ export {
   ZegoCoHostConnectState,
   ZegoToastType,
   ZegoSeatsState,
+  ZegoLiveAudioRoomCohostRequestState,
 };
