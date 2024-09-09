@@ -4,12 +4,15 @@ import ZegoUIKit, {
 import { zloginfo } from '../utils/logger';
 import * as ZIM from 'zego-zim-react-native';
 
+import { getPackageVersion } from '../utils/package_version';
+
 let _ZIMKitPlugin = null;
 let _pluginConnectionState;
 const _callbackID = 'ZegoPrebuiltPlugins' + String(Math.floor(Math.random() * 10000));
 
 const _install = (plugins) => {
   ZegoUIKit.installPlugins(plugins);
+  ZegoUIKit.logComponentsVersion(new Map([['PrebuiltLiveAudioRoom', getPackageVersion()]]));
 
   plugins.forEach(plugin => {
     if (plugin.ZIMKit) {
