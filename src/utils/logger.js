@@ -1,13 +1,13 @@
-import ZegoUIKit from '@zegocloud/zego-uikit-rn';
+import {ZegoUIKitLogger} from '@zegocloud/zego-uikit-rn';
 
 export const zloginfo = (...msg) => {
-  ZegoUIKit.kitLogInfo('PrebuiltLiveAudioRoom', ...msg);
+  ZegoUIKitLogger.logInfo('PrebuiltLiveAudioRoom', ...msg);
 };
 
 export const zlogwarning = (...msg) => {
-  ZegoUIKit.kitLogWarning('PrebuiltLiveAudioRoom', ...msg);
+  ZegoUIKitLogger.logWarning('PrebuiltLiveAudioRoom', ...msg);
 };
 
 export const zlogerror = (...msg) => {
-  ZegoUIKit.kitLogError('PrebuiltLiveAudioRoom', ...msg);
+  ZegoUIKitLogger.logError('PrebuiltLiveAudioRoom', ...msg);
 };

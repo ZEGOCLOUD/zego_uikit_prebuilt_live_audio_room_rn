@@ -45,7 +45,7 @@
 		A40F771D9D8E41EA070A804C /* Pods-ZegoPrebuiltLiveAudioRoom-ZegoPrebuiltLiveAudioRoomTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZegoPrebuiltLiveAudioRoom-ZegoPrebuiltLiveAudioRoomTests.debug.xcconfig"; path = "Target Support Files/Pods-ZegoPrebuiltLiveAudioRoom-ZegoPrebuiltLiveAudioRoomTests/Pods-ZegoPrebuiltLiveAudioRoom-ZegoPrebuiltLiveAudioRoomTests.debug.xcconfig"; sourceTree = "<group>"; };
 		AB5E37CE6808BA19EC597554 /* libPods-ZegoPrebuiltLiveAudioRoom.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ZegoPrebuiltLiveAudioRoom.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4A3B54DA1C820F0CCB3FC43 /* Pods-ZegoPrebuiltLiveAudioRoom.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZegoPrebuiltLiveAudioRoom.debug.xcconfig"; path = "Target Support Files/Pods-ZegoPrebuiltLiveAudioRoom/Pods-ZegoPrebuiltLiveAudioRoom.debug.xcconfig"; sourceTree = "<group>"; };
-		C372EE1A45036DE14C93CE18 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = ZegoPrebuiltLiveAudioRoom/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C372EE1A45036DE14C93CE18 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = ZegoPrebuiltLiveAudioRoom/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		EBD6429B29487F5F009F285E /* bundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bundle; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -484,7 +484,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.8.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -519,7 +519,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.8.0;
+				MARKETING_VERSION = 2.8.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
